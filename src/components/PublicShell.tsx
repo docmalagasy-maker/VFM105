@@ -33,7 +33,7 @@ export default function PublicShell({
       <div className="pointer-events-none absolute right-6 top-6 hidden aspect-[3/4] w-[clamp(9rem,14vw,15rem)] overflow-hidden rounded-2xl shadow-2xl ring-2 ring-white/30 lg:block">
         <Image
           src="/images/responsable.jpg"
-          alt=""
+          alt="Responsable du projet VFM 105"
           fill
           sizes="15rem"
           className="object-cover"
