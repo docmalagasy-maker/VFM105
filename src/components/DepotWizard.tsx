@@ -4,6 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { validateTelephoneMadagascar } from "@/lib/validation";
 import type { AutreCoordonnee, PieceJointe, Responsable } from "@/lib/types";
+import PublicShell from "@/components/PublicShell";
+import {
+  IconPeople,
+  IconGear,
+  IconPhone,
+  IconDoc,
+  IconPaperclip,
+  IconSend,
+  IconLock,
+  IconMail,
+  IconUpload,
+} from "@/components/icons";
 
 const ACTIVITES = [
   "Agriculture",
@@ -216,13 +228,15 @@ export default function DepotWizard() {
   if (etape === "previsualisation") {
     const activite = form.activite === "Autre" ? form.activiteAutre : form.activite;
     return (
-      <div className="mx-auto w-full max-w-2xl px-4 py-10">
-        <h1 className="text-2xl font-semibold text-zinc-900">Récapitulatif de votre dossier</h1>
+      <PublicShell cardClassName="max-w-2xl">
+        <h1 className="text-xl font-bold text-vfm-marine sm:text-2xl">
+          Récapitulatif de votre dossier
+        </h1>
         <p className="mt-1 text-sm text-zinc-600">
           Vérifiez attentivement les informations avant de valider définitivement.
         </p>
 
-        <dl className="mt-8 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white">
+        <dl className="mt-6 divide-y divide-zinc-200 rounded-xl border border-zinc-200">
           <Ligne label="Association">{form.nomAssociation}</Ligne>
           <Ligne label="Adresse">{form.adresseAssociation}</Ligne>
           <Ligne label="Responsable principal">
@@ -264,7 +278,7 @@ export default function DepotWizard() {
         </dl>
 
         {erreurEnvoi && (
-          <p className="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">{erreurEnvoi}</p>
+          <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{erreurEnvoi}</p>
         )}
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -272,7 +286,7 @@ export default function DepotWizard() {
             type="button"
             onClick={() => setEtape("formulaire")}
             disabled={envoiEnCours}
-            className="flex-1 rounded-md border border-zinc-300 px-4 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+            className="flex-1 rounded-lg border border-zinc-300 px-4 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
           >
             Modifier mes renseignements
           </button>
@@ -280,24 +294,28 @@ export default function DepotWizard() {
             type="button"
             onClick={validerDefinitivement}
             disabled={envoiEnCours}
-            className="flex-1 rounded-md bg-zinc-900 px-4 py-3 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-vfm-marine px-4 py-3 text-sm font-medium text-white hover:bg-vfm-marine-dark disabled:opacity-50"
           >
+            <IconSend className="h-4 w-4" />
             {envoiEnCours ? "Envoi en cours..." : "Valider définitivement mon dossier"}
           </button>
         </div>
-      </div>
+      </PublicShell>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10">
-      <h1 className="text-2xl font-semibold text-zinc-900">Dépôt de dossier — VFM 105</h1>
-      <p className="mt-1 text-sm text-zinc-600">
-        Renseignez les informations de votre association, votre projet et vos coordonnées.
-      </p>
+    <PublicShell cardClassName="max-w-4xl">
+      <div className="text-center sm:text-left">
+        <h1 className="text-xl font-bold text-vfm-marine sm:text-2xl">VFM 105</h1>
+        <p className="mt-1 text-sm text-zinc-600">
+          Déposez en ligne le dossier de votre association auprès du VFM — district
+          d&apos;Ambohidratrimo.
+        </p>
+      </div>
 
       {erreurs.length > 0 && (
-        <div className="mt-6 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
           <ul className="list-inside list-disc">
             {erreurs.map((e, i) => (
               <li key={i}>{e}</li>
@@ -307,204 +325,254 @@ export default function DepotWizard() {
       )}
 
       <form
-        className="mt-6 flex flex-col gap-8"
         onSubmit={(e) => {
           e.preventDefault();
           passerAPrevisualisation();
         }}
       >
-        <Section titre="Informations sur l'association">
-          <Champ label="Nom de l'association" obligatoire>
-            <input
-              className="input"
-              value={form.nomAssociation}
-              onChange={(e) => setForm((f) => ({ ...f, nomAssociation: e.target.value }))}
-            />
-          </Champ>
-          <Champ label="Adresse de l'association" obligatoire>
-            <textarea
-              className="input"
-              rows={2}
-              value={form.adresseAssociation}
-              onChange={(e) => setForm((f) => ({ ...f, adresseAssociation: e.target.value }))}
-            />
-          </Champ>
-
-          <div className="flex flex-col gap-3">
-            <span className="text-sm font-medium text-zinc-700">Responsables</span>
-            {form.responsables.map((r, i) => (
-              <div key={i} className="flex gap-2">
+        <div className="mt-6 grid gap-x-10 gap-y-8 lg:grid-cols-2">
+          <div className="flex flex-col gap-8">
+            <Section titre="Informations sur l'association" icon={<IconPeople className="h-5 w-5" />}>
+              <Champ label="Nom de l'association" obligatoire>
                 <input
                   className="input"
-                  placeholder={i === 0 ? "Prénom (responsable principal)" : "Prénom"}
-                  value={r.prenom}
-                  onChange={(e) => majResponsable(i, "prenom", e.target.value)}
+                  placeholder="Ex : Jeunes pour le Développement"
+                  value={form.nomAssociation}
+                  onChange={(e) => setForm((f) => ({ ...f, nomAssociation: e.target.value }))}
                 />
-                <input
+              </Champ>
+              <Champ label="Adresse de l'association" obligatoire>
+                <textarea
                   className="input"
-                  placeholder={i === 0 ? "Nom (responsable principal)" : "Nom"}
-                  value={r.nom}
-                  onChange={(e) => majResponsable(i, "nom", e.target.value)}
+                  rows={2}
+                  placeholder="Adresse complète de l'association"
+                  value={form.adresseAssociation}
+                  onChange={(e) => setForm((f) => ({ ...f, adresseAssociation: e.target.value }))}
                 />
-                {i > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => retirerResponsable(i)}
-                    className="px-2 text-sm text-zinc-500 hover:text-red-600"
-                  >
-                    Retirer
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={ajouterResponsable}
-              className="self-start text-sm font-medium text-zinc-700 underline"
-            >
-              + Ajouter un responsable
-            </button>
-          </div>
+              </Champ>
 
-          <Champ label="Activité de l'association" obligatoire>
-            <select
-              className="input"
-              value={form.activite}
-              onChange={(e) => setForm((f) => ({ ...f, activite: e.target.value }))}
-            >
-              {ACTIVITES.map((a) => (
-                <option key={a} value={a}>
-                  {a}
-                </option>
-              ))}
-            </select>
-            {form.activite === "Autre" && (
-              <input
-                className="input mt-2"
-                placeholder="Précisez l'activité"
-                value={form.activiteAutre}
-                onChange={(e) => setForm((f) => ({ ...f, activiteAutre: e.target.value }))}
-              />
-            )}
-          </Champ>
-
-          <Champ label="Nombre de membres" obligatoire>
-            <input
-              className="input"
-              type="number"
-              min={1}
-              step={1}
-              value={form.nombreMembres}
-              onChange={(e) => setForm((f) => ({ ...f, nombreMembres: e.target.value }))}
-            />
-          </Champ>
-        </Section>
-
-        <Section titre="Coordonnées">
-          <Champ label="Numéro de téléphone" obligatoire>
-            <input
-              className="input"
-              placeholder="034 00 000 00"
-              value={form.telephone}
-              onChange={(e) => setForm((f) => ({ ...f, telephone: e.target.value }))}
-            />
-          </Champ>
-          <Champ label="Adresse e-mail">
-            <input
-              className="input"
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-            />
-          </Champ>
-
-          <div className="flex flex-col gap-3">
-            {form.autresCoordonnees.map((a, i) => (
-              <div key={i} className="flex gap-2">
-                <select
-                  className="input"
-                  value={a.type}
-                  onChange={(e) => majAutreCoordonnee(i, "type", e.target.value)}
-                >
-                  <option>WhatsApp</option>
-                  <option>Autre téléphone</option>
-                  <option>Adresse complémentaire</option>
-                  <option>Autre</option>
-                </select>
-                <input
-                  className="input"
-                  value={a.valeur}
-                  onChange={(e) => majAutreCoordonnee(i, "valeur", e.target.value)}
-                />
+              <div className="flex flex-col gap-3">
+                <span className="text-sm font-medium text-zinc-700">Responsables</span>
+                {form.responsables.map((r, i) => (
+                  <div key={i} className="flex gap-2">
+                    <input
+                      className="input"
+                      placeholder={i === 0 ? "Prénom (responsable principal)" : "Prénom"}
+                      value={r.prenom}
+                      onChange={(e) => majResponsable(i, "prenom", e.target.value)}
+                    />
+                    <input
+                      className="input"
+                      placeholder={i === 0 ? "Nom (responsable principal)" : "Nom"}
+                      value={r.nom}
+                      onChange={(e) => majResponsable(i, "nom", e.target.value)}
+                    />
+                    {i > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => retirerResponsable(i)}
+                        className="px-2 text-sm text-zinc-500 hover:text-red-600"
+                      >
+                        Retirer
+                      </button>
+                    )}
+                  </div>
+                ))}
                 <button
                   type="button"
-                  onClick={() => retirerAutreCoordonnee(i)}
-                  className="px-2 text-sm text-zinc-500 hover:text-red-600"
+                  onClick={ajouterResponsable}
+                  className="self-start text-sm font-medium text-vfm-marine underline"
                 >
-                  Retirer
+                  + Ajouter un responsable
                 </button>
               </div>
-            ))}
-            <button
-              type="button"
-              onClick={ajouterAutreCoordonnee}
-              className="self-start text-sm font-medium text-zinc-700 underline"
-            >
-              + Ajouter une autre coordonnée
-            </button>
+            </Section>
+
+            <Section titre="Activité et membres" icon={<IconGear className="h-5 w-5" />}>
+              <Champ label="Activité de l'association" obligatoire>
+                <select
+                  className="input"
+                  value={form.activite}
+                  onChange={(e) => setForm((f) => ({ ...f, activite: e.target.value }))}
+                >
+                  {ACTIVITES.map((a) => (
+                    <option key={a} value={a}>
+                      {a}
+                    </option>
+                  ))}
+                </select>
+                {form.activite === "Autre" && (
+                  <input
+                    className="input mt-2"
+                    placeholder="Précisez l'activité"
+                    value={form.activiteAutre}
+                    onChange={(e) => setForm((f) => ({ ...f, activiteAutre: e.target.value }))}
+                  />
+                )}
+              </Champ>
+
+              <Champ label="Nombre de membres" obligatoire>
+                <input
+                  className="input"
+                  type="number"
+                  min={1}
+                  step={1}
+                  placeholder="Ex : 50"
+                  value={form.nombreMembres}
+                  onChange={(e) => setForm((f) => ({ ...f, nombreMembres: e.target.value }))}
+                />
+              </Champ>
+            </Section>
           </div>
-        </Section>
 
-        <Section titre="Description de votre projet, de vos besoins ou de votre demande">
-          <textarea
-            className="input"
-            rows={8}
-            value={form.description}
-            onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-          />
-        </Section>
+          <div className="flex flex-col gap-8">
+            <Section titre="Coordonnées" icon={<IconPhone className="h-5 w-5" />}>
+              <Champ label="Numéro de téléphone" obligatoire>
+                <div className="relative">
+                  <IconPhone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                  <input
+                    className="input pl-10"
+                    placeholder="034 00 000 00"
+                    value={form.telephone}
+                    onChange={(e) => setForm((f) => ({ ...f, telephone: e.target.value }))}
+                  />
+                </div>
+              </Champ>
+              <Champ label="Adresse e-mail">
+                <div className="relative">
+                  <IconMail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                  <input
+                    className="input pl-10"
+                    type="email"
+                    placeholder="exemple@email.com"
+                    value={form.email}
+                    onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                  />
+                </div>
+              </Champ>
 
-        <Section titre="Pièces jointes">
-          <input
-            type="file"
-            multiple
-            onChange={(e) => ajouterFichiers(e.target.files)}
-            className="text-sm"
-          />
-          <p className="text-xs text-zinc-500">10 Mo maximum par fichier — PDF, Word, JPEG, PNG, WebP.</p>
-          {form.pieces.length > 0 && (
-            <ul className="mt-2 flex flex-col gap-1">
-              {form.pieces.map((p, i) => (
-                <li key={i} className="flex items-center justify-between rounded bg-zinc-50 px-3 py-2 text-sm">
-                  <span>{p.nom}</span>
-                  <button
-                    type="button"
-                    onClick={() => retirerPiece(i)}
-                    className="text-zinc-500 hover:text-red-600"
-                  >
-                    Supprimer
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Section>
+              <div className="flex flex-col gap-3">
+                {form.autresCoordonnees.map((a, i) => (
+                  <div key={i} className="flex gap-2">
+                    <select
+                      className="input"
+                      value={a.type}
+                      onChange={(e) => majAutreCoordonnee(i, "type", e.target.value)}
+                    >
+                      <option>WhatsApp</option>
+                      <option>Autre téléphone</option>
+                      <option>Adresse complémentaire</option>
+                      <option>Autre</option>
+                    </select>
+                    <input
+                      className="input"
+                      value={a.valeur}
+                      onChange={(e) => majAutreCoordonnee(i, "valeur", e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => retirerAutreCoordonnee(i)}
+                      className="px-2 text-sm text-zinc-500 hover:text-red-600"
+                    >
+                      Retirer
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={ajouterAutreCoordonnee}
+                  className="self-start text-sm font-medium text-vfm-marine underline"
+                >
+                  + Ajouter une autre coordonnée
+                </button>
+              </div>
+            </Section>
+
+            <Section titre="Votre projet" icon={<IconDoc className="h-5 w-5" />}>
+              <Champ label="Description de votre projet, de vos besoins ou de votre demande" obligatoire>
+                <textarea
+                  className="input"
+                  rows={6}
+                  placeholder="Décrivez ici votre projet, vos besoins ou toute autre information utile..."
+                  value={form.description}
+                  onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                />
+              </Champ>
+            </Section>
+
+            <Section titre="Pièces jointes" icon={<IconPaperclip className="h-5 w-5" />}>
+              <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-zinc-300 px-4 py-6 text-center hover:border-vfm-marine">
+                <IconUpload className="h-6 w-6 text-zinc-400" />
+                <span className="text-sm text-zinc-600">
+                  Sélectionnez un fichier ou glissez-déposez ici
+                </span>
+                <span className="text-xs text-zinc-400">
+                  10 Mo maximum par fichier — PDF, Word, JPEG, PNG, WebP.
+                </span>
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => ajouterFichiers(e.target.files)}
+                  className="hidden"
+                />
+              </label>
+              {form.pieces.length > 0 && (
+                <ul className="flex flex-col gap-1">
+                  {form.pieces.map((p, i) => (
+                    <li
+                      key={i}
+                      className="flex items-center justify-between rounded bg-zinc-50 px-3 py-2 text-sm"
+                    >
+                      <span className="truncate">{p.nom}</span>
+                      <button
+                        type="button"
+                        onClick={() => retirerPiece(i)}
+                        className="shrink-0 text-zinc-500 hover:text-red-600"
+                      >
+                        Supprimer
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Section>
+          </div>
+        </div>
 
         <button
           type="submit"
-          className="rounded-md bg-zinc-900 px-4 py-3 text-sm font-medium text-white hover:bg-zinc-800"
+          className="mt-8 flex w-full items-center justify-center gap-2 rounded-lg bg-vfm-marine px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-vfm-marine-dark"
         >
+          <IconSend className="h-4 w-4" />
           Enregistrer mon dossier
         </button>
+
+        <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-zinc-500">
+          <IconLock className="h-3.5 w-3.5" />
+          Vos informations sont sécurisées et traitées de manière confidentielle.
+        </p>
       </form>
-    </div>
+    </PublicShell>
   );
 }
 
-function Section({ titre, children }: { titre: string; children: React.ReactNode }) {
+function Section({
+  titre,
+  icon,
+  children,
+}: {
+  titre: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <fieldset className="flex flex-col gap-4">
-      <legend className="text-base font-semibold text-zinc-900">{titre}</legend>
+      <legend className="mb-1 flex items-center gap-2 text-base font-semibold text-vfm-marine">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-vfm-marine text-white">
+          {icon}
+        </span>
+        {titre}
+      </legend>
       {children}
     </fieldset>
   );

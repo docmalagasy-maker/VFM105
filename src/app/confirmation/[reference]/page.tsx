@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { obtenirDossierParReference } from "@/lib/repository";
+import PublicShell from "@/components/PublicShell";
 
 export default async function ConfirmationPage({
   params,
@@ -13,13 +14,15 @@ export default async function ConfirmationPage({
   if (!dossier) notFound();
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center px-4 py-16 text-center">
-      <div className="w-full rounded-lg border border-zinc-200 bg-white p-8">
-        <h1 className="text-xl font-semibold text-zinc-900">
+    <PublicShell cardClassName="max-w-xl">
+      <div className="text-center">
+        <h1 className="text-xl font-semibold text-vfm-marine sm:text-2xl">
           Votre dossier a bien été enregistré.
         </h1>
         <p className="mt-4 text-sm text-zinc-600">Référence</p>
-        <p className="text-2xl font-bold tracking-wide text-zinc-900">{dossier.reference}</p>
+        <p className="text-2xl font-bold tracking-wide text-vfm-marine sm:text-3xl">
+          {dossier.reference}
+        </p>
         <p className="mt-4 text-sm text-zinc-600">
           {dossier.statutSms === "envoye" &&
             `Un SMS de confirmation vous a été envoyé au numéro ${dossier.coordonnees.telephone}.`}
@@ -28,10 +31,13 @@ export default async function ConfirmationPage({
           {dossier.statutSms === "echoue" &&
             "Votre dossier est enregistré, mais le SMS de confirmation n'a pas pu être envoyé pour le moment."}
         </p>
+        <Link
+          href="/"
+          className="mt-8 inline-block text-sm font-medium text-vfm-marine underline"
+        >
+          Retour à l&apos;accueil
+        </Link>
       </div>
-      <Link href="/" className="mt-8 text-sm font-medium text-zinc-700 underline">
-        Retour à l&apos;accueil
-      </Link>
-    </div>
+    </PublicShell>
   );
 }
