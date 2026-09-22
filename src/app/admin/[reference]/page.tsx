@@ -44,7 +44,12 @@ export default async function DossierAdminPage({
             <ul className="list-inside list-disc">
               {dossier.pieces.map((p, i) => (
                 <li key={i}>
-                  <a href={p.url} target="_blank" rel="noreferrer" className="underline">
+                  <a
+                    href={`/api/admin/pieces/${p.pathname}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline"
+                  >
                     {p.nom}
                   </a>
                 </li>

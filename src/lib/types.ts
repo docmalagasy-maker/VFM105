@@ -20,7 +20,8 @@ export interface AutreCoordonnee {
 
 export interface PieceJointe {
   nom: string;
-  url: string;
+  /** Chemin interne dans le store Blob privé (pas une URL publique). */
+  pathname: string;
   taille: number;
   type: string;
 }

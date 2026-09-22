@@ -5,13 +5,14 @@ import { MAX_TAILLE_FICHIER, TYPES_FICHIERS_ACCEPTES } from "@/lib/validation";
 export interface UploadResultat {
   ok: boolean;
   erreur?: string;
-  piece?: { nom: string; url: string; taille: number; type: string };
+  piece?: { nom: string; pathname: string; taille: number; type: string };
 }
 
 /**
- * Stocke une pièce jointe sur Vercel Blob (espace sécurisé, accès par URL
- * signée le temps nécessaire). Nécessite la variable BLOB_READ_WRITE_TOKEN
- * (créée automatiquement en ajoutant le store "Blob" depuis Vercel Storage).
+ * Stocke une pièce jointe sur Vercel Blob en accès privé : le fichier n'est
+ * jamais accessible par une URL publique, uniquement via la route
+ * `/api/admin/pieces/...` (protégée par l'authentification admin) qui lit le
+ * blob côté serveur avec BLOB_READ_WRITE_TOKEN.
  */
 export async function uploaderPieceJointe(fichier: File): Promise<UploadResultat> {
   if (fichier.size > MAX_TAILLE_FICHIER) {
@@ -30,7 +31,7 @@ export async function uploaderPieceJointe(fichier: File): Promise<UploadResultat
   const nomSecurise = `${crypto.randomUUID()}-${fichier.name}`.replace(/[^\w.\-]/g, "_");
 
   const blob = await put(`dossiers/${nomSecurise}`, fichier, {
-    access: "public",
+    access: "private",
     addRandomSuffix: true,
   });
 
@@ -38,7 +39,7 @@ export async function uploaderPieceJointe(fichier: File): Promise<UploadResultat
     ok: true,
     piece: {
       nom: fichier.name,
-      url: blob.url,
+      pathname: blob.pathname,
       taille: fichier.size,
       type: fichier.type,
     },

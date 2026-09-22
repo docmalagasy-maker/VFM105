@@ -27,7 +27,7 @@ export const responsableSchema = z.object({
 
 export const pieceJointeSchema = z.object({
   nom: z.string().min(1),
-  url: z.string().url(),
+  pathname: z.string().min(1),
   taille: z.number().positive(),
   type: z.string().min(1),
 });
