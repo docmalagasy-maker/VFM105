@@ -37,7 +37,7 @@ Settings → Environment Variables), jamais commitées :
 |---|---|
 | `DATABASE_URL` | Base Postgres (dossiers, séquence de référence) |
 | `BLOB_READ_WRITE_TOKEN` | Stockage des pièces jointes (Vercel Storage → Blob) |
-| `SMS_GATEWAY_URL` / `SMS_GATEWAY_SECRET` | Passerelle SMS Android du responsable |
+| `SMS_GATEWAY_SECRET` | Secret partagé avec l'app Android (voir ci-dessous) |
 | `ADMIN_USER` / `ADMIN_PASSWORD` | Accès à `/admin` |
 
 ## Mettre en ligne une nouvelle version (GitHub Desktop → GitHub → Vercel)
@@ -58,7 +58,7 @@ programmeur.
    **Blob** (les variables `DATABASE_URL` et `BLOB_READ_WRITE_TOKEN` sont
    alors injectées automatiquement).
 4. Dans Vercel : *Settings → Environment Variables*, ajouter
-   `SMS_GATEWAY_URL`, `SMS_GATEWAY_SECRET`, `ADMIN_USER`, `ADMIN_PASSWORD`.
+   `SMS_GATEWAY_SECRET`, `ADMIN_USER`, `ADMIN_PASSWORD`.
 5. Exécuter `migrations/001_init.sql` sur la base Postgres créée (via
    l'interface Vercel/Neon, ou `psql "$DATABASE_URL" -f migrations/001_init.sql`).
 6. Redéployer (*Deployments → Redeploy*) pour que les nouvelles variables
@@ -73,9 +73,11 @@ programmeur.
 
 ## Ce qui reste à brancher avant une mise en production réelle
 
-- L'application Android « passerelle SMS » elle-même (spécification dans
+- Installer et configurer l'application Android « passerelle SMS » sur le
+  téléphone du responsable (projet complet et instructions dans
   [`android-sms-gateway/README.md`](android-sms-gateway/README.md)) — sans
-  elle, les dossiers sont enregistrés mais le SMS reste en statut « échoué ».
+  elle, les dossiers sont enregistrés mais le SMS reste en statut « à
+  envoyer » indéfiniment.
 - Un renforcement de l'authentification `/admin` (actuellement basique,
   suffisant en v1 mais à faire évoluer — plusieurs administrateurs, etc.,
   voir §26 du cahier des charges).

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { renvoyerSms } from "@/lib/repository";
+import { remettreSmsEnAttente } from "@/lib/repository";
 
 export async function POST(
   _request: NextRequest,
@@ -7,8 +7,8 @@ export async function POST(
 ) {
   const { reference } = await params;
   try {
-    const statutSms = await renvoyerSms(reference);
-    return NextResponse.json({ statutSms });
+    await remettreSmsEnAttente(reference);
+    return NextResponse.json({ statutSms: "a_envoyer" });
   } catch (err) {
     console.error("Erreur renvoi SMS", err);
     return NextResponse.json({ erreur: "Le renvoi du SMS a échoué." }, { status: 500 });

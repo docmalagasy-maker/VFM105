@@ -1,55 +1,80 @@
 # Passerelle SMS Android — VFM 105
 
-Ce dossier documente l'application Android à développer séparément (§13.2 et
-§22.2 du cahier des charges). Elle tourne sur le téléphone du responsable du
-projet et envoie les SMS de confirmation avec sa carte SIM.
+Application Android qui tourne sur le téléphone du responsable du projet et
+envoie les SMS de confirmation avec sa carte SIM (§13.2 et §22.2 du cahier
+des charges).
 
-Elle peut être livrée dans un dépôt GitHub séparé ; ce fichier fixe le contrat
-attendu avec le site web pour que les deux projets restent compatibles.
+Projet Android Studio complet dans ce dossier — ouvrir `android-sms-gateway/`
+directement dans Android Studio, ou compiler en ligne de commande :
 
-## Rôle
-
-1. Recevoir une requête HTTP signée depuis le serveur (Vercel).
-2. Vérifier la signature — aucun visiteur du site ne doit pouvoir déclencher
-   un envoi.
-3. Envoyer le SMS via `SmsManager` avec la carte SIM du téléphone.
-4. Répondre au serveur pour confirmer le succès ou l'échec.
-
-## Contrat HTTP attendu par le site
-
-Le site (`src/lib/sms.ts`) appelle, à chaque validation définitive de dossier :
-
-```
-POST <SMS_GATEWAY_URL>
-Content-Type: application/json
-X-Signature: HMAC-SHA256(corps, SMS_GATEWAY_SECRET) en hexadécimal
-
-{
-  "telephone": "+261340000000",
-  "message": "VFM 105 : Votre dossier a bien été reçu. Référence : VFM-105-2026-0001. Merci.",
-  "horodatage": 1735689600000
-}
+```bash
+./gradlew assembleDebug
 ```
 
-Réponse attendue :
+L'APK compilé se trouve ensuite dans `app/build/outputs/apk/debug/app-debug.apk`.
 
-- `200 OK` si le SMS a été transmis à l'API Android pour envoi ;
-- tout autre code → le site marque le dossier en statut SMS "échoué" et
-  conserve le dossier (voir §23 : un échec de SMS ne doit jamais faire perdre
-  le dossier).
+## Fonctionnement (sondage, pas de serveur sur le téléphone)
 
-`SMS_GATEWAY_SECRET` doit être un secret long et aléatoire, identique côté
-site (variable d'environnement Vercel) et côté application Android. Il ne
-doit jamais être commité en clair dans un dépôt.
+Le téléphone n'accepte **aucune connexion entrante** — il n'expose rien sur
+Internet, pas besoin de tunnel ni d'adresse fixe. À la place, l'application :
 
-## Pistes d'implémentation côté Android
+1. interroge le site toutes les 15 secondes (`GET /api/sms-gateway/pending`,
+   authentifié par un secret partagé) pour savoir si des SMS sont en attente ;
+2. envoie chaque SMS avec `SmsManager` (la carte SIM du téléphone) ;
+3. confirme le résultat au site (`POST /api/sms-gateway/report`).
 
-- Un petit serveur HTTP embarqué (ex. NanoHTTPD, ou Ktor) écoutant en local,
-  exposé à Internet via un tunnel sécurisé (ex. Cloudflare Tunnel, Tailscale
-  Funnel) pour éviter d'ouvrir un port sur le réseau mobile ;
-- ou, alternative plus simple à opérer : le téléphone interroge
-  périodiquement une file d'attente côté serveur (polling) au lieu de
-  recevoir un push — évite d'exposer le téléphone directement sur Internet.
+Un dossier reste enregistré même si le téléphone est éteint ou hors ligne —
+le SMS repart automatiquement dès que la passerelle se reconnecte (voir
+§23 du cahier des charges : un échec de SMS ne fait jamais perdre le dossier).
 
-Le choix exact revient au développeur de l'application Android, du moment
-que le contrat ci-dessus (signature HMAC, statuts de retour) est respecté.
+## Configuration
+
+Au premier lancement, dans l'application :
+
+- **Adresse du site** : `https://vfm-105.vercel.app` (ou le domaine définitif).
+- **Secret partagé** : doit être **identique** à la variable d'environnement
+  `SMS_GATEWAY_SECRET` configurée côté Vercel. À générer une seule fois
+  (chaîne aléatoire longue, ex. `openssl rand -hex 32`) et reporter la même
+  valeur des deux côtés.
+
+L'application demande ensuite l'autorisation d'envoyer des SMS (et
+d'afficher une notification permanente, obligatoire pour qu'Android laisse
+la passerelle tourner en arrière-plan) puis démarre.
+
+## Contrat HTTP avec le serveur
+
+### `GET /api/sms-gateway/pending`
+
+En-tête `X-Gateway-Secret: <secret>`. Réponse :
+
+```json
+{ "sms": [{ "reference": "VFM-105-2026-0001", "telephone": "+261340000000", "message": "VFM 105 : ..." }] }
+```
+
+### `POST /api/sms-gateway/report`
+
+En-tête `X-Gateway-Secret: <secret>`, corps :
+
+```json
+{ "reference": "VFM-105-2026-0001", "succes": true }
+```
+
+Les deux routes répondent `401` si le secret est absent ou incorrect, et
+`503` si `SMS_GATEWAY_SECRET` n'est pas configuré côté serveur.
+
+## Fiabilité
+
+- **Redémarrage automatique** : si le téléphone redémarre alors que la
+  passerelle était active, elle se relance seule (`BootReceiver`).
+- **Notification permanente** : requise par Android pour les services de
+  fond de longue durée ; affiche l'état du dernier sondage.
+- **Un seul SIM géré** : utilise la SIM par défaut du téléphone
+  (`SmsManager.getDefault()`). Pour un téléphone double SIM, s'assurer que
+  la SIM voulue est définie par défaut pour les SMS dans les réglages Android.
+
+## Sécurité
+
+Le secret (`SMS_GATEWAY_SECRET`) est la seule protection empêchant un tiers
+d'interroger ces routes et de savoir quels numéros reçoivent des SMS —
+à traiter comme un mot de passe : générer une valeur longue et aléatoire,
+ne jamais la commiter en clair, et la changer si elle a pu fuiter.

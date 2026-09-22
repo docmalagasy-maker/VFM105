@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">VFM 105 – Passerelle SMS</string>
+    <string name="label_server_url">Adresse du site</string>
+    <string name="label_secret">Secret partagé (SMS_GATEWAY_SECRET)</string>
+    <string name="button_start">Démarrer la passerelle</string>
+    <string name="button_stop">Arrêter la passerelle</string>
+    <string name="status_stopped">Passerelle arrêtée</string>
+    <string name="status_running">Passerelle active</string>
+    <string name="notification_channel_name">Passerelle SMS VFM 105</string>
+    <string name="notification_title">Passerelle SMS VFM 105 active</string>
+    <string name="permission_required">Autorisation SMS refusée : la passerelle ne peut pas fonctionner sans elle.</string>
+</resources>

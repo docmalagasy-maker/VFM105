@@ -43,7 +43,11 @@ export default function DossierActions({
     const reponse = await fetch(`/api/admin/dossiers/${reference}/resend-sms`, { method: "POST" });
     const json = await reponse.json();
     setEnCours(false);
-    setMessage(reponse.ok ? `SMS ${json.statutSms}.` : json.erreur ?? "Échec du renvoi.");
+    setMessage(
+      reponse.ok
+        ? "SMS remis en file d'attente, la passerelle Android l'enverra sous peu."
+        : (json.erreur ?? "Échec du renvoi.")
+    );
     router.refresh();
   }
 

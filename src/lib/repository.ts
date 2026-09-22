@@ -1,6 +1,5 @@
 import { getPool } from "@/lib/db";
 import { genererProchaineReference } from "@/lib/reference";
-import { messageConfirmation, envoyerSms } from "@/lib/sms";
 import type { Dossier, DossierInput, StatutDossier } from "@/lib/types";
 
 function ligneVersDossier(row: Record<string, unknown>): Dossier {
@@ -86,10 +85,11 @@ export async function creerDossier(input: DossierInput): Promise<{
 
   const dossier = ligneVersDossier(result.rows[0]);
 
-  const sms = await envoyerSms(dossier.coordonnees.telephone, messageConfirmation(reference));
-  await marquerStatutSms(reference, sms.succes ? "envoye" : "echoue");
-  dossier.statutSms = sms.succes ? "envoye" : "echoue";
-
+  // Le SMS n'est pas envoyé ici : il reste en statut "a_envoyer" et sera
+  // relevé par la passerelle Android au prochain sondage (voir
+  // /api/sms-gateway/pending). Découplé pour ne jamais bloquer ni faire
+  // échouer l'enregistrement du dossier à cause d'un problème réseau côté
+  // téléphone (§23 du cahier des charges).
   return { dossier, creeMaintenant: true };
 }
 
@@ -104,13 +104,31 @@ export async function marquerStatutSms(
   );
 }
 
-export async function renvoyerSms(reference: string): Promise<Dossier["statutSms"]> {
+/**
+ * Remet le SMS en file d'attente : la passerelle Android le relèvera à son
+ * prochain sondage. Utilisé pour le renvoi manuel depuis l'administration.
+ */
+export async function remettreSmsEnAttente(reference: string): Promise<void> {
   const dossier = await obtenirDossierParReference(reference);
   if (!dossier) throw new Error("Dossier introuvable.");
-  const sms = await envoyerSms(dossier.coordonnees.telephone, messageConfirmation(reference));
-  const statut = sms.succes ? "envoye" : "echoue";
-  await marquerStatutSms(reference, statut);
-  return statut;
+  await marquerStatutSms(reference, "a_envoyer");
+}
+
+export interface SmsEnAttente {
+  reference: string;
+  telephone: string;
+}
+
+export async function listerSmsEnAttente(limite = 20): Promise<SmsEnAttente[]> {
+  const pool = getPool();
+  const result = await pool.query<{ reference: string; telephone: string }>(
+    `SELECT reference, telephone FROM dossiers
+     WHERE statut_sms = 'a_envoyer'
+     ORDER BY date_depot ASC
+     LIMIT $1`,
+    [limite]
+  );
+  return result.rows;
 }
 
 export async function obtenirDossierParReference(reference: string): Promise<Dossier | null> {
