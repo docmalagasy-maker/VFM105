@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { uploaderPieceJointe } from "@/lib/blob";
+import { uploaderPieceJointe } from "@/lib/stockage";
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();

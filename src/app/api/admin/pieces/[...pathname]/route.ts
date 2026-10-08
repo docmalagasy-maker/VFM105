@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { get } from "@vercel/blob";
+import path from "node:path";
+import { lirePieceJointe } from "@/lib/stockage";
 
 /**
- * Sert une pièce jointe depuis le store Blob privé. Protégé par le proxy
- * d'authentification admin (voir src/proxy.ts, matcher "/api/admin/:path*") :
- * aucun visiteur du site ne peut atteindre cette route sans identifiants.
+ * Sert une pièce jointe depuis le stockage disque du serveur. Protégé par le
+ * proxy d'authentification admin (voir src/proxy.ts, matcher
+ * "/api/admin/:path*") : aucun visiteur du site ne peut atteindre cette route
+ * sans identifiants.
  */
 export async function GET(
   _request: NextRequest,
@@ -13,15 +15,16 @@ export async function GET(
   const { pathname } = await params;
   const chemin = pathname.join("/");
 
-  const resultat = await get(chemin, { access: "private" });
-  if (!resultat || resultat.statusCode !== 200) {
+  const resultat = await lirePieceJointe(chemin);
+  if (!resultat) {
     return NextResponse.json({ erreur: "Pièce jointe introuvable." }, { status: 404 });
   }
 
-  return new NextResponse(resultat.stream, {
+  return new NextResponse(new Uint8Array(resultat.contenu), {
     headers: {
-      "Content-Type": resultat.blob.contentType,
-      "Content-Disposition": resultat.blob.contentDisposition,
+      "Content-Type": resultat.type,
+      "Content-Disposition": `inline; filename="${path.basename(chemin)}"`,
+      "X-Content-Type-Options": "nosniff",
     },
   });
 }
