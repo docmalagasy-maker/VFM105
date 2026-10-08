@@ -12,7 +12,8 @@ SMS de confirmation.**
 
 - [Next.js 16](https://nextjs.org/) (App Router) + React 19 + Tailwind CSS 4
 - Postgres (via `DATABASE_URL`) pour les dossiers et le compteur de référence
-- [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) pour les pièces jointes
+- Stockage disque du serveur pour les pièces jointes (`UPLOAD_DIR`, volume persistant)
+- Hébergement : VPS avec Coolify (image Docker, voir [`Dockerfile`](Dockerfile))
 - Passerelle SMS Android séparée (voir [`android-sms-gateway/README.md`](android-sms-gateway/README.md))
 
 ## Développement local
@@ -30,46 +31,42 @@ ou de développement) et appliquez `migrations/001_init.sql`.
 
 ## Variables d'environnement
 
-Voir [`.env.example`](.env.example). À définir dans Vercel (Project
-Settings → Environment Variables), jamais commitées :
+Voir [`.env.example`](.env.example). À définir dans Coolify (application →
+*Environment Variables*), jamais commitées :
 
 | Variable | Rôle |
 |---|---|
 | `DATABASE_URL` | Base Postgres (dossiers, séquence de référence) |
-| `BLOB_READ_WRITE_TOKEN` | Stockage des pièces jointes (Vercel Storage → Blob) |
+| `UPLOAD_DIR` | Dossier des pièces jointes (fixé à `/app/data/uploads` par le `Dockerfile`) |
+| `DATABASE_SSL` | `true` seulement pour une base externe exigeant SSL (désactivé par défaut) |
 | `SMS_GATEWAY_SECRET` | Secret partagé avec l'app Android (voir ci-dessous) |
 | `ADMIN_USER` / `ADMIN_PASSWORD` | Accès à `/admin` |
 
-## Mettre en ligne une nouvelle version (GitHub Desktop → GitHub → Vercel)
+## Mettre en ligne une nouvelle version (GitHub Desktop → GitHub → Coolify)
 
-Ce projet suit le flux imposé au §22 du cahier des charges : aucune plateforme
-de déploiement alternative, aucune dépendance à un compte personnel du
-programmeur.
+Le site est hébergé sur un VPS géré par [Coolify](https://coolify.io/),
+relié au dépôt GitHub `docmalagasy-maker/VFM105` (branche `master`).
+Adresse publique : **https://vfm.0550.site**.
 
-**Première mise en ligne :**
-
-1. Dans **GitHub Desktop** : *File → Add Local Repository* et choisir ce
-   dossier (`D:\PROJETS\VFM105`), puis *Publish repository* (nom suggéré :
-   `vfm-105`) sur le compte GitHub du responsable du projet.
-2. Sur [vercel.com](https://vercel.com) : *Add New → Project*, importer le
-   dépôt `vfm-105` qui vient d'être publié. Vercel détecte automatiquement
-   Next.js.
-3. Dans Vercel : *Storage* → ajouter un store **Postgres** et un store
-   **Blob** (les variables `DATABASE_URL` et `BLOB_READ_WRITE_TOKEN` sont
-   alors injectées automatiquement).
-4. Dans Vercel : *Settings → Environment Variables*, ajouter
-   `SMS_GATEWAY_SECRET`, `ADMIN_USER`, `ADMIN_PASSWORD`.
-5. Exécuter `migrations/001_init.sql` sur la base Postgres créée (via
-   l'interface Vercel/Neon, ou `psql "$DATABASE_URL" -f migrations/001_init.sql`).
-6. Redéployer (*Deployments → Redeploy*) pour que les nouvelles variables
-   soient prises en compte.
-
-**Mises à jour suivantes :**
+**Mises à jour :**
 
 1. Modifier le code localement, tester avec `npm run dev`.
 2. Dans GitHub Desktop : vérifier les changements, écrire un message de
-   commit, *Commit to main*, puis *Push origin*.
-3. Vercel déploie automatiquement la nouvelle version à réception du push.
+   commit, *Commit to master*, puis *Push origin*.
+3. Coolify reçoit le push et reconstruit automatiquement le site (2 à
+   3 minutes). Suivi dans Coolify → application → *Deployments*.
+
+**Configuration Coolify (pour mémoire, déjà en place) :**
+
+- Application : build **Dockerfile**, port **3000**, domaine
+  `https://vfm.0550.site` (certificat HTTPS automatique).
+- Volume persistant monté sur `/app/data/uploads` (pièces jointes).
+- Base **PostgreSQL** dans le même projet, initialisée par
+  `migrations/001_init.sql` (script d'initialisation Coolify). Une future
+  migration SQL s'exécute depuis l'onglet *Terminal* de la base
+  (`psql -U postgres`).
+- Le site doit être servi en **HTTPS** : le bouton de validation utilise
+  `crypto.randomUUID()`, indisponible sur une page HTTP.
 
 ## Ce qui reste à brancher avant une mise en production réelle
 

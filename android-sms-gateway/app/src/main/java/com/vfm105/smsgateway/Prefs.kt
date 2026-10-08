@@ -8,7 +8,7 @@ object Prefs {
     private const val CLE_URL = "server_url"
     private const val CLE_SECRET = "secret"
     private const val CLE_ACTIF = "actif"
-    private const val URL_PAR_DEFAUT = "https://vfm-105.vercel.app"
+    private const val URL_PAR_DEFAUT = "https://vfm.0550.site"
 
     fun sauvegarder(context: Context, url: String, secret: String) {
         prefs(context).edit()

@@ -31,9 +31,9 @@ le SMS repart automatiquement dès que la passerelle se reconnecte (voir
 
 Au premier lancement, dans l'application :
 
-- **Adresse du site** : `https://vfm-105.vercel.app` (ou le domaine définitif).
+- **Adresse du site** : `https://vfm.0550.site`.
 - **Secret partagé** : doit être **identique** à la variable d'environnement
-  `SMS_GATEWAY_SECRET` configurée côté Vercel. À générer une seule fois
+  `SMS_GATEWAY_SECRET` configurée dans Coolify (variables d'environnement de l'application). À générer une seule fois
   (chaîne aléatoire longue, ex. `openssl rand -hex 32`) et reporter la même
   valeur des deux côtés.
 
