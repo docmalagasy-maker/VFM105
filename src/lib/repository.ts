@@ -1,5 +1,6 @@
 import { getPool } from "@/lib/db";
 import { genererProchaineReference } from "@/lib/reference";
+import { supprimerPieceJointe } from "@/lib/stockage";
 import type { Dossier, DossierInput, StatutDossier } from "@/lib/types";
 
 function ligneVersDossier(row: Record<string, unknown>): Dossier {
@@ -177,6 +178,34 @@ export async function listerDossiers(recherche?: string): Promise<Dossier[]> {
     `SELECT * FROM dossiers ORDER BY date_depot DESC LIMIT 200`
   );
   return result.rows.map(ligneVersDossier);
+}
+
+/**
+ * Supprime définitivement un dossier et ses pièces jointes sur le disque.
+ * Une pièce encore citée par un autre dossier est conservée (le chemin est
+ * fourni par le navigateur au dépôt, il pourrait pointer vers le fichier
+ * d'un autre dossier). Retourne false si le dossier n'existe pas.
+ */
+export async function supprimerDossier(reference: string): Promise<boolean> {
+  const pool = getPool();
+  const result = await pool.query<{ pieces: Dossier["pieces"] }>(
+    `DELETE FROM dossiers WHERE reference = $1 RETURNING pieces`,
+    [reference]
+  );
+  if (result.rows.length === 0) return false;
+
+  for (const piece of result.rows[0].pieces ?? []) {
+    const encoreUtilisee = await pool.query(
+      `SELECT 1 FROM dossiers WHERE pieces @> $1::jsonb LIMIT 1`,
+      [JSON.stringify([{ pathname: piece.pathname }])]
+    );
+    if (encoreUtilisee.rows.length === 0) {
+      await supprimerPieceJointe(piece.pathname).catch((err) =>
+        console.error("Suppression pièce jointe impossible", piece.pathname, err)
+      );
+    }
+  }
+  return true;
 }
 
 export async function changerStatutDossier(

@@ -1,7 +1,7 @@
 import { getPool } from "@/lib/db";
 
 /**
- * Génère la prochaine référence VFM-105-AAAA-NNNN de façon atomique
+ * Génère la prochaine référence VFM-AAAA-NNNN de façon atomique
  * (UPDATE ... RETURNING sous verrou ligne Postgres : aucune collision possible
  * même avec des validations simultanées).
  */
@@ -17,5 +17,5 @@ export async function genererProchaineReference(annee: number): Promise<string> 
   );
   const numero = result.rows[0].dernier_numero;
   const numeroFormate = String(numero).padStart(4, "0");
-  return `VFM-105-${annee}-${numeroFormate}`;
+  return `VFM-${annee}-${numeroFormate}`;
 }

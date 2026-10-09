@@ -17,7 +17,8 @@ export default async function ConfirmationPage({
     <PublicShell cardClassName="max-w-xl">
       <div className="text-center">
         <h1 className="text-xl font-semibold text-vfm-marine sm:text-2xl">
-          Misaotra anao ny VFM Ambohidratrimo
+          {/* Dossiers déposés avant l'ajout du district : « VFM » seul */}
+          Misaotra anao ny VFM{dossier.association.district ? ` ${dossier.association.district}` : ""}
         </h1>
         <p className="mt-2 text-sm text-zinc-600">
           Voaray ny momba anao sy ny fikambananao.

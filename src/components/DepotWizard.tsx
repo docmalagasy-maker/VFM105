@@ -18,16 +18,18 @@ import {
   IconUpload,
 } from "@/components/icons";
 
+const AUTRE = "Hafa";
+
 const ACTIVITES = [
-  "Agriculture",
-  "Jeunesse",
-  "Sport",
-  "Environnement",
-  "Culture",
-  "Aide sociale",
-  "Développement local",
-  "Formation",
-  "Autre",
+  "Fambolena sy fiompiana",
+  "Tanora",
+  "Fanatanjahantena",
+  "Tontolo iainana",
+  "Kolontsaina",
+  "Asa sosialy",
+  "Fampandrosoana ifotony",
+  "Fiofanana",
+  AUTRE,
 ];
 
 interface FormState {
@@ -67,7 +69,9 @@ function chargerBrouillon(): FormState {
   try {
     const brut = window.localStorage.getItem(CLE_LOCALSTORAGE);
     if (!brut) return ETAT_INITIAL;
-    return { ...ETAT_INITIAL, ...JSON.parse(brut) };
+    const brouillon: FormState = { ...ETAT_INITIAL, ...JSON.parse(brut) };
+    if (!ACTIVITES.includes(brouillon.activite)) brouillon.activite = ETAT_INITIAL.activite;
+    return brouillon;
   } catch {
     return ETAT_INITIAL;
   }
@@ -137,12 +141,12 @@ export default function DepotWizard() {
         const reponse = await fetch("/api/upload", { method: "POST", body: donnees });
         const json = await reponse.json();
         if (!reponse.ok) {
-          setErreurs((e) => [...e, json.erreur ?? `Échec de l'ajout de ${fichier.name}.`]);
+          setErreurs((e) => [...e, json.erreur ?? `Tsy tafiditra ny rakitra ${fichier.name}.`]);
           continue;
         }
         setForm((f) => ({ ...f, pieces: [...f.pieces, json.piece] }));
       } catch {
-        setErreurs((e) => [...e, `Échec de l'ajout de ${fichier.name}.`]);
+        setErreurs((e) => [...e, `Tsy tafiditra ny rakitra ${fichier.name}.`]);
       }
     }
   }
@@ -153,25 +157,25 @@ export default function DepotWizard() {
 
   function valider(): boolean {
     const problemes: string[] = [];
-    if (!form.nomAssociation.trim()) problemes.push("Veuillez renseigner le nom de l'association.");
-    if (!form.adresseAssociation.trim()) problemes.push("Veuillez renseigner l'adresse de l'association.");
-    if (!form.district) problemes.push("Veuillez choisir le district de l'association.");
+    if (!form.nomAssociation.trim()) problemes.push("Soraty ny anaran'ny fikambanana.");
+    if (!form.adresseAssociation.trim()) problemes.push("Soraty ny adiresin'ny fikambanana.");
+    if (!form.district) problemes.push("Safidio ny distrikan'ny fikambanana.");
     const principal = form.responsables[0];
     if (!principal?.nom.trim() || !principal?.prenom.trim()) {
-      problemes.push("Veuillez renseigner le responsable principal.");
+      problemes.push("Soraty ny anarana sy ny fanampin'anaran'ny tompon'andraikitra voalohany.");
     }
     const membres = Number(form.nombreMembres);
     if (!form.nombreMembres || !Number.isInteger(membres) || membres <= 0) {
-      problemes.push("Le nombre de membres doit être un nombre entier positif.");
+      problemes.push("Isa feno mihoatra ny aotra no atao amin'ny isan'ny mpikambana.");
     }
     if (!validateTelephoneMadagascar(form.telephone).valide) {
-      problemes.push("Le numéro de téléphone semble incorrect.");
+      problemes.push("Toa diso ny laharana finday.");
     }
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      problemes.push("L'adresse e-mail semble incorrecte.");
+      problemes.push("Toa diso ny adiresy mailaka.");
     }
     if (!form.description.trim()) {
-      problemes.push("Veuillez décrire votre projet, vos besoins ou votre demande.");
+      problemes.push("Hazavao ny tetikasanao, ny filanao na ny fangatahanao.");
     }
     setErreurs(problemes);
     return problemes.length === 0;
@@ -189,7 +193,7 @@ export default function DepotWizard() {
     setEnvoiEnCours(true);
     setErreurEnvoi(null);
 
-    const activite = form.activite === "Autre" ? form.activiteAutre.trim() : form.activite;
+    const activite = form.activite === AUTRE ? form.activiteAutre.trim() : form.activite;
 
     try {
       const reponse = await fetch("/api/dossiers", {
@@ -217,7 +221,7 @@ export default function DepotWizard() {
 
       const json = await reponse.json();
       if (!reponse.ok) {
-        setErreurEnvoi(json.erreur ?? "Votre dossier n'a pas pu être envoyé. Veuillez réessayer.");
+        setErreurEnvoi(json.erreur ?? "Tsy lasa ny antontan-taratasinao. Andramo indray azafady.");
         setEnvoiEnCours(false);
         return;
       }
@@ -225,54 +229,54 @@ export default function DepotWizard() {
       window.localStorage.removeItem(CLE_LOCALSTORAGE);
       router.push(`/confirmation/${json.dossier.reference}`);
     } catch {
-      setErreurEnvoi("Votre dossier n'a pas pu être envoyé. Veuillez réessayer.");
+      setErreurEnvoi("Tsy lasa ny antontan-taratasinao. Andramo indray azafady.");
       setEnvoiEnCours(false);
     }
   }
 
   if (etape === "previsualisation") {
-    const activite = form.activite === "Autre" ? form.activiteAutre : form.activite;
+    const activite = form.activite === AUTRE ? form.activiteAutre : form.activite;
     return (
       <PublicShell cardClassName="max-w-2xl">
         <h1 className="text-xl font-bold text-vfm-marine sm:text-2xl">
-          Récapitulatif de votre dossier
+          Famintinana ny antontan-taratasinao
         </h1>
         <p className="mt-1 text-sm text-zinc-600">
-          Vérifiez attentivement les informations avant de valider définitivement.
+          Hamarino tsara ireo mombamomba ireo alohan&apos;ny handefasana azy farany.
         </p>
 
         <dl className="mt-6 divide-y divide-vfm-beige-bord rounded-2xl border border-vfm-beige-bord bg-vfm-beige-clair">
-          <Ligne label="Association">{form.nomAssociation}</Ligne>
-          <Ligne label="Adresse">{form.adresseAssociation}</Ligne>
-          <Ligne label="District">{form.district}</Ligne>
-          <Ligne label="Responsable principal">
+          <Ligne label="Fikambanana">{form.nomAssociation}</Ligne>
+          <Ligne label="Adiresy">{form.adresseAssociation}</Ligne>
+          <Ligne label="Distrika">{form.district}</Ligne>
+          <Ligne label="Tompon'andraikitra voalohany">
             {form.responsables[0]?.prenom} {form.responsables[0]?.nom}
           </Ligne>
           {form.responsables.slice(1).map((r, i) =>
             r.nom || r.prenom ? (
-              <Ligne key={i} label={`Responsable ${i + 2}`}>
+              <Ligne key={i} label={`Tompon'andraikitra faha-${i + 2}`}>
                 {r.prenom} {r.nom}
               </Ligne>
             ) : null
           )}
-          <Ligne label="Activité">{activite}</Ligne>
-          <Ligne label="Nombre de membres">{form.nombreMembres}</Ligne>
-          <Ligne label="Téléphone">{form.telephone}</Ligne>
-          {form.email && <Ligne label="E-mail">{form.email}</Ligne>}
+          <Ligne label="Asa">{activite}</Ligne>
+          <Ligne label="Isan'ny mpikambana">{form.nombreMembres}</Ligne>
+          <Ligne label="Finday">{form.telephone}</Ligne>
+          {form.email && <Ligne label="Mailaka">{form.email}</Ligne>}
           {form.autresCoordonnees.filter((a) => a.valeur).length > 0 && (
-            <Ligne label="Autres coordonnées">
+            <Ligne label="Fifandraisana hafa">
               {form.autresCoordonnees
                 .filter((a) => a.valeur)
                 .map((a) => `${a.type} : ${a.valeur}`)
                 .join(" · ")}
             </Ligne>
           )}
-          <Ligne label="Description du projet">
+          <Ligne label="Ny tetikasa">
             <span className="whitespace-pre-wrap">{form.description}</span>
           </Ligne>
-          <Ligne label="Pièces jointes">
+          <Ligne label="Antontan-taratasy miaraka">
             {form.pieces.length === 0 ? (
-              "Aucune"
+              "Tsy misy"
             ) : (
               <ul className="list-inside list-disc">
                 {form.pieces.map((p, i) => (
@@ -294,7 +298,7 @@ export default function DepotWizard() {
             disabled={envoiEnCours}
             className="flex-1 rounded-2xl border border-vfm-beige-bord px-4 py-3.5 text-sm font-medium text-zinc-700 hover:bg-vfm-beige-clair disabled:opacity-50"
           >
-            Modifier mes renseignements
+            Hanova ny mombamomba
           </button>
           <button
             type="button"
@@ -303,7 +307,7 @@ export default function DepotWizard() {
             className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-vfm-vert px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-vfm-vert/25 hover:bg-vfm-vert-dark disabled:opacity-50"
           >
             <IconSend className="h-4 w-4" />
-            {envoiEnCours ? "Envoi en cours..." : "Valider définitivement mon dossier"}
+            {envoiEnCours ? "Eo am-pandefasana..." : "Handefa farany ny antontan-taratasiko"}
           </button>
         </div>
       </PublicShell>
@@ -314,19 +318,18 @@ export default function DepotWizard() {
     <PublicShell cardClassName="max-w-5xl">
       <div className="flex flex-col items-center gap-3 text-center">
         <span className="rounded-full bg-vfm-vert/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-vfm-vert-dark">
-          Dépôt de dossier en ligne
+          Fametrahana an-tserasera
         </span>
-        <h1 className="text-2xl font-bold text-vfm-marine sm:text-3xl">VFM 105</h1>
+        <h1 className="text-2xl font-bold text-vfm-marine sm:text-3xl">VFM</h1>
         <p className="max-w-xl text-sm text-zinc-600 sm:text-base">
-          Déposez en ligne le dossier de votre association auprès du VFM — district
-          d&apos;Ambohidratrimo. Les champs marqués <span className="text-vfm-rouge">*</span> sont
-          obligatoires.
+          Apetraho an-tserasera eo amin&apos;ny VFM ny antontan-taratasin&apos;ny fikambananao.
+          Tsy maintsy fenoina ireo saha misy marika <span className="text-vfm-rouge">*</span>.
         </p>
       </div>
 
       {erreurs.length > 0 && (
         <div className="mt-8 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
-          <p className="mb-1 font-semibold">Merci de corriger les points suivants :</p>
+          <p className="mb-1 font-semibold">Azafady, ahitsio ireto manaraka ireto :</p>
           <ul className="list-inside list-disc space-y-0.5">
             {erreurs.map((e, i) => (
               <li key={i}>{e}</li>
@@ -345,38 +348,38 @@ export default function DepotWizard() {
           <div className="flex flex-col gap-6">
             <Section
               numero={1}
-              titre="L'association"
-              sousTitre="Identité, adresse et responsables"
+              titre="Ny fikambanana"
+              sousTitre="Anarana, adiresy ary tompon'andraikitra"
               icon={<IconPeople className="h-5 w-5" />}
             >
-              <Champ label="Nom de l'association" obligatoire>
+              <Champ label="Anaran'ny fikambanana" obligatoire>
                 <input
                   className="input"
-                  placeholder="Ex : Jeunes pour le Développement"
+                  placeholder="Ohatra : Tanora ho an'ny Fampandrosoana"
                   value={form.nomAssociation}
                   onChange={(e) => setForm((f) => ({ ...f, nomAssociation: e.target.value }))}
                 />
               </Champ>
-              <Champ label="Adresse de l'association" obligatoire>
+              <Champ label="Adiresin'ny fikambanana" obligatoire>
                 <textarea
                   className="input"
                   rows={2}
-                  placeholder="Lot, fokontany, commune..."
+                  placeholder="Lot, fokontany, kaominina..."
                   value={form.adresseAssociation}
                   onChange={(e) => setForm((f) => ({ ...f, adresseAssociation: e.target.value }))}
                 />
               </Champ>
-              <Champ label="District" obligatoire>
+              <Champ label="Distrika" obligatoire>
                 <select
                   className="input"
                   value={form.district}
                   onChange={(e) => setForm((f) => ({ ...f, district: e.target.value }))}
                 >
                   <option value="" disabled>
-                    Choisissez le district
+                    Safidio ny distrika
                   </option>
                   {DISTRICTS_PAR_REGION.map((r) => (
-                    <optgroup key={r.region} label={`Région ${r.region}`}>
+                    <optgroup key={r.region} label={`Faritra ${r.region}`}>
                       {r.districts.map((d) => (
                         <option key={d} value={d}>
                           {d}
@@ -389,20 +392,20 @@ export default function DepotWizard() {
 
               <div className="flex flex-col gap-2">
                 <span className="text-sm font-medium text-zinc-700">
-                  Responsables <span className="text-vfm-rouge">*</span>
+                  Tompon&apos;andraikitra <span className="text-vfm-rouge">*</span>
                 </span>
                 {form.responsables.map((r, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
                       <input
                         className="input"
-                        placeholder={i === 0 ? "Prénom (principal)" : "Prénom"}
+                        placeholder={i === 0 ? "Fanampin'anarana (voalohany)" : "Fanampin'anarana"}
                         value={r.prenom}
                         onChange={(e) => majResponsable(i, "prenom", e.target.value)}
                       />
                       <input
                         className="input"
-                        placeholder={i === 0 ? "Nom (principal)" : "Nom"}
+                        placeholder={i === 0 ? "Anarana (voalohany)" : "Anarana"}
                         value={r.nom}
                         onChange={(e) => majResponsable(i, "nom", e.target.value)}
                       />
@@ -410,17 +413,17 @@ export default function DepotWizard() {
                     {i > 0 && <BoutonRetirer onClick={() => retirerResponsable(i)} />}
                   </div>
                 ))}
-                <BoutonAjouter onClick={ajouterResponsable}>Ajouter un responsable</BoutonAjouter>
+                <BoutonAjouter onClick={ajouterResponsable}>Hanampy tompon&apos;andraikitra</BoutonAjouter>
               </div>
             </Section>
 
             <Section
               numero={2}
-              titre="Activité et membres"
-              sousTitre="Domaine d'action de l'association"
+              titre="Asa sy mpikambana"
+              sousTitre="Sehatra iasan'ny fikambanana"
               icon={<IconGear className="h-5 w-5" />}
             >
-              <Champ label="Activité de l'association" obligatoire>
+              <Champ label="Asan'ny fikambanana" obligatoire>
                 <select
                   className="input"
                   value={form.activite}
@@ -432,23 +435,23 @@ export default function DepotWizard() {
                     </option>
                   ))}
                 </select>
-                {form.activite === "Autre" && (
+                {form.activite === AUTRE && (
                   <input
                     className="input mt-2"
-                    placeholder="Précisez l'activité"
+                    placeholder="Lazao mazava ilay asa"
                     value={form.activiteAutre}
                     onChange={(e) => setForm((f) => ({ ...f, activiteAutre: e.target.value }))}
                   />
                 )}
               </Champ>
 
-              <Champ label="Nombre de membres" obligatoire>
+              <Champ label="Isan'ny mpikambana" obligatoire>
                 <input
                   className="input"
                   type="number"
                   min={1}
                   step={1}
-                  placeholder="Ex : 50"
+                  placeholder="Ohatra : 50"
                   value={form.nombreMembres}
                   onChange={(e) => setForm((f) => ({ ...f, nombreMembres: e.target.value }))}
                 />
@@ -459,11 +462,11 @@ export default function DepotWizard() {
           <div className="flex flex-col gap-6">
             <Section
               numero={3}
-              titre="Coordonnées"
-              sousTitre="Le SMS de confirmation sera envoyé à ce numéro"
+              titre="Fifandraisana"
+              sousTitre="Amin'ity laharana ity no handefasana ny SMS fanamarinana"
               icon={<IconPhone className="h-5 w-5" />}
             >
-              <Champ label="Numéro de téléphone" obligatoire>
+              <Champ label="Laharana finday" obligatoire>
                 <div className="relative">
                   <IconPhone className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-vfm-vert" />
                   <input
@@ -475,13 +478,13 @@ export default function DepotWizard() {
                   />
                 </div>
               </Champ>
-              <Champ label="Adresse e-mail">
+              <Champ label="Adiresy mailaka">
                 <div className="relative">
                   <IconMail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-vfm-vert" />
                   <input
                     className="input pl-10"
                     type="email"
-                    placeholder="exemple@email.com"
+                    placeholder="ohatra@email.com"
                     value={form.email}
                     onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                   />
@@ -498,13 +501,13 @@ export default function DepotWizard() {
                         onChange={(e) => majAutreCoordonnee(i, "type", e.target.value)}
                       >
                         <option>WhatsApp</option>
-                        <option>Autre téléphone</option>
-                        <option>Adresse complémentaire</option>
-                        <option>Autre</option>
+                        <option>Finday hafa</option>
+                        <option>Adiresy fanampiny</option>
+                        <option>Hafa</option>
                       </select>
                       <input
                         className="input"
-                        placeholder="Valeur"
+                        placeholder="Soraty eto"
                         value={a.valeur}
                         onChange={(e) => majAutreCoordonnee(i, "valeur", e.target.value)}
                       />
@@ -513,22 +516,22 @@ export default function DepotWizard() {
                   </div>
                 ))}
                 <BoutonAjouter onClick={ajouterAutreCoordonnee}>
-                  Ajouter une autre coordonnée
+                  Hanampy fifandraisana hafa
                 </BoutonAjouter>
               </div>
             </Section>
 
             <Section
               numero={4}
-              titre="Votre projet"
-              sousTitre="Expliquez votre besoin ou votre demande"
+              titre="Ny tetikasanao"
+              sousTitre="Hazavao ny filanao na ny fangatahanao"
               icon={<IconDoc className="h-5 w-5" />}
             >
-              <Champ label="Description de votre projet, de vos besoins ou de votre demande" obligatoire>
+              <Champ label="Fanazavana momba ny tetikasanao, ny filanao na ny fangatahanao" obligatoire>
                 <textarea
                   className="input"
                   rows={6}
-                  placeholder="Décrivez ici votre projet, vos besoins ou toute autre information utile..."
+                  placeholder="Soraty eto ny tetikasanao, ny filanao na izay fanazavana ilaina hafa..."
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                 />
@@ -537,8 +540,8 @@ export default function DepotWizard() {
 
             <Section
               numero={5}
-              titre="Pièces jointes"
-              sousTitre="Statuts, récépissé, photos... (facultatif)"
+              titre="Antontan-taratasy miaraka"
+              sousTitre="Sata, tapakila fanamarinana, sary... (tsy voatery)"
               icon={<IconPaperclip className="h-5 w-5" />}
             >
               <label className="group flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-vfm-beige-bord bg-white px-4 py-7 text-center transition-colors hover:border-vfm-vert hover:bg-vfm-vert/5">
@@ -546,10 +549,10 @@ export default function DepotWizard() {
                   <IconUpload className="h-6 w-6" />
                 </span>
                 <span className="text-sm font-medium text-zinc-700">
-                  Cliquez pour sélectionner un ou plusieurs fichiers
+                  Tsindrio eto raha hisafidy rakitra iray na maromaro
                 </span>
                 <span className="text-xs text-zinc-500">
-                  10 Mo maximum par fichier — PDF, Word, JPEG, PNG, WebP.
+                  10 Mo farafahabetsany isaky ny rakitra — PDF, Word, JPEG, PNG, WebP.
                 </span>
                 <input
                   type="file"
@@ -574,7 +577,7 @@ export default function DepotWizard() {
                         onClick={() => retirerPiece(i)}
                         className="shrink-0 text-xs font-medium text-zinc-500 hover:text-vfm-rouge"
                       >
-                        Supprimer
+                        Esory
                       </button>
                     </li>
                   ))}
@@ -590,12 +593,12 @@ export default function DepotWizard() {
             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-vfm-vert px-6 py-4 text-base font-semibold text-white shadow-lg shadow-vfm-vert/25 transition-all hover:-translate-y-0.5 hover:bg-vfm-vert-dark hover:shadow-xl"
           >
             <IconSend className="h-5 w-5" />
-            Vérifier mon dossier
+            Hamarino ny antontan-taratasiko
           </button>
 
           <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-zinc-500">
             <IconLock className="h-3.5 w-3.5" />
-            Vos informations sont sécurisées et traitées de manière confidentielle.
+            Voaaro tsara ary tazonina ho tsiambaratelo ny mombamomba anao.
           </p>
         </div>
       </form>
@@ -671,8 +674,8 @@ function BoutonRetirer({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      aria-label="Retirer"
-      title="Retirer"
+      aria-label="Esory"
+      title="Esory"
       className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg text-zinc-400 transition-colors hover:bg-red-50 hover:text-vfm-rouge"
     >
       ×

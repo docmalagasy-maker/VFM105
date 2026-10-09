@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { MAX_TAILLE_FICHIER, TYPES_FICHIERS_ACCEPTES } from "@/lib/validation";
 
@@ -48,10 +48,10 @@ function cheminAbsolu(pathname: string): string | null {
 
 export async function uploaderPieceJointe(fichier: File): Promise<UploadResultat> {
   if (fichier.size > MAX_TAILLE_FICHIER) {
-    return { ok: false, erreur: "Ce fichier est trop volumineux (10 Mo maximum)." };
+    return { ok: false, erreur: "Lehibe loatra ity rakitra ity (10 Mo farafahabetsany)." };
   }
   if (!TYPES_FICHIERS_ACCEPTES.includes(fichier.type)) {
-    return { ok: false, erreur: "Type de fichier non accepté." };
+    return { ok: false, erreur: "Tsy ekena io karazana rakitra io." };
   }
 
   // Le nom stocké ne dépend jamais du nom fourni par le visiteur (hors
@@ -59,7 +59,7 @@ export async function uploaderPieceJointe(fichier: File): Promise<UploadResultat
   const pathname = `dossiers/${crypto.randomUUID()}${EXTENSION_PAR_TYPE[fichier.type]}`;
   const destination = cheminAbsolu(pathname);
   if (!destination) {
-    return { ok: false, erreur: "Chemin de stockage invalide." };
+    return { ok: false, erreur: "Tsy mety ny toerana fitehirizana." };
   }
 
   await mkdir(path.dirname(destination), { recursive: true });
@@ -88,4 +88,11 @@ export async function lirePieceJointe(
   } catch {
     return null;
   }
+}
+
+/** Supprime une pièce jointe du disque. Sans effet si elle n'existe plus. */
+export async function supprimerPieceJointe(pathname: string): Promise<void> {
+  const absolu = cheminAbsolu(pathname);
+  if (!absolu) return;
+  await rm(absolu, { force: true });
 }

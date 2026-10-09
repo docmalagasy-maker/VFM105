@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   const fichier = formData.get("fichier");
 
   if (!(fichier instanceof File)) {
-    return NextResponse.json({ erreur: "Aucun fichier reçu." }, { status: 400 });
+    return NextResponse.json({ erreur: "Tsy nisy rakitra voaray." }, { status: 400 });
   }
 
   const resultat = await uploaderPieceJointe(fichier);

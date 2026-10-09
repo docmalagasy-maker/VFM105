@@ -13,14 +13,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VFM 105",
-  description: "Dépôt de dossier en ligne — VFM 105, district d'Ambohidratrimo.",
+  title: "VFM",
+  description: "Fametrahana an-tserasera ny antontan-taratasin'ny fikambanana eo amin'ny VFM — Madagasikara.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="fr"
+      lang="mg"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

@@ -6,7 +6,7 @@ import { isDatabaseConfigured } from "@/lib/db";
 export async function POST(request: NextRequest) {
   if (!isDatabaseConfigured()) {
     return NextResponse.json(
-      { erreur: "Le service n'est pas encore configuré (base de données absente). Veuillez réessayer plus tard." },
+      { erreur: "Mbola tsy vonona ny tolotra. Andramo indray any aoriana azafady." },
       { status: 503 }
     );
   }
@@ -15,13 +15,13 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ erreur: "Requête invalide." }, { status: 400 });
+    return NextResponse.json({ erreur: "Fangatahana tsy manara-penitra." }, { status: 400 });
   }
 
   const parsed = dossierInputSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { erreur: parsed.error.issues[0]?.message ?? "Formulaire invalide." },
+      { erreur: parsed.error.issues[0]?.message ?? "Tsy feno araka ny tokony ho izy ny taratasy." },
       { status: 400 }
     );
   }
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error("Erreur création dossier", err);
     return NextResponse.json(
-      { erreur: "Votre dossier n'a pas pu être envoyé. Veuillez réessayer." },
+      { erreur: "Tsy lasa ny antontan-taratasinao. Andramo indray azafady." },
       { status: 500 }
     );
   }

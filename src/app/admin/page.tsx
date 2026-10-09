@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listerDossiers } from "@/lib/repository";
+import BoutonSupprimer from "./BoutonSupprimer";
 
 const LIBELLES_STATUT: Record<string, string> = {
   recu: "Reçu",
@@ -49,13 +50,14 @@ export default async function AdminPage({
               <th className="px-4 py-2">Téléphone</th>
               <th className="px-4 py-2">Statut</th>
               <th className="px-4 py-2">SMS</th>
+              <th className="sticky right-0 bg-zinc-50 px-4 py-2" />
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {dossiers.map((d) => (
               <tr key={d.reference} className="hover:bg-zinc-50">
                 <td className="px-4 py-2">
-                  <Link href={`/admin/${d.reference}`} className="font-medium text-zinc-900 underline">
+                  <Link href={`/admin/${d.reference}`} className="whitespace-nowrap font-medium text-zinc-900 underline">
                     {d.reference}
                   </Link>
                 </td>
@@ -67,11 +69,14 @@ export default async function AdminPage({
                 <td className="px-4 py-2">{d.coordonnees.telephone}</td>
                 <td className="px-4 py-2">{LIBELLES_STATUT[d.statut] ?? d.statut}</td>
                 <td className="px-4 py-2">{LIBELLES_SMS[d.statutSms] ?? d.statutSms}</td>
+                <td className="sticky right-0 bg-white px-4 py-2 text-right shadow-[-8px_0_8px_-8px_rgba(0,0,0,0.15)]">
+                  <BoutonSupprimer reference={d.reference} association={d.association.nom} />
+                </td>
               </tr>
             ))}
             {dossiers.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-zinc-500">
+                <td colSpan={8} className="px-4 py-8 text-center text-zinc-500">
                   Aucun dossier trouvé.
                 </td>
               </tr>

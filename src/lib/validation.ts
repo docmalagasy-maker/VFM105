@@ -22,8 +22,8 @@ export function validateTelephoneMadagascar(valeur: string): {
 }
 
 export const responsableSchema = z.object({
-  nom: z.string().trim().min(1, "Le nom du responsable est obligatoire."),
-  prenom: z.string().trim().min(1, "Le prénom du responsable est obligatoire."),
+  nom: z.string().trim().min(1, "Tsy maintsy soratana ny anaran'ny tompon'andraikitra."),
+  prenom: z.string().trim().min(1, "Tsy maintsy soratana ny fanampin'anaran'ny tompon'andraikitra."),
 });
 
 export const pieceJointeSchema = z.object({
@@ -36,29 +36,29 @@ export const pieceJointeSchema = z.object({
 export const dossierInputSchema = z.object({
   idempotencyKey: z.string().uuid(),
   association: z.object({
-    nom: z.string().trim().min(1, "Le nom de l'association est obligatoire."),
-    adresse: z.string().trim().min(1, "L'adresse de l'association est obligatoire."),
+    nom: z.string().trim().min(1, "Tsy maintsy soratana ny anaran'ny fikambanana."),
+    adresse: z.string().trim().min(1, "Tsy maintsy soratana ny adiresin'ny fikambanana."),
     district: z
       .string()
-      .refine((val) => TOUS_LES_DISTRICTS.includes(val), "Veuillez choisir le district de l'association."),
-    activite: z.string().trim().min(1, "L'activité de l'association est obligatoire."),
+      .refine((val) => TOUS_LES_DISTRICTS.includes(val), "Safidio ny distrikan'ny fikambanana."),
+    activite: z.string().trim().min(1, "Tsy maintsy soratana ny asan'ny fikambanana."),
     nombreMembres: z
       .number()
-      .int("Le nombre de membres doit être un nombre entier.")
-      .positive("Le nombre de membres doit être positif."),
+      .int("Isa feno no atao amin'ny isan'ny mpikambana.")
+      .positive("Tsy maintsy mihoatra ny aotra ny isan'ny mpikambana."),
   }),
   responsables: z
     .array(responsableSchema)
-    .min(1, "Le responsable principal est obligatoire."),
+    .min(1, "Tsy maintsy soratana ny tompon'andraikitra voalohany."),
   coordonnees: z.object({
     telephone: z.string().refine(
       (val) => validateTelephoneMadagascar(val).valide,
-      "Le numéro de téléphone semble incorrect."
+      "Toa diso ny laharana finday."
     ),
     email: z
       .string()
       .trim()
-      .email("L'adresse e-mail semble incorrecte.")
+      .email("Toa diso ny adiresy mailaka.")
       .optional()
       .or(z.literal("")),
     autres: z
@@ -68,7 +68,7 @@ export const dossierInputSchema = z.object({
   description: z
     .string()
     .trim()
-    .min(1, "La description du projet ou de la demande est obligatoire."),
+    .min(1, "Tsy maintsy hazavaina ny tetikasa na ny fangatahana."),
   pieces: z.array(pieceJointeSchema).default([]),
 });
 
