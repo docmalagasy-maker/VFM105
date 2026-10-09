@@ -1,5 +1,6 @@
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { z } from "zod";
+import { TOUS_LES_DISTRICTS } from "@/lib/districts";
 
 // Madagascar : numéros mobiles à 10 chiffres commençant par 032/033/034/037/038,
 // acceptés avec ou sans indicatif +261.
@@ -37,6 +38,9 @@ export const dossierInputSchema = z.object({
   association: z.object({
     nom: z.string().trim().min(1, "Le nom de l'association est obligatoire."),
     adresse: z.string().trim().min(1, "L'adresse de l'association est obligatoire."),
+    district: z
+      .string()
+      .refine((val) => TOUS_LES_DISTRICTS.includes(val), "Veuillez choisir le district de l'association."),
     activite: z.string().trim().min(1, "L'activité de l'association est obligatoire."),
     nombreMembres: z
       .number()

@@ -13,6 +13,7 @@ function ligneVersDossier(row: Record<string, unknown>): Dossier {
     association: {
       nom: row.association_nom as string,
       adresse: row.association_adresse as string,
+      district: (row.association_district as string) ?? "",
       activite: row.association_activite as string,
       nombreMembres: row.association_nombre_membres as number,
     },
@@ -27,6 +28,22 @@ function ligneVersDossier(row: Record<string, unknown>): Dossier {
   };
 }
 
+let colonneDistrictVerifiee: Promise<unknown> | undefined;
+
+/**
+ * Applique migrations/002_district.sql si besoin (idempotent), pour qu'un
+ * déploiement ne casse pas le dépôt de dossiers avant la migration manuelle.
+ */
+function verifierColonneDistrict(): Promise<unknown> {
+  colonneDistrictVerifiee ??= getPool()
+    .query(`ALTER TABLE dossiers ADD COLUMN IF NOT EXISTS association_district TEXT`)
+    .catch((err) => {
+      colonneDistrictVerifiee = undefined;
+      throw err;
+    });
+  return colonneDistrictVerifiee;
+}
+
 /**
  * Enregistre définitivement un dossier. Idempotent : si `idempotencyKey` a
  * déjà été utilisé (double clic, retry réseau), retourne le dossier existant
@@ -37,6 +54,7 @@ export async function creerDossier(input: DossierInput): Promise<{
   creeMaintenant: boolean;
 }> {
   const pool = getPool();
+  await verifierColonneDistrict();
 
   const existant = await pool.query(
     `SELECT * FROM dossiers WHERE idempotency_key = $1`,
@@ -52,9 +70,10 @@ export async function creerDossier(input: DossierInput): Promise<{
   const result = await pool.query(
     `INSERT INTO dossiers (
        reference, idempotency_key, date_depot, statut, statut_sms,
-       association_nom, association_adresse, association_activite, association_nombre_membres,
-       responsables, telephone, email, autres_coordonnees, description, pieces
-     ) VALUES ($1,$2,$3,'recu','a_envoyer',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+       association_nom, association_adresse, association_district, association_activite,
+       association_nombre_membres, responsables, telephone, email, autres_coordonnees,
+       description, pieces
+     ) VALUES ($1,$2,$3,'recu','a_envoyer',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
      ON CONFLICT (idempotency_key) DO NOTHING
      RETURNING *`,
     [
@@ -63,6 +82,7 @@ export async function creerDossier(input: DossierInput): Promise<{
       maintenant.toISOString(),
       input.association.nom,
       input.association.adresse,
+      input.association.district,
       input.association.activite,
       input.association.nombreMembres,
       JSON.stringify(input.responsables),

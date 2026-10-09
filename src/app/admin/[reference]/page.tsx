@@ -21,6 +21,9 @@ export default async function DossierAdminPage({
       <dl className="mt-6 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white">
         <Ligne label="Association">{dossier.association.nom}</Ligne>
         <Ligne label="Adresse">{dossier.association.adresse}</Ligne>
+        {dossier.association.district && (
+          <Ligne label="District">{dossier.association.district}</Ligne>
+        )}
         <Ligne label="Activité">{dossier.association.activite}</Ligne>
         <Ligne label="Nombre de membres">{dossier.association.nombreMembres}</Ligne>
         <Ligne label="Responsables">

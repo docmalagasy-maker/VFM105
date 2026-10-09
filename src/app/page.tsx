@@ -12,7 +12,7 @@ export default function Accueil() {
         </p>
         <Link
           href="/deposer"
-          className="mt-8 inline-flex w-full items-center justify-center rounded-lg bg-vfm-marine px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-vfm-marine-dark sm:text-base"
+          className="mt-8 inline-flex w-full items-center justify-center rounded-2xl bg-vfm-vert px-6 py-4 text-base font-semibold text-white shadow-lg shadow-vfm-vert/25 transition-all hover:-translate-y-0.5 hover:bg-vfm-vert-dark"
         >
           Déposer un dossier
         </Link>

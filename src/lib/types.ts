@@ -31,6 +31,7 @@ export interface DossierInput {
   association: {
     nom: string;
     adresse: string;
+    district: string;
     activite: string;
     nombreMembres: number;
   };

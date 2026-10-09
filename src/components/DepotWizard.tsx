@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { validateTelephoneMadagascar } from "@/lib/validation";
 import type { AutreCoordonnee, PieceJointe, Responsable } from "@/lib/types";
 import PublicShell from "@/components/PublicShell";
+import { DISTRICTS_PAR_REGION } from "@/lib/districts";
 import {
   IconPeople,
   IconGear,
@@ -32,6 +33,7 @@ const ACTIVITES = [
 interface FormState {
   nomAssociation: string;
   adresseAssociation: string;
+  district: string;
   responsables: Responsable[];
   activite: string;
   activiteAutre: string;
@@ -46,6 +48,7 @@ interface FormState {
 const ETAT_INITIAL: FormState = {
   nomAssociation: "",
   adresseAssociation: "",
+  district: "",
   responsables: [{ nom: "", prenom: "" }],
   activite: ACTIVITES[0],
   activiteAutre: "",
@@ -152,6 +155,7 @@ export default function DepotWizard() {
     const problemes: string[] = [];
     if (!form.nomAssociation.trim()) problemes.push("Veuillez renseigner le nom de l'association.");
     if (!form.adresseAssociation.trim()) problemes.push("Veuillez renseigner l'adresse de l'association.");
+    if (!form.district) problemes.push("Veuillez choisir le district de l'association.");
     const principal = form.responsables[0];
     if (!principal?.nom.trim() || !principal?.prenom.trim()) {
       problemes.push("Veuillez renseigner le responsable principal.");
@@ -196,6 +200,7 @@ export default function DepotWizard() {
           association: {
             nom: form.nomAssociation.trim(),
             adresse: form.adresseAssociation.trim(),
+            district: form.district,
             activite,
             nombreMembres: Number(form.nombreMembres),
           },
@@ -236,9 +241,10 @@ export default function DepotWizard() {
           Vérifiez attentivement les informations avant de valider définitivement.
         </p>
 
-        <dl className="mt-6 divide-y divide-zinc-200 rounded-xl border border-zinc-200">
+        <dl className="mt-6 divide-y divide-vfm-beige-bord rounded-2xl border border-vfm-beige-bord bg-vfm-beige-clair">
           <Ligne label="Association">{form.nomAssociation}</Ligne>
           <Ligne label="Adresse">{form.adresseAssociation}</Ligne>
+          <Ligne label="District">{form.district}</Ligne>
           <Ligne label="Responsable principal">
             {form.responsables[0]?.prenom} {form.responsables[0]?.nom}
           </Ligne>
@@ -286,7 +292,7 @@ export default function DepotWizard() {
             type="button"
             onClick={() => setEtape("formulaire")}
             disabled={envoiEnCours}
-            className="flex-1 rounded-lg border border-zinc-300 px-4 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+            className="flex-1 rounded-2xl border border-vfm-beige-bord px-4 py-3.5 text-sm font-medium text-zinc-700 hover:bg-vfm-beige-clair disabled:opacity-50"
           >
             Modifier mes renseignements
           </button>
@@ -294,7 +300,7 @@ export default function DepotWizard() {
             type="button"
             onClick={validerDefinitivement}
             disabled={envoiEnCours}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-vfm-marine px-4 py-3 text-sm font-medium text-white hover:bg-vfm-marine-dark disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-vfm-vert px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-vfm-vert/25 hover:bg-vfm-vert-dark disabled:opacity-50"
           >
             <IconSend className="h-4 w-4" />
             {envoiEnCours ? "Envoi en cours..." : "Valider définitivement mon dossier"}
@@ -305,18 +311,23 @@ export default function DepotWizard() {
   }
 
   return (
-    <PublicShell cardClassName="max-w-4xl">
-      <div className="text-center sm:text-left">
-        <h1 className="text-xl font-bold text-vfm-marine sm:text-2xl">VFM 105</h1>
-        <p className="mt-1 text-sm text-zinc-600">
+    <PublicShell cardClassName="max-w-5xl">
+      <div className="flex flex-col items-center gap-3 text-center">
+        <span className="rounded-full bg-vfm-vert/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-vfm-vert-dark">
+          Dépôt de dossier en ligne
+        </span>
+        <h1 className="text-2xl font-bold text-vfm-marine sm:text-3xl">VFM 105</h1>
+        <p className="max-w-xl text-sm text-zinc-600 sm:text-base">
           Déposez en ligne le dossier de votre association auprès du VFM — district
-          d&apos;Ambohidratrimo.
+          d&apos;Ambohidratrimo. Les champs marqués <span className="text-vfm-rouge">*</span> sont
+          obligatoires.
         </p>
       </div>
 
       {erreurs.length > 0 && (
-        <div className="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
-          <ul className="list-inside list-disc">
+        <div className="mt-8 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+          <p className="mb-1 font-semibold">Merci de corriger les points suivants :</p>
+          <ul className="list-inside list-disc space-y-0.5">
             {erreurs.map((e, i) => (
               <li key={i}>{e}</li>
             ))}
@@ -330,9 +341,14 @@ export default function DepotWizard() {
           passerAPrevisualisation();
         }}
       >
-        <div className="mt-6 grid gap-x-10 gap-y-8 lg:grid-cols-2">
-          <div className="flex flex-col gap-8">
-            <Section titre="Informations sur l'association" icon={<IconPeople className="h-5 w-5" />}>
+        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          <div className="flex flex-col gap-6">
+            <Section
+              numero={1}
+              titre="L'association"
+              sousTitre="Identité, adresse et responsables"
+              icon={<IconPeople className="h-5 w-5" />}
+            >
               <Champ label="Nom de l'association" obligatoire>
                 <input
                   className="input"
@@ -345,50 +361,65 @@ export default function DepotWizard() {
                 <textarea
                   className="input"
                   rows={2}
-                  placeholder="Adresse complète de l'association"
+                  placeholder="Lot, fokontany, commune..."
                   value={form.adresseAssociation}
                   onChange={(e) => setForm((f) => ({ ...f, adresseAssociation: e.target.value }))}
                 />
               </Champ>
+              <Champ label="District" obligatoire>
+                <select
+                  className="input"
+                  value={form.district}
+                  onChange={(e) => setForm((f) => ({ ...f, district: e.target.value }))}
+                >
+                  <option value="" disabled>
+                    Choisissez le district
+                  </option>
+                  {DISTRICTS_PAR_REGION.map((r) => (
+                    <optgroup key={r.region} label={`Région ${r.region}`}>
+                      {r.districts.map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </Champ>
 
-              <div className="flex flex-col gap-3">
-                <span className="text-sm font-medium text-zinc-700">Responsables</span>
+              <div className="flex flex-col gap-2">
+                <span className="text-sm font-medium text-zinc-700">
+                  Responsables <span className="text-vfm-rouge">*</span>
+                </span>
                 {form.responsables.map((r, i) => (
-                  <div key={i} className="flex gap-2">
-                    <input
-                      className="input"
-                      placeholder={i === 0 ? "Prénom (responsable principal)" : "Prénom"}
-                      value={r.prenom}
-                      onChange={(e) => majResponsable(i, "prenom", e.target.value)}
-                    />
-                    <input
-                      className="input"
-                      placeholder={i === 0 ? "Nom (responsable principal)" : "Nom"}
-                      value={r.nom}
-                      onChange={(e) => majResponsable(i, "nom", e.target.value)}
-                    />
-                    {i > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => retirerResponsable(i)}
-                        className="px-2 text-sm text-zinc-500 hover:text-red-600"
-                      >
-                        Retirer
-                      </button>
-                    )}
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
+                      <input
+                        className="input"
+                        placeholder={i === 0 ? "Prénom (principal)" : "Prénom"}
+                        value={r.prenom}
+                        onChange={(e) => majResponsable(i, "prenom", e.target.value)}
+                      />
+                      <input
+                        className="input"
+                        placeholder={i === 0 ? "Nom (principal)" : "Nom"}
+                        value={r.nom}
+                        onChange={(e) => majResponsable(i, "nom", e.target.value)}
+                      />
+                    </div>
+                    {i > 0 && <BoutonRetirer onClick={() => retirerResponsable(i)} />}
                   </div>
                 ))}
-                <button
-                  type="button"
-                  onClick={ajouterResponsable}
-                  className="self-start text-sm font-medium text-vfm-marine underline"
-                >
-                  + Ajouter un responsable
-                </button>
+                <BoutonAjouter onClick={ajouterResponsable}>Ajouter un responsable</BoutonAjouter>
               </div>
             </Section>
 
-            <Section titre="Activité et membres" icon={<IconGear className="h-5 w-5" />}>
+            <Section
+              numero={2}
+              titre="Activité et membres"
+              sousTitre="Domaine d'action de l'association"
+              icon={<IconGear className="h-5 w-5" />}
+            >
               <Champ label="Activité de l'association" obligatoire>
                 <select
                   className="input"
@@ -425,13 +456,19 @@ export default function DepotWizard() {
             </Section>
           </div>
 
-          <div className="flex flex-col gap-8">
-            <Section titre="Coordonnées" icon={<IconPhone className="h-5 w-5" />}>
+          <div className="flex flex-col gap-6">
+            <Section
+              numero={3}
+              titre="Coordonnées"
+              sousTitre="Le SMS de confirmation sera envoyé à ce numéro"
+              icon={<IconPhone className="h-5 w-5" />}
+            >
               <Champ label="Numéro de téléphone" obligatoire>
                 <div className="relative">
-                  <IconPhone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                  <IconPhone className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-vfm-vert" />
                   <input
                     className="input pl-10"
+                    inputMode="tel"
                     placeholder="034 00 000 00"
                     value={form.telephone}
                     onChange={(e) => setForm((f) => ({ ...f, telephone: e.target.value }))}
@@ -440,7 +477,7 @@ export default function DepotWizard() {
               </Champ>
               <Champ label="Adresse e-mail">
                 <div className="relative">
-                  <IconMail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                  <IconMail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-vfm-vert" />
                   <input
                     className="input pl-10"
                     type="email"
@@ -451,44 +488,42 @@ export default function DepotWizard() {
                 </div>
               </Champ>
 
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
                 {form.autresCoordonnees.map((a, i) => (
-                  <div key={i} className="flex gap-2">
-                    <select
-                      className="input"
-                      value={a.type}
-                      onChange={(e) => majAutreCoordonnee(i, "type", e.target.value)}
-                    >
-                      <option>WhatsApp</option>
-                      <option>Autre téléphone</option>
-                      <option>Adresse complémentaire</option>
-                      <option>Autre</option>
-                    </select>
-                    <input
-                      className="input"
-                      value={a.valeur}
-                      onChange={(e) => majAutreCoordonnee(i, "valeur", e.target.value)}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => retirerAutreCoordonnee(i)}
-                      className="px-2 text-sm text-zinc-500 hover:text-red-600"
-                    >
-                      Retirer
-                    </button>
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
+                      <select
+                        className="input"
+                        value={a.type}
+                        onChange={(e) => majAutreCoordonnee(i, "type", e.target.value)}
+                      >
+                        <option>WhatsApp</option>
+                        <option>Autre téléphone</option>
+                        <option>Adresse complémentaire</option>
+                        <option>Autre</option>
+                      </select>
+                      <input
+                        className="input"
+                        placeholder="Valeur"
+                        value={a.valeur}
+                        onChange={(e) => majAutreCoordonnee(i, "valeur", e.target.value)}
+                      />
+                    </div>
+                    <BoutonRetirer onClick={() => retirerAutreCoordonnee(i)} />
                   </div>
                 ))}
-                <button
-                  type="button"
-                  onClick={ajouterAutreCoordonnee}
-                  className="self-start text-sm font-medium text-vfm-marine underline"
-                >
-                  + Ajouter une autre coordonnée
-                </button>
+                <BoutonAjouter onClick={ajouterAutreCoordonnee}>
+                  Ajouter une autre coordonnée
+                </BoutonAjouter>
               </div>
             </Section>
 
-            <Section titre="Votre projet" icon={<IconDoc className="h-5 w-5" />}>
+            <Section
+              numero={4}
+              titre="Votre projet"
+              sousTitre="Expliquez votre besoin ou votre demande"
+              icon={<IconDoc className="h-5 w-5" />}
+            >
               <Champ label="Description de votre projet, de vos besoins ou de votre demande" obligatoire>
                 <textarea
                   className="input"
@@ -500,13 +535,20 @@ export default function DepotWizard() {
               </Champ>
             </Section>
 
-            <Section titre="Pièces jointes" icon={<IconPaperclip className="h-5 w-5" />}>
-              <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-zinc-300 px-4 py-6 text-center hover:border-vfm-marine">
-                <IconUpload className="h-6 w-6 text-zinc-400" />
-                <span className="text-sm text-zinc-600">
-                  Sélectionnez un fichier ou glissez-déposez ici
+            <Section
+              numero={5}
+              titre="Pièces jointes"
+              sousTitre="Statuts, récépissé, photos... (facultatif)"
+              icon={<IconPaperclip className="h-5 w-5" />}
+            >
+              <label className="group flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-vfm-beige-bord bg-white px-4 py-7 text-center transition-colors hover:border-vfm-vert hover:bg-vfm-vert/5">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-vfm-vert/10 text-vfm-vert transition-transform group-hover:scale-110">
+                  <IconUpload className="h-6 w-6" />
                 </span>
-                <span className="text-xs text-zinc-400">
+                <span className="text-sm font-medium text-zinc-700">
+                  Cliquez pour sélectionner un ou plusieurs fichiers
+                </span>
+                <span className="text-xs text-zinc-500">
                   10 Mo maximum par fichier — PDF, Word, JPEG, PNG, WebP.
                 </span>
                 <input
@@ -517,17 +559,20 @@ export default function DepotWizard() {
                 />
               </label>
               {form.pieces.length > 0 && (
-                <ul className="flex flex-col gap-1">
+                <ul className="flex flex-col gap-2">
                   {form.pieces.map((p, i) => (
                     <li
                       key={i}
-                      className="flex items-center justify-between rounded bg-zinc-50 px-3 py-2 text-sm"
+                      className="flex items-center justify-between gap-3 rounded-xl border border-vfm-beige-bord bg-white px-3 py-2 text-sm"
                     >
-                      <span className="truncate">{p.nom}</span>
+                      <span className="flex min-w-0 items-center gap-2">
+                        <IconPaperclip className="h-4 w-4 shrink-0 text-vfm-vert" />
+                        <span className="truncate">{p.nom}</span>
+                      </span>
                       <button
                         type="button"
                         onClick={() => retirerPiece(i)}
-                        className="shrink-0 text-zinc-500 hover:text-red-600"
+                        className="shrink-0 text-xs font-medium text-zinc-500 hover:text-vfm-rouge"
                       >
                         Supprimer
                       </button>
@@ -539,42 +584,54 @@ export default function DepotWizard() {
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="mt-8 flex w-full items-center justify-center gap-2 rounded-lg bg-vfm-marine px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-vfm-marine-dark"
-        >
-          <IconSend className="h-4 w-4" />
-          Enregistrer mon dossier
-        </button>
+        <div className="mx-auto mt-10 max-w-md">
+          <button
+            type="submit"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-vfm-vert px-6 py-4 text-base font-semibold text-white shadow-lg shadow-vfm-vert/25 transition-all hover:-translate-y-0.5 hover:bg-vfm-vert-dark hover:shadow-xl"
+          >
+            <IconSend className="h-5 w-5" />
+            Vérifier mon dossier
+          </button>
 
-        <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-zinc-500">
-          <IconLock className="h-3.5 w-3.5" />
-          Vos informations sont sécurisées et traitées de manière confidentielle.
-        </p>
+          <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-zinc-500">
+            <IconLock className="h-3.5 w-3.5" />
+            Vos informations sont sécurisées et traitées de manière confidentielle.
+          </p>
+        </div>
       </form>
     </PublicShell>
   );
 }
 
 function Section({
+  numero,
   titre,
+  sousTitre,
   icon,
   children,
 }: {
+  numero: number;
   titre: string;
+  sousTitre: string;
   icon: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
-    <fieldset className="flex flex-col gap-4">
-      <legend className="mb-1 flex items-center gap-2 text-base font-semibold text-vfm-marine">
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-vfm-marine text-white">
+    <section className="rounded-2xl border border-vfm-beige-bord bg-vfm-beige-clair p-5 sm:p-6">
+      <header className="mb-5 flex items-center gap-3">
+        <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-vfm-marine text-white shadow-sm">
           {icon}
+          <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-vfm-vert text-[0.65rem] font-bold text-white ring-2 ring-vfm-beige-clair">
+            {numero}
+          </span>
         </span>
-        {titre}
-      </legend>
-      {children}
-    </fieldset>
+        <div>
+          <h2 className="text-base font-semibold text-vfm-marine sm:text-lg">{titre}</h2>
+          <p className="text-xs text-zinc-500 sm:text-sm">{sousTitre}</p>
+        </div>
+      </header>
+      <div className="flex flex-col gap-4">{children}</div>
+    </section>
   );
 }
 
@@ -590,10 +647,36 @@ function Champ({
   return (
     <label className="flex flex-col gap-1.5">
       <span className="text-sm font-medium text-zinc-700">
-        {label} {obligatoire && <span className="text-red-600">*</span>}
+        {label} {obligatoire && <span className="text-vfm-rouge">*</span>}
       </span>
       {children}
     </label>
+  );
+}
+
+function BoutonAjouter({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="self-start rounded-full border border-dashed border-vfm-vert/50 px-4 py-1.5 text-sm font-medium text-vfm-vert-dark transition-colors hover:border-vfm-vert hover:bg-vfm-vert/10"
+    >
+      + {children}
+    </button>
+  );
+}
+
+function BoutonRetirer({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Retirer"
+      title="Retirer"
+      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg text-zinc-400 transition-colors hover:bg-red-50 hover:text-vfm-rouge"
+    >
+      ×
+    </button>
   );
 }
 

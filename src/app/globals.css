@@ -4,11 +4,18 @@
   --background: #ffffff;
   --foreground: #171717;
 
-  /* Identité VFM */
+  /* Identité VFM (couleurs du logo) */
   --vfm-marine: #142b47;
   --vfm-marine-dark: #0c1c30;
-  --vfm-vert: #2f7a45;
-  --vfm-rouge: #c1272d;
+  --vfm-vert: #0a9a4a;
+  --vfm-vert-dark: #087a3b;
+  --vfm-rouge: #d81f26;
+  --vfm-bleu: #0b4ea2;
+
+  /* Habillage public beige */
+  --vfm-beige: #f3ebdc;
+  --vfm-beige-clair: #faf6ee;
+  --vfm-beige-bord: #e6dac3;
 }
 
 @theme inline {
@@ -17,10 +24,14 @@
   --color-vfm-marine: var(--vfm-marine);
   --color-vfm-marine-dark: var(--vfm-marine-dark);
   --color-vfm-vert: var(--vfm-vert);
+  --color-vfm-vert-dark: var(--vfm-vert-dark);
   --color-vfm-rouge: var(--vfm-rouge);
+  --color-vfm-bleu: var(--vfm-bleu);
+  --color-vfm-beige: var(--vfm-beige);
+  --color-vfm-beige-clair: var(--vfm-beige-clair);
+  --color-vfm-beige-bord: var(--vfm-beige-bord);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-script: var(--font-script);
 }
 
 body {
@@ -29,37 +40,66 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Fond texturé bleu marine de l'habillage public (accueil, dépôt, confirmation) */
-.bg-vfm-texture {
-  background-color: var(--vfm-marine);
+/* Fond beige de l'habillage public (accueil, dépôt, confirmation) */
+.bg-vfm-public {
+  background-color: var(--vfm-beige);
   background-image:
-    radial-gradient(ellipse at top, rgba(255, 255, 255, 0.1), transparent 60%),
-    linear-gradient(160deg, rgba(20, 43, 71, 0.55) 0%, rgba(12, 28, 48, 0.75) 100%),
-    url("/images/texture-bleu.jpg");
-  background-size: cover, cover, cover;
-  background-position: center, center, center;
-  background-repeat: no-repeat, no-repeat, repeat;
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 255, 255, 0.75), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(230, 218, 195, 0.6), transparent 70%);
 }
 
-.font-script {
-  font-family: var(--font-script), cursive;
+/* Liseré aux couleurs du logo (rouge, vert, bleu) */
+.vfm-lisere {
+  background: linear-gradient(
+    90deg,
+    var(--vfm-rouge) 0 33.33%,
+    var(--vfm-vert) 33.33% 66.66%,
+    var(--vfm-bleu) 66.66% 100%
+  );
 }
 
 @layer components {
   .input {
     width: 100%;
-    border-radius: 0.5rem;
-    border: 1px solid #d4d4d8;
+    border-radius: 0.75rem;
+    border: 1px solid var(--vfm-beige-bord);
     background: #fff;
-    padding: 0.625rem 0.875rem;
-    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
     color: #18181b;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+  }
+
+  .input::placeholder {
+    color: #a1a1aa;
+  }
+
+  .input:hover {
+    border-color: #d3c4a6;
   }
 
   .input:focus {
     outline: none;
-    border-color: var(--vfm-marine);
-    box-shadow: 0 0 0 3px rgba(20, 43, 71, 0.12);
+    border-color: var(--vfm-vert);
+    box-shadow: 0 0 0 4px rgba(10, 154, 74, 0.14);
+  }
+
+  select.input {
+    appearance: none;
+    padding-right: 2.75rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23142b47'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.06l3.71-3.83a.75.75 0 1 1 1.08 1.04l-4.25 4.39a.75.75 0 0 1-1.08 0L5.21 8.27a.75.75 0 0 1 .02-1.06Z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    background-size: 1.25rem;
+  }
+
+  select.input optgroup {
+    font-weight: 700;
+    color: var(--vfm-marine);
+  }
+
+  select.input option {
+    font-weight: 400;
+    color: #18181b;
   }
 }
