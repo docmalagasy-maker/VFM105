@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "VFM",
-  description: "Fametrahana an-tserasera ny antontan-taratasin'ny fikambanana eo amin'ny VFM — Madagasikara.",
+  description: "Fametrahana Dosie ho an'ny fikambanana eo amin'ny VFM — Madagasikara.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -1,12 +1,13 @@
 import Link from "next/link";
+import MenuPublic from "@/components/MenuPublic";
 import PublicShell from "@/components/PublicShell";
 
 export default function Accueil() {
   return (
-    <PublicShell cardClassName="max-w-md">
+    <PublicShell cardClassName="max-w-md" menu={<MenuPublic accueil />}>
       <div className="flex flex-col items-center text-center">
         <span className="rounded-full bg-vfm-vert/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-vfm-vert-dark">
-          Fametrahana an-tserasera
+          Fametrahana Dosie
         </span>
         <h1 className="mt-3 text-2xl font-bold text-vfm-marine sm:text-3xl">VFM</h1>
         <p className="mt-3 text-sm text-zinc-600 sm:text-base">

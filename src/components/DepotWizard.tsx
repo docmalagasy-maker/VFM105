@@ -318,7 +318,7 @@ export default function DepotWizard() {
     <PublicShell cardClassName="max-w-5xl">
       <div className="flex flex-col items-center gap-3 text-center">
         <span className="rounded-full bg-vfm-vert/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-vfm-vert-dark">
-          Fametrahana an-tserasera
+          Fametrahana Dosie
         </span>
         <h1 className="text-2xl font-bold text-vfm-marine sm:text-3xl">VFM</h1>
         <p className="max-w-xl text-sm text-zinc-600 sm:text-base">

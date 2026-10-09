@@ -35,7 +35,7 @@ let colonneDistrictVerifiee: Promise<unknown> | undefined;
  * Applique migrations/002_district.sql si besoin (idempotent), pour qu'un
  * déploiement ne casse pas le dépôt de dossiers avant la migration manuelle.
  */
-function verifierColonneDistrict(): Promise<unknown> {
+export function verifierColonneDistrict(): Promise<unknown> {
   colonneDistrictVerifiee ??= getPool()
     .query(`ALTER TABLE dossiers ADD COLUMN IF NOT EXISTS association_district TEXT`)
     .catch((err) => {
@@ -158,24 +158,27 @@ export async function obtenirDossierParReference(reference: string): Promise<Dos
   return result.rows.length > 0 ? ligneVersDossier(result.rows[0]) : null;
 }
 
-export async function listerDossiers(recherche?: string): Promise<Dossier[]> {
+export async function listerDossiers(recherche?: string, limite = 200): Promise<Dossier[]> {
   const pool = getPool();
+  await verifierColonneDistrict();
   if (recherche && recherche.trim()) {
     const motif = `%${recherche.trim()}%`;
     const result = await pool.query(
       `SELECT * FROM dossiers
        WHERE reference ILIKE $1
           OR association_nom ILIKE $1
+          OR association_district ILIKE $1
           OR telephone ILIKE $1
           OR responsables::text ILIKE $1
        ORDER BY date_depot DESC
-       LIMIT 200`,
-      [motif]
+       LIMIT $2`,
+      [motif, limite]
     );
     return result.rows.map(ligneVersDossier);
   }
   const result = await pool.query(
-    `SELECT * FROM dossiers ORDER BY date_depot DESC LIMIT 200`
+    `SELECT * FROM dossiers ORDER BY date_depot DESC LIMIT $1`,
+    [limite]
   );
   return result.rows.map(ligneVersDossier);
 }

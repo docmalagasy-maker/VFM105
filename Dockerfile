@@ -23,6 +23,8 @@ ENV NODE_ENV=production \
 COPY --from=build --chown=node:node /app/.next/standalone ./
 COPY --from=build --chown=node:node /app/.next/static ./.next/static
 COPY --from=build --chown=node:node /app/public ./public
+# Photos de la galerie publique (dossier GALERIE du dépôt)
+COPY --from=build --chown=node:node /app/GALERIE ./GALERIE
 
 # Pièces jointes : à monter comme volume persistant dans Coolify.
 RUN mkdir -p /app/data/uploads && chown -R node:node /app/data

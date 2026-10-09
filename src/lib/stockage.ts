@@ -36,7 +36,8 @@ const EXTENSION_PAR_TYPE: Record<string, string> = {
  * l'authentification admin).
  */
 function dossierStockage(): string {
-  return path.resolve(process.env.UPLOAD_DIR || path.join(process.cwd(), "data", "uploads"));
+  // Chemin choisi à l'exécution : ne pas l'inclure dans le traçage du build.
+  return path.resolve(/*turbopackIgnore: true*/ process.env.UPLOAD_DIR || path.join(process.cwd(), "data", "uploads"));
 }
 
 /** Résout un chemin interne en refusant toute sortie du dossier de stockage. */
