@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { dossierInputSchema } from "@/lib/validation";
+import { rattacherAuReferentiel } from "@/lib/referentiel";
 import { creerDossier } from "@/lib/repository";
 import { isDatabaseConfigured } from "@/lib/db";
 
@@ -27,7 +28,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { dossier, creeMaintenant } = await creerDossier(parsed.data);
+    // Commune et fokontany rattachés au référentiel officiel quand c'est possible
+    const { association } = parsed.data;
+    const localisation = rattacherAuReferentiel(association.district, association);
+    const { dossier, creeMaintenant } = await creerDossier({
+      ...parsed.data,
+      association: { ...association, communePcode: undefined, fokontanyPcode: undefined, ...localisation },
+    });
     return NextResponse.json({ dossier, creeMaintenant }, { status: creeMaintenant ? 201 : 200 });
   } catch (err) {
     console.error("Erreur création dossier", err);

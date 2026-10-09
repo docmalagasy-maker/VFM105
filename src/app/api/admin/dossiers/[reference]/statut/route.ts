@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { changerStatutDossier } from "@/lib/repository";
 import { z } from "zod";
+import { exigerSession, reponseAccesRefuse } from "@/lib/auth";
 
 const schema = z.object({
   statut: z.enum([
@@ -17,6 +18,11 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ reference: string }> }
 ) {
+  try {
+    await exigerSession(true);
+  } catch (err) {
+    return reponseAccesRefuse(err);
+  }
   const { reference } = await params;
   const body = await request.json().catch(() => null);
   const parsed = schema.safeParse(body);

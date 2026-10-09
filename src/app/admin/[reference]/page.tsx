@@ -1,4 +1,5 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { obtenirSession } from "@/lib/auth";
 import { obtenirDossierParReference } from "@/lib/repository";
 import DossierActions from "./DossierActions";
 
@@ -7,9 +8,12 @@ export default async function DossierAdminPage({
 }: {
   params: Promise<{ reference: string }>;
 }) {
+  const session = await obtenirSession();
+  if (!session) redirect("/admin/connexion");
   const { reference } = await params;
   const dossier = await obtenirDossierParReference(reference);
-  if (!dossier) notFound();
+  // Administrateur de district : uniquement les dossiers de son district, en lecture seule
+  if (!dossier || (session.role === "district" && dossier.association.district !== session.district)) notFound();
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-10">
@@ -24,6 +28,8 @@ export default async function DossierAdminPage({
         {dossier.association.district && (
           <Ligne label="District">{dossier.association.district}</Ligne>
         )}
+        {dossier.association.commune && <Ligne label="Commune">{dossier.association.commune}</Ligne>}
+        {dossier.association.fokontany && <Ligne label="Fokontany">{dossier.association.fokontany}</Ligne>}
         <Ligne label="Activité">{dossier.association.activite}</Ligne>
         <Ligne label="Nombre de membres">{dossier.association.nombreMembres}</Ligne>
         <Ligne label="Responsables">
@@ -62,7 +68,9 @@ export default async function DossierAdminPage({
         </Ligne>
       </dl>
 
-      <DossierActions reference={dossier.reference} statut={dossier.statut} statutSms={dossier.statutSms} />
+      {session.role === "super" && (
+        <DossierActions reference={dossier.reference} statut={dossier.statut} statutSms={dossier.statutSms} />
+      )}
     </div>
   );
 }

@@ -32,6 +32,11 @@ export interface DossierInput {
     nom: string;
     adresse: string;
     district: string;
+    /** Commune : nom du référentiel officiel, ou saisi à la main (communePcode vide). */
+    commune: string;
+    communePcode?: string;
+    fokontany?: string;
+    fokontanyPcode?: string;
     activite: string;
     nombreMembres: number;
   };

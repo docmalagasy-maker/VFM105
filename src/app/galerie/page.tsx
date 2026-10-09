@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
-import MenuPublic from "@/components/MenuPublic";
 import PublicShell from "@/components/PublicShell";
 import { listerPhotos } from "@/lib/galerie";
 import GrilleGalerie from "./GrilleGalerie";
@@ -16,7 +15,7 @@ export default async function GaleriePage() {
   const photos = await listerPhotos();
 
   return (
-    <PublicShell cardClassName="max-w-6xl" menu={<MenuPublic />}>
+    <PublicShell cardClassName="max-w-6xl">
       <div className="text-center">
         <h1 className="text-2xl font-bold text-vfm-marine sm:text-3xl">Sary</h1>
         <p className="mt-2 text-sm text-zinc-600 sm:text-base">

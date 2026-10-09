@@ -41,6 +41,10 @@ export const dossierInputSchema = z.object({
     district: z
       .string()
       .refine((val) => TOUS_LES_DISTRICTS.includes(val), "Safidio ny distrikan'ny fikambanana."),
+    commune: z.string().trim().min(1, "Safidio na soraty ny kaominin'ny fikambanana.").max(120),
+    communePcode: z.string().max(20).optional(),
+    fokontany: z.string().trim().max(120).optional(),
+    fokontanyPcode: z.string().max(20).optional(),
     activite: z.string().trim().min(1, "Tsy maintsy soratana ny asan'ny fikambanana."),
     nombreMembres: z
       .number()

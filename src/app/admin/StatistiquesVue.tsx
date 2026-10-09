@@ -1,19 +1,56 @@
-import { calculerStatistiques, type LigneZone } from "@/lib/statistiques";
+import {
+  calculerStatistiques,
+  COMMUNE_NON_RENSEIGNEE,
+  type LigneZone,
+} from "@/lib/statistiques";
 
 const nombre = (n: number, decimales = 0) =>
-  n.toLocaleString("fr-FR", { maximumFractionDigits: decimales, minimumFractionDigits: 0 });
+  n.toLocaleString("fr-FR", {
+    maximumFractionDigits: decimales,
+    minimumFractionDigits: 0,
+  });
 
-export default async function StatistiquesVue() {
-  const s = await calculerStatistiques();
+/** `district` : statistiques limitées à ce district (administrateur de district). */
+export default async function StatistiquesVue({
+  district,
+}: {
+  district?: string;
+}) {
+  const s = await calculerStatistiques(district);
+  const communesRepresentees = s.parCommune.filter(
+    (c) => c.nom !== COMMUNE_NON_RENSEIGNEE,
+  ).length;
 
   return (
     <div className="mt-6 flex flex-col gap-8">
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-        <Tuile libelle="Associations enregistrées" valeur={nombre(s.totalAssociations)} />
-        <Tuile libelle="Membres déclarés (total)" valeur={nombre(s.totalMembres)} />
-        <Tuile libelle="Membres par association (moyenne)" valeur={nombre(s.moyenneMembres, 1)} />
-        <Tuile libelle="Membres par association (médiane)" valeur={nombre(s.medianeMembres, 1)} />
-        <Tuile libelle="Districts représentés" valeur={`${s.districtsCouverts} / 120`} />
+        <Tuile
+          libelle="Associations enregistrées"
+          valeur={nombre(s.totalAssociations)}
+        />
+        <Tuile
+          libelle="Membres déclarés (total)"
+          valeur={nombre(s.totalMembres)}
+        />
+        <Tuile
+          libelle="Membres par association (moyenne)"
+          valeur={nombre(s.moyenneMembres, 1)}
+        />
+        <Tuile
+          libelle="Membres par association (médiane)"
+          valeur={nombre(s.medianeMembres, 1)}
+        />
+        {district ? (
+          <Tuile
+            libelle="Communes représentées"
+            valeur={String(communesRepresentees)}
+          />
+        ) : (
+          <Tuile
+            libelle="Districts représentés"
+            valeur={`${s.districtsCouverts} / 120`}
+          />
+        )}
       </section>
 
       <Bloc
@@ -33,7 +70,9 @@ export default async function StatistiquesVue() {
           <tbody className="divide-y divide-zinc-100">
             {s.parTranche.map((t) => (
               <tr key={t.libelle}>
-                <td className="whitespace-nowrap py-2 pr-4 text-zinc-700">{t.libelle}</td>
+                <td className="whitespace-nowrap py-2 pr-4 text-zinc-700">
+                  {t.libelle}
+                </td>
                 <td className="py-2 pr-4">
                   <Barre
                     valeur={t.associations}
@@ -44,7 +83,9 @@ export default async function StatistiquesVue() {
                 <td className="py-2 pr-4 text-right tabular-nums text-zinc-600">
                   {nombre(t.part * 100, 1)} %
                 </td>
-                <td className="py-2 text-right tabular-nums text-zinc-600">{nombre(t.membres)}</td>
+                <td className="py-2 text-right tabular-nums text-zinc-600">
+                  {nombre(t.membres)}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -52,22 +93,43 @@ export default async function StatistiquesVue() {
       </Bloc>
 
       <Bloc
-        titre="Associations et membres par district"
-        export="districts"
-        note="Trié par nombre d'associations. Seuls les districts ayant au moins une association apparaissent."
+        titre="Associations et membres par commune"
+        export="communes"
+        note="Trié par nombre d'associations. Commune choisie dans la liste officielle ou saisie à la main."
       >
-        <TableZones lignes={s.parDistrict} avecRegion />
+        <TableZones
+          lignes={s.parCommune}
+          colonnes={district ? ["Commune"] : ["Commune", "District"]}
+        />
       </Bloc>
 
-      <Bloc titre="Associations et membres par région" export="regions">
-        <TableZones lignes={s.parRegion} />
-      </Bloc>
+      {!district && (
+        <Bloc
+          titre="Associations et membres par district"
+          export="districts"
+          note="Trié par nombre d'associations. Seuls les districts ayant au moins une association apparaissent."
+        >
+          <TableZones
+            lignes={s.parDistrict}
+            colonnes={["District", "Région"]}
+          />
+        </Bloc>
+      )}
+
+      {!district && (
+        <Bloc titre="Associations et membres par région" export="regions">
+          <TableZones lignes={s.parRegion} colonnes={["Région"]} />
+        </Bloc>
+      )}
 
       <section className="rounded-lg border border-zinc-200 bg-white p-5">
-        <h2 className="text-base font-semibold text-zinc-900">Données détaillées</h2>
+        <h2 className="text-base font-semibold text-zinc-900">
+          Données détaillées
+        </h2>
         <p className="mt-1 text-sm text-zinc-500">
-          Tous les dossiers enregistrés, une ligne par dossier (association, district, membres,
-          coordonnées, description...). Le fichier s&apos;ouvre dans Excel ou LibreOffice.
+          Tous les dossiers enregistrés, une ligne par dossier (association,
+          district, membres, coordonnées, description...). Le fichier
+          s&apos;ouvre dans Excel ou LibreOffice.
         </p>
         <a
           href="/api/admin/export?type=dossiers"
@@ -83,7 +145,9 @@ export default async function StatistiquesVue() {
 function Tuile({ libelle, valeur }: { libelle: string; valeur: string }) {
   return (
     <div className="rounded-lg border border-zinc-200 bg-white px-4 py-3">
-      <p className="text-2xl font-semibold tabular-nums text-zinc-900">{valeur}</p>
+      <p className="text-2xl font-semibold tabular-nums text-zinc-900">
+        {valeur}
+      </p>
       <p className="mt-1 text-xs text-zinc-500">{libelle}</p>
     </div>
   );
@@ -119,9 +183,21 @@ function Bloc({
   );
 }
 
-function TableZones({ lignes, avecRegion }: { lignes: LigneZone[]; avecRegion?: boolean }) {
+/** `colonnes` : libellé de la zone, puis éventuellement celui de la zone parente (champ « region »). */
+function TableZones({
+  lignes,
+  colonnes,
+}: {
+  lignes: LigneZone[];
+  colonnes: [string] | [string, string];
+}) {
+  const avecParent = colonnes.length === 2;
   if (lignes.length === 0) {
-    return <p className="py-4 text-center text-sm text-zinc-500">Aucune association enregistrée.</p>;
+    return (
+      <p className="py-4 text-center text-sm text-zinc-500">
+        Aucune association enregistrée.
+      </p>
+    );
   }
   const maxAssociations = Math.max(...lignes.map((l) => l.associations));
   const maxMembres = Math.max(...lignes.map((l) => l.membres));
@@ -130,8 +206,10 @@ function TableZones({ lignes, avecRegion }: { lignes: LigneZone[]; avecRegion?: 
       <table className="w-full text-left text-sm">
         <thead className="sticky top-0 bg-white text-zinc-500">
           <tr>
-            <th className="py-2 pr-4 font-medium">{avecRegion ? "District" : "Région"}</th>
-            {avecRegion && <th className="py-2 pr-4 font-medium">Région</th>}
+            <th className="py-2 pr-4 font-medium">{colonnes[0]}</th>
+            {avecParent && (
+              <th className="py-2 pr-4 font-medium">{colonnes[1]}</th>
+            )}
             <th className="w-1/4 py-2 pr-4 font-medium">Associations</th>
             <th className="w-1/4 py-2 pr-4 font-medium">Membres déclarés</th>
             <th className="py-2 text-right font-medium">Moyenne</th>
@@ -139,16 +217,32 @@ function TableZones({ lignes, avecRegion }: { lignes: LigneZone[]; avecRegion?: 
         </thead>
         <tbody className="divide-y divide-zinc-100">
           {lignes.map((l) => (
-            <tr key={l.nom}>
-              <td className="whitespace-nowrap py-2 pr-4 text-zinc-900">{l.nom}</td>
-              {avecRegion && <td className="whitespace-nowrap py-2 pr-4 text-zinc-500">{l.region}</td>}
+            <tr key={`${l.region ?? ""}|${l.nom}`}>
+              <td className="whitespace-nowrap py-2 pr-4 text-zinc-900">
+                {l.nom}
+              </td>
+              {avecParent && (
+                <td className="whitespace-nowrap py-2 pr-4 text-zinc-500">
+                  {l.region}
+                </td>
+              )}
               <td className="py-2 pr-4">
-                <Barre valeur={l.associations} max={maxAssociations} infobulle={`${l.nom} : ${l.associations} association(s)`} />
+                <Barre
+                  valeur={l.associations}
+                  max={maxAssociations}
+                  infobulle={`${l.nom} : ${l.associations} association(s)`}
+                />
               </td>
               <td className="py-2 pr-4">
-                <Barre valeur={l.membres} max={maxMembres} infobulle={`${l.nom} : ${nombre(l.membres)} membre(s)`} />
+                <Barre
+                  valeur={l.membres}
+                  max={maxMembres}
+                  infobulle={`${l.nom} : ${nombre(l.membres)} membre(s)`}
+                />
               </td>
-              <td className="py-2 text-right tabular-nums text-zinc-600">{nombre(l.moyenneMembres, 1)}</td>
+              <td className="py-2 text-right tabular-nums text-zinc-600">
+                {nombre(l.moyenneMembres, 1)}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -158,8 +252,17 @@ function TableZones({ lignes, avecRegion }: { lignes: LigneZone[]; avecRegion?: 
 }
 
 /** Barre horizontale simple (une seule série) avec la valeur affichée à droite. */
-function Barre({ valeur, max, infobulle }: { valeur: number; max: number; infobulle: string }) {
-  const largeur = max > 0 ? Math.max((valeur / max) * 100, valeur > 0 ? 2 : 0) : 0;
+function Barre({
+  valeur,
+  max,
+  infobulle,
+}: {
+  valeur: number;
+  max: number;
+  infobulle: string;
+}) {
+  const largeur =
+    max > 0 ? Math.max((valeur / max) * 100, valeur > 0 ? 2 : 0) : 0;
   return (
     <div className="group flex items-center gap-2" title={infobulle}>
       <div className="h-3 min-w-[4rem] flex-1">
@@ -168,7 +271,9 @@ function Barre({ valeur, max, infobulle }: { valeur: number; max: number; infobu
           style={{ width: `${largeur}%` }}
         />
       </div>
-      <span className="w-14 shrink-0 text-right tabular-nums text-zinc-700">{nombre(valeur)}</span>
+      <span className="w-14 shrink-0 text-right tabular-nums text-zinc-700">
+        {nombre(valeur)}
+      </span>
     </div>
   );
 }

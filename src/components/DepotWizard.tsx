@@ -6,6 +6,7 @@ import { validateTelephoneMadagascar } from "@/lib/validation";
 import type { AutreCoordonnee, PieceJointe, Responsable } from "@/lib/types";
 import PublicShell from "@/components/PublicShell";
 import { DISTRICTS_PAR_REGION } from "@/lib/districts";
+import ChoixLocalite, { LOCALITE_VIDE, type Localite } from "@/components/ChoixLocalite";
 import {
   IconPeople,
   IconGear,
@@ -36,6 +37,7 @@ interface FormState {
   nomAssociation: string;
   adresseAssociation: string;
   district: string;
+  localite: Localite;
   responsables: Responsable[];
   activite: string;
   activiteAutre: string;
@@ -51,6 +53,7 @@ const ETAT_INITIAL: FormState = {
   nomAssociation: "",
   adresseAssociation: "",
   district: "",
+  localite: LOCALITE_VIDE,
   responsables: [{ nom: "", prenom: "" }],
   activite: ACTIVITES[0],
   activiteAutre: "",
@@ -160,6 +163,7 @@ export default function DepotWizard() {
     if (!form.nomAssociation.trim()) problemes.push("Soraty ny anaran'ny fikambanana.");
     if (!form.adresseAssociation.trim()) problemes.push("Soraty ny adiresin'ny fikambanana.");
     if (!form.district) problemes.push("Safidio ny distrikan'ny fikambanana.");
+    else if (!form.localite.commune.trim()) problemes.push("Safidio na soraty ny kaominin'ny fikambanana.");
     const principal = form.responsables[0];
     if (!principal?.nom.trim() || !principal?.prenom.trim()) {
       problemes.push("Soraty ny anarana sy ny fanampin'anaran'ny tompon'andraikitra voalohany.");
@@ -205,6 +209,10 @@ export default function DepotWizard() {
             nom: form.nomAssociation.trim(),
             adresse: form.adresseAssociation.trim(),
             district: form.district,
+            commune: form.localite.commune.trim(),
+            communePcode: form.localite.communePcode || undefined,
+            fokontany: form.localite.fokontany.trim() || undefined,
+            fokontanyPcode: form.localite.fokontanyPcode || undefined,
             activite,
             nombreMembres: Number(form.nombreMembres),
           },
@@ -249,6 +257,8 @@ export default function DepotWizard() {
           <Ligne label="Fikambanana">{form.nomAssociation}</Ligne>
           <Ligne label="Adiresy">{form.adresseAssociation}</Ligne>
           <Ligne label="Distrika">{form.district}</Ligne>
+          <Ligne label="Kaominina">{form.localite.commune}</Ligne>
+          {form.localite.fokontany && <Ligne label="Fokontany">{form.localite.fokontany}</Ligne>}
           <Ligne label="Tompon'andraikitra voalohany">
             {form.responsables[0]?.prenom} {form.responsables[0]?.nom}
           </Ligne>
@@ -373,7 +383,7 @@ export default function DepotWizard() {
                 <select
                   className="input"
                   value={form.district}
-                  onChange={(e) => setForm((f) => ({ ...f, district: e.target.value }))}
+                  onChange={(e) => setForm((f) => ({ ...f, district: e.target.value, localite: LOCALITE_VIDE }))}
                 >
                   <option value="" disabled>
                     Safidio ny distrika
@@ -389,6 +399,11 @@ export default function DepotWizard() {
                   ))}
                 </select>
               </Champ>
+              <ChoixLocalite
+                district={form.district}
+                valeur={form.localite}
+                onChange={(modif) => setForm((f) => ({ ...f, localite: { ...f.localite, ...modif } }))}
+              />
 
               <div className="flex flex-col gap-2">
                 <span className="text-sm font-medium text-zinc-700">

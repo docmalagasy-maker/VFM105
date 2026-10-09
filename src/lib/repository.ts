@@ -1,4 +1,5 @@
 import { getPool } from "@/lib/db";
+import { verifierSchema } from "@/lib/schema";
 import { genererProchaineReference } from "@/lib/reference";
 import { supprimerPieceJointe } from "@/lib/stockage";
 import type { Dossier, DossierInput, StatutDossier } from "@/lib/types";
@@ -15,6 +16,10 @@ function ligneVersDossier(row: Record<string, unknown>): Dossier {
       nom: row.association_nom as string,
       adresse: row.association_adresse as string,
       district: (row.association_district as string) ?? "",
+      commune: (row.association_commune as string) ?? "",
+      communePcode: (row.association_commune_pcode as string) ?? undefined,
+      fokontany: (row.association_fokontany as string) ?? undefined,
+      fokontanyPcode: (row.association_fokontany_pcode as string) ?? undefined,
       activite: row.association_activite as string,
       nombreMembres: row.association_nombre_membres as number,
     },
@@ -29,22 +34,6 @@ function ligneVersDossier(row: Record<string, unknown>): Dossier {
   };
 }
 
-let colonneDistrictVerifiee: Promise<unknown> | undefined;
-
-/**
- * Applique migrations/002_district.sql si besoin (idempotent), pour qu'un
- * déploiement ne casse pas le dépôt de dossiers avant la migration manuelle.
- */
-export function verifierColonneDistrict(): Promise<unknown> {
-  colonneDistrictVerifiee ??= getPool()
-    .query(`ALTER TABLE dossiers ADD COLUMN IF NOT EXISTS association_district TEXT`)
-    .catch((err) => {
-      colonneDistrictVerifiee = undefined;
-      throw err;
-    });
-  return colonneDistrictVerifiee;
-}
-
 /**
  * Enregistre définitivement un dossier. Idempotent : si `idempotencyKey` a
  * déjà été utilisé (double clic, retry réseau), retourne le dossier existant
@@ -55,7 +44,7 @@ export async function creerDossier(input: DossierInput): Promise<{
   creeMaintenant: boolean;
 }> {
   const pool = getPool();
-  await verifierColonneDistrict();
+  await verifierSchema();
 
   const existant = await pool.query(
     `SELECT * FROM dossiers WHERE idempotency_key = $1`,
@@ -71,10 +60,11 @@ export async function creerDossier(input: DossierInput): Promise<{
   const result = await pool.query(
     `INSERT INTO dossiers (
        reference, idempotency_key, date_depot, statut, statut_sms,
-       association_nom, association_adresse, association_district, association_activite,
-       association_nombre_membres, responsables, telephone, email, autres_coordonnees,
-       description, pieces
-     ) VALUES ($1,$2,$3,'recu','a_envoyer',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+       association_nom, association_adresse, association_district, association_commune,
+       association_commune_pcode, association_fokontany, association_fokontany_pcode,
+       association_activite, association_nombre_membres, responsables, telephone, email,
+       autres_coordonnees, description, pieces
+     ) VALUES ($1,$2,$3,'recu','a_envoyer',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
      ON CONFLICT (idempotency_key) DO NOTHING
      RETURNING *`,
     [
@@ -84,6 +74,10 @@ export async function creerDossier(input: DossierInput): Promise<{
       input.association.nom,
       input.association.adresse,
       input.association.district,
+      input.association.commune,
+      input.association.communePcode || null,
+      input.association.fokontany || null,
+      input.association.fokontanyPcode || null,
       input.association.activite,
       input.association.nombreMembres,
       JSON.stringify(input.responsables),
@@ -158,29 +152,43 @@ export async function obtenirDossierParReference(reference: string): Promise<Dos
   return result.rows.length > 0 ? ligneVersDossier(result.rows[0]) : null;
 }
 
-export async function listerDossiers(recherche?: string, limite = 200): Promise<Dossier[]> {
+/**
+ * Liste des dossiers, du plus récent au plus ancien. `district` limite aux
+ * dossiers de ce district (administrateur de district).
+ */
+export async function listerDossiers(
+  recherche?: string,
+  limite = 200,
+  district?: string
+): Promise<Dossier[]> {
   const pool = getPool();
-  await verifierColonneDistrict();
-  if (recherche && recherche.trim()) {
-    const motif = `%${recherche.trim()}%`;
-    const result = await pool.query(
-      `SELECT * FROM dossiers
-       WHERE reference ILIKE $1
-          OR association_nom ILIKE $1
-          OR association_district ILIKE $1
-          OR telephone ILIKE $1
-          OR responsables::text ILIKE $1
-       ORDER BY date_depot DESC
-       LIMIT $2`,
-      [motif, limite]
-    );
-    return result.rows.map(ligneVersDossier);
-  }
+  await verifierSchema();
+  const motif = recherche?.trim() ? `%${recherche.trim()}%` : null;
   const result = await pool.query(
-    `SELECT * FROM dossiers ORDER BY date_depot DESC LIMIT $1`,
-    [limite]
+    `SELECT * FROM dossiers
+     WHERE ($2::text IS NULL OR association_district = $2)
+       AND ($3::text IS NULL
+         OR reference ILIKE $3
+         OR association_nom ILIKE $3
+         OR association_district ILIKE $3
+         OR association_commune ILIKE $3
+         OR association_fokontany ILIKE $3
+         OR telephone ILIKE $3
+         OR responsables::text ILIKE $3)
+     ORDER BY date_depot DESC
+     LIMIT $1`,
+    [limite, district ?? null, motif]
   );
   return result.rows.map(ligneVersDossier);
+}
+
+/** Vrai si la pièce jointe appartient à un dossier du district donné. */
+export async function pieceDuDistrict(pathname: string, district: string): Promise<boolean> {
+  const r = await getPool().query(
+    `SELECT 1 FROM dossiers WHERE association_district = $1 AND pieces @> $2::jsonb LIMIT 1`,
+    [district, JSON.stringify([{ pathname }])]
+  );
+  return r.rows.length > 0;
 }
 
 /**

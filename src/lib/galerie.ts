@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
+import type { Session } from "@/lib/jeton";
 
 /**
  * Deux sources de photos pour la galerie publique :
@@ -20,6 +21,8 @@ export interface Photo {
   /** Légende déduite du nom de fichier (« 01-fete-nationale_2026.jpg » → « fete nationale 2026 »). */
   legende: string;
   date: number;
+  /** Photo envoyée depuis l'admin : id de l'administrateur de district, ou « super ». */
+  auteur?: number | "super";
 }
 
 export const TYPES_PAR_EXTENSION: Record<string, string> = {
@@ -92,6 +95,7 @@ async function lister(source: SourcePhoto): Promise<Photo[]> {
       url: `/galerie/photo/${source}/${encodeURIComponent(nom)}`,
       legende: legende(nom, source),
       date: infos.mtimeMs,
+      auteur: source === "envoi" ? auteurPhoto(nom) : undefined,
     });
   }
   return photos;
@@ -122,13 +126,20 @@ export async function lirePhoto(
   }
 }
 
-export async function ajouterPhoto(fichier: File): Promise<{ ok: true; nom: string } | { ok: false; erreur: string }> {
+/** Auteur encodé dans le nom du fichier : « …-a12.jpg » (district n° 12), sinon super-administrateur. */
+function auteurPhoto(nom: string): number | "super" {
+  const m = /-a(\d+)\.[a-z]+$/i.exec(nom);
+  return m ? Number(m[1]) : "super";
+}
+
+export async function ajouterPhoto(fichier: File, session: Session): Promise<{ ok: true; nom: string } | { ok: false; erreur: string }> {
   const extension = EXTENSION_PAR_TYPE[fichier.type];
   if (!extension) return { ok: false, erreur: `${fichier.name} : format non accepté (JPEG, PNG, WebP ou GIF).` };
   if (fichier.size > MAX_TAILLE_PHOTO) return { ok: false, erreur: `${fichier.name} : trop volumineux (15 Mo maximum).` };
 
   // Nom horodaté + aléatoire : jamais le nom fourni, et tri chronologique simple.
-  const nom = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}${extension}`;
+  const marque = session.role === "district" ? `-a${session.id}` : "-s";
+  const nom = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}${marque}${extension}`;
   const destination = cheminPhoto("envoi", nom);
   if (!destination) return { ok: false, erreur: "Nom de fichier invalide." };
   await mkdir(path.dirname(destination), { recursive: true });
@@ -136,12 +147,20 @@ export async function ajouterPhoto(fichier: File): Promise<{ ok: true; nom: stri
   return { ok: true, nom };
 }
 
-/** Supprime une photo envoyée depuis l'admin (celles du dossier GALERIE se gèrent via Git). */
-export async function supprimerPhoto(nom: string): Promise<boolean> {
+/**
+ * Supprime une photo envoyée depuis l'admin (celles du dossier GALERIE se gèrent
+ * via Git). Un administrateur de district ne supprime que ses propres photos.
+ */
+export async function supprimerPhoto(nom: string, session: Session): Promise<boolean> {
   const absolu = cheminPhoto("envoi", nom);
   if (!absolu) return false;
+  if (!peutSupprimer(nom, session)) return false;
   const existe = await stat(/*turbopackIgnore: true*/ absolu).then((s) => s.isFile()).catch(() => false);
   if (!existe) return false;
   await rm(absolu, { force: true });
   return true;
+}
+
+export function peutSupprimer(nom: string, session: Session): boolean {
+  return session.role === "super" || auteurPhoto(nom) === session.id;
 }

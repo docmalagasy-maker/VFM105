@@ -1,15 +1,13 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
+import MenuPublic from "@/components/MenuPublic";
 
 export default function PublicShell({
   children,
   cardClassName = "max-w-md",
-  menu,
 }: {
   children: ReactNode;
   cardClassName?: string;
-  /** Menu affiché entre le logo et la carte (accueil, galerie). */
-  menu?: ReactNode;
 }) {
   return (
     <div className="relative min-h-dvh w-full bg-vfm-public">
@@ -27,7 +25,10 @@ export default function PublicShell({
           />
         </div>
 
-        {menu && <div className="mb-6 w-full">{menu}</div>}
+        {/* Menus Sary | Fifandraisana, visibles sur toutes les pages publiques */}
+        <div className="mb-6 w-full">
+          <MenuPublic />
+        </div>
 
         <div
           className={`w-full ${cardClassName} overflow-hidden rounded-3xl border border-vfm-beige-bord bg-white shadow-[0_20px_50px_-20px_rgba(20,43,71,0.25)]`}

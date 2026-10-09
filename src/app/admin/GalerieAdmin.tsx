@@ -5,7 +5,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Photo } from "@/lib/galerie";
 
-export default function GalerieAdmin({ photos }: { photos: Photo[] }) {
+export default function GalerieAdmin({
+  photos,
+  auteur,
+}: {
+  photos: Photo[];
+  /** Utilisateur connecté : un administrateur de district ne supprime que ses propres photos. */
+  auteur: number | "super";
+}) {
   const router = useRouter();
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
   const [message, setMessage] = useState<{ texte: string; erreur: boolean } | null>(null);
@@ -106,7 +113,7 @@ export default function GalerieAdmin({ photos }: { photos: Photo[] }) {
                   <span className="truncate text-xs text-zinc-500" title={p.nom}>
                     {p.source === "envoi" ? "Envoyée ici" : p.nom}
                   </span>
-                  {p.source === "envoi" && (
+                  {p.source === "envoi" && (auteur === "super" || p.auteur === auteur) && (
                     <button
                       type="button"
                       onClick={() => supprimer(p)}

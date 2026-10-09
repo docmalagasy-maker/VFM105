@@ -17,6 +17,10 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | B | 9 octobre 2026 | B2 — Statistiques et exports CSV | Mis en ligne |
 | C | 9 octobre 2026 | C1 — Galerie photos « Sary » | Mis en ligne |
 | C | 9 octobre 2026 | C2 — Menu contact « Fifandraisana » | Mis en ligne |
+| C | 9 octobre 2026 | C3 — Menus Sary / Fifandraisana visibles sur toutes les pages | Mis en ligne |
+| D | 9 octobre 2026 | D1 — Administrateurs de district et droits d'accès | Mis en ligne |
+| D | 9 octobre 2026 | D2.1 — Carte interactive districts / communes | Mis en ligne |
+| D | 9 octobre 2026 | D2.2 / D2.3 — Listes District > Commune > Fokontany, liées à la carte | Mis en ligne |
 
 ---
 
@@ -357,3 +361,213 @@ lot C (sans légende, noms automatiques).
 - [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
 - [ ] Ajouter de vraies photos (dossier `GALERIE` ou admin) et vérifier
       `/galerie` sur téléphone et ordinateur.
+
+### C3 — Correction : menus visibles en permanence
+
+**Avant :** les menus **Sary** | **Fifandraisana** n'apparaissaient que sur
+l'accueil et la galerie ; ils disparaissaient sur le formulaire de dépôt.
+
+**Après :** les menus sont intégrés à l'habillage commun de toutes les
+pages publiques : accueil, formulaire de dépôt, récapitulatif, page de
+remerciement et galerie. Le lien **Fandraisana** (retour à l'accueil)
+s'ajoute automatiquement sur toutes les pages sauf l'accueil.
+
+Quitter le formulaire par un menu ne fait pas perdre la saisie : le
+brouillon est conservé dans le navigateur et retrouvé au retour.
+
+**Fichiers :** `src/components/PublicShell.tsx` (menu toujours affiché),
+`src/components/MenuPublic.tsx` (détection de l'accueil),
+`src/app/page.tsx` et `src/app/galerie/page.tsx` (menu retiré, désormais
+fourni par l'habillage).
+
+**Vérifié en local :** menus présents sur `/`, `/deposer` et `/galerie` ;
+« Fandraisana » absent de l'accueil uniquement.
+
+---
+
+## Lot D — 9 octobre 2026 — Administrateurs de district et cartographie
+
+### Référentiel géographique (source des données)
+
+Les projets `D:\WINTIME CODE\onn-board` et `D:\New_moring` ont été examinés :
+ils ne contiennent ni les contours des districts et des communes, ni les
+noms des fokontany (onn-board : contours des 24 régions et liste des
+communes ; New Morning : carte des régions en image et données simulées).
+
+Source retenue (accord donné le 9 octobre 2026) : **Madagascar —
+Subnational Administrative Boundaries**, BNGRC, diffusée par OCHA/HDX
+(data.humdata.org, jeu `cod-ab-mdg`, mise à jour du 13 août 2026),
+**licence CC BY-IGO** (citation de la source affichée sous la carte).
+Fichiers téléchargés sur le PC uniquement (hors dépôt) :
+`mdg_admin_boundaries.xlsx` (3,3 Mo) et `mdg_admin_boundaries.geojson.zip`
+(77,3 Mo).
+
+Données extraites et allégées, intégrées au site :
+
+| Fichier | Contenu | Taille |
+|---|---|---|
+| `src/data/referentiel-geo.json` | 120 districts → 1 645 communes → 17 465 fokontany (noms + codes officiels) | 620 Ko (côté serveur) |
+| `public/carte/districts.json` | Contours simplifiés des 120 districts | 217 Ko |
+| `public/carte/communes/<code>.json` | Contours simplifiés des communes, un fichier par district | 1,8 Mo au total (≈ 15 Ko chargés par district) |
+
+20 districts portent un nom différent dans la source officielle
+(« Antananarivo I » = « 1er Arrondissement », « Taolanaro » =
+« Taolagnaro », « Port-Bergé » = « Port-Berge (Boriziny-Vaovao) »...) :
+la correspondance est faite automatiquement, la liste du formulaire ne
+change pas.
+
+### D1 — Administrateurs de district et droits d'accès
+
+**Connexion :** la fenêtre de mot de passe du navigateur est remplacée par
+une **page de connexion** (`/admin/connexion`). Le super-administrateur se
+connecte avec les mêmes identifiants qu'avant (`ADMIN_USER` /
+`ADMIN_PASSWORD`). Session de 12 heures, bouton « Se déconnecter » ;
+8 essais ratés → blocage 15 minutes.
+
+**Demande d'accès (par l'administrateur de district lui-même) :** page
+`/admin/inscription` (lien aussi sur la page de connexion) : nom, prénom,
+téléphone, district d'origine, **identifiant et mot de passe choisis par
+l'administrateur** (10 caractères minimum). Le mot de passe est enregistré
+chiffré (scrypt) : personne, pas même le super-administrateur, ne peut le
+lire.
+
+**Validation par le super-administrateur :**
+
+- un e-mail est envoyé à **doc.malagasy@gmail.com** avec un lien de
+  validation ; le lien ouvre la demande, **uniquement après connexion en
+  super-administrateur** (un lien intercepté ne suffit pas) ;
+- les demandes apparaissent aussi dans le nouvel onglet **Administrateurs**
+  (réservé au super-administrateur) : Valider, Refuser, Désactiver,
+  Réactiver, Supprimer ;
+- tant que la demande n'est pas validée, la connexion est refusée ; une
+  désactivation prend effet immédiatement.
+
+**Règles :**
+
+- un seul administrateur (actif ou en attente) par district, garanti par la
+  base de données ; les districts déjà attribués sont grisés dans la liste ;
+- identifiant unique, différent de celui du super-administrateur.
+
+**Droits de l'administrateur de district** (choix du 9 octobre 2026) :
+
+| Fonction | Super-administrateur | Administrateur de district |
+|---|---|---|
+| Liste et consultation des dossiers | Tous | Son district uniquement |
+| Fiche d'un dossier, pièces jointes | Tous | Son district uniquement (lecture seule) |
+| Changer le statut, renvoyer le SMS, supprimer un dossier | Oui | Non |
+| Statistiques | Nationales | Son district (par commune) |
+| Exports CSV | Tout | Son district uniquement |
+| Carte | Madagascar entière | Son district |
+| Galerie photos (nationale) | Ajouter, supprimer toutes les photos envoyées | Ajouter ; supprimer ses propres photos |
+| Gestion des administrateurs | Oui | Non |
+
+Les restrictions sont appliquées côté serveur (affichage, consultation,
+modification, exports, carte, pièces jointes) : testées en appelant
+directement les adresses interdites (403 ou 404).
+
+### D2.1 — Carte interactive (onglet « Carte »)
+
+- **Super-administrateur :** carte de Madagascar par district, colorée selon
+  le nombre d'associations (0, 1, 2–4, 5–9, 10 et plus) ; survol = nom et
+  chiffres ; clic sur un district → carte de ses communes ; bouton
+  « ← Madagascar » pour revenir. Liste des districts classés à droite.
+- **Administrateur de district :** directement la carte des communes de son
+  district.
+- Clic sur une commune → liste de ses associations : nom, responsable,
+  téléphone (cliquable), fokontany, nombre de membres, lien vers la fiche.
+- Les communes **saisies à la main** (hors référentiel) sont listées à part,
+  « hors carte », et restent consultables.
+- Données lues en direct dans la base : chaque nouveau dossier apparaît
+  aussitôt sur la carte.
+
+### D2.2 / D2.3 — Formulaire : District > Kaominina > Fokontany
+
+Dans le bloc « Ny fikambanana », après le district :
+
+- **Kaominina** (obligatoire) : liste des communes du district choisi,
+  plus « Hafa (soraty ny anarana) » pour saisir un nom absent de la liste ;
+- **Fokontany** (facultatif) : liste des fokontany de la commune choisie,
+  plus « Hafa » pour la saisie libre ; saisie libre directe si la commune
+  a été écrite à la main ;
+- changer de district vide la commune et le fokontany ; bouton « Lisitra »
+  pour revenir à la liste après une saisie manuelle ;
+- récapitulatif, fiche admin, exports et carte affichent commune et
+  fokontany.
+
+**Enregistrement :** chaque dossier conserve le nom de la commune et du
+fokontany, et leur code officiel quand ils viennent du référentiel. Le
+serveur revérifie : un code qui n'appartient pas au district choisi est
+ignoré, et un nom tapé à la main identique à un nom officiel est rattaché
+automatiquement à son code. Les saisies manuelles sont conservées telles
+quelles et comptées dans les statistiques (tableau par commune).
+
+### Base de données
+
+Migration `migrations/003_admins_geo.sql`, **appliquée automatiquement**
+au premier accès après le déploiement (aucune action manuelle) :
+4 colonnes ajoutées aux dossiers (commune, code commune, fokontany, code
+fokontany), nouvelle table `administrateurs`.
+
+### Configuration à faire (Coolify et LWS)
+
+1. **Boîte d'envoi chez LWS** : `noreply@0550.site`, créée le 9 octobre
+   2026. Serveur vérifié : `mail77.lwspanel.com`, port 465 (SSL),
+   certificat valide ; l'enregistrement SPF du domaine autorise ce serveur.
+2. **Coolify → application → Environment Variables**, ajouter :
+
+| Variable | Valeur |
+|---|---|
+| `SMTP_HOST` | `mail77.lwspanel.com` (serveur LWS de la boîte ; `mail.0550.site` pointe au même endroit mais son certificat SSL est au nom de lwspanel.com et serait refusé) |
+| `SMTP_PORT` | `465` |
+| `SMTP_USER` | `noreply@0550.site` |
+| `SMTP_PASSWORD` | mot de passe de la boîte (ne jamais l'écrire ailleurs) |
+| `SMTP_FROM` | `VFM <noreply@0550.site>` |
+| `SESSION_SECRET` | nouveau secret de 64 caractères (méthode `serveur.md` §5) — conseillé |
+| `SUPER_ADMIN_EMAIL` | facultatif, `doc.malagasy@gmail.com` par défaut |
+
+3. **Deploy**. Sans les variables `SMTP_*`, tout fonctionne mais les
+   demandes ne sont visibles que dans l'onglet Administrateurs.
+
+### Fichiers principaux
+
+| Fichier | Rôle |
+|---|---|
+| `src/lib/auth.ts`, `src/lib/jeton.ts`, `src/proxy.ts` | Sessions, mots de passe, protection des pages admin |
+| `src/app/admin/connexion/`, `src/app/admin/inscription/`, `src/app/admin/validation/[jeton]/` | Connexion, demande d'accès, validation |
+| `src/app/api/auth/*` | Connexion, déconnexion, inscription |
+| `src/lib/administrateurs.ts`, `src/app/admin/AdministrateursVue.tsx`, `ActionsAdministrateur.tsx`, `src/app/api/admin/administrateurs/[id]/` | Gestion des comptes |
+| `src/lib/email.ts` | Envoi d'e-mails (nodemailer) |
+| `src/lib/referentiel.ts`, `src/data/referentiel-geo.json`, `src/app/api/referentiel/` | Référentiel District > Commune > Fokontany |
+| `src/components/ChoixLocalite.tsx`, `src/components/DepotWizard.tsx` | Listes liées du formulaire |
+| `src/lib/carte.ts`, `src/app/api/admin/carte/`, `src/app/admin/CarteAdmin.tsx`, `public/carte/` | Carte interactive |
+| `src/lib/schema.ts`, `migrations/003_admins_geo.sql` | Évolution de la base |
+| Routes `src/app/api/admin/*`, `src/lib/statistiques.ts`, `src/lib/galerie.ts`, pages `src/app/admin/*` | Application des droits par district |
+
+Nouvelles dépendances : `d3-geo` (dessin de la carte), `nodemailer`
+(e-mails, version 10.0.16).
+
+**Vérifié en local** (base de test) : listes liées (25 communes pour
+Ambohidratrimo, 31 fokontany pour Mahitsy), saisie manuelle, rattachement
+et contrôle des codes ; demande d'accès, refus d'une 2e demande pour le
+même district, connexion refusée avant validation, validation par lien
+(connexion super-administrateur exigée) ; administrateur de district limité
+à son district pour la liste, les fiches, les exports et la carte ; actions
+interdites refusées (403/404) ; galerie : suppression des photos d'autrui
+refusée ; carte nationale (120 districts) et carte de district
+(25 communes) colorées selon les données ; build de production réussi.
+
+### Mise en ligne du lot D
+
+- [ ] GO, commit et push sur `master` (avec C3).
+- [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
+- [ ] Se reconnecter à `/admin` avec les identifiants habituels (nouvelle
+      page de connexion).
+- [x] Créer la boîte `noreply@0550.site` chez LWS.
+- [x] Variables `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_FROM` ajoutées
+      dans Coolify (9 octobre 2026).
+- [x] Test depuis le VPS : ports 465 et 587 vers `mail77.lwspanel.com`
+      ouverts.
+- [ ] `SMTP_PASSWORD` et `SESSION_SECRET` : à saisir par le responsable
+      (secrets), puis *Deploy*.
+- [ ] Test : demande d'accès pour un district, réception de l'e-mail,
+      validation, connexion de l'administrateur de district.

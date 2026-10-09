@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const EMAIL_CONTACT = "contact.vfm@0550.site";
 
 /** Menus publics « Sary » (galerie photos) | « Fifandraisana » (contact). */
-export default function MenuPublic({ accueil }: { accueil?: boolean }) {
+export default function MenuPublic() {
+  const accueil = usePathname() === "/";
   const [contactOuvert, setContactOuvert] = useState(false);
 
   return (

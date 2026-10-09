@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { exigerSession, reponseAccesRefuse } from "@/lib/auth";
 import { supprimerDossier } from "@/lib/repository";
 
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ reference: string }> }
 ) {
+  try {
+    await exigerSession(true);
+  } catch (err) {
+    return reponseAccesRefuse(err);
+  }
   const { reference } = await params;
   try {
     const supprime = await supprimerDossier(reference);

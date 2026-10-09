@@ -1,9 +1,10 @@
 import { getPool } from "@/lib/db";
 import { DISTRICTS_PAR_REGION } from "@/lib/districts";
-import { verifierColonneDistrict } from "@/lib/repository";
+import { verifierSchema } from "@/lib/schema";
 
 /** Libellé des dossiers déposés avant l'ajout du champ District. */
 export const DISTRICT_NON_RENSEIGNE = "Non renseigné";
+export const COMMUNE_NON_RENSEIGNEE = "Non renseignée";
 
 const REGION_PAR_DISTRICT = new Map(
   DISTRICTS_PAR_REGION.flatMap((r) => r.districts.map((d) => [d, r.region] as const))
@@ -43,6 +44,8 @@ export interface Statistiques {
   districtsCouverts: number;
   parDistrict: LigneZone[];
   parRegion: LigneZone[];
+  /** Par commune (la colonne « region » contient alors le district). */
+  parCommune: LigneZone[];
   parTranche: LigneTranche[];
 }
 
@@ -62,11 +65,15 @@ function regrouper(lignes: { cle: string; membres: number; region?: string }[]):
 /**
  * Statistiques sur les associations enregistrées. Chaque dossier compte pour
  * une association (une association qui dépose deux dossiers compte deux fois).
+ * `district` limite le calcul à ce district (administrateur de district).
  */
-export async function calculerStatistiques(): Promise<Statistiques> {
-  await verifierColonneDistrict();
-  const result = await getPool().query<{ district: string | null; membres: number }>(
-    `SELECT association_district AS district, association_nombre_membres AS membres FROM dossiers`
+export async function calculerStatistiques(district?: string): Promise<Statistiques> {
+  await verifierSchema();
+  const result = await getPool().query<{ district: string | null; commune: string | null; membres: number }>(
+    `SELECT association_district AS district, association_commune AS commune,
+            association_nombre_membres AS membres
+     FROM dossiers WHERE ($1::text IS NULL OR association_district = $1)`,
+    [district ?? null]
   );
 
   const lignes = result.rows.map((r) => {
@@ -74,6 +81,7 @@ export async function calculerStatistiques(): Promise<Statistiques> {
     return {
       district,
       region: REGION_PAR_DISTRICT.get(district) ?? DISTRICT_NON_RENSEIGNE,
+      commune: r.commune?.trim() || COMMUNE_NON_RENSEIGNEE,
       membres: Number(r.membres) || 0,
     };
   });
@@ -87,6 +95,11 @@ export async function calculerStatistiques(): Promise<Statistiques> {
 
   const parDistrict = regrouper(lignes.map((l) => ({ cle: l.district, region: l.region, membres: l.membres })));
   const parRegion = regrouper(lignes.map((l) => ({ cle: l.region, membres: l.membres })));
+  const SEPARATEUR = "|";
+  // Clé « district / commune » : deux communes homonymes de districts différents restent distinctes
+  const parCommune = regrouper(
+    lignes.map((l) => ({ cle: `${l.district}${SEPARATEUR}${l.commune}`, region: l.district, membres: l.membres }))
+  ).map((z) => ({ ...z, nom: z.nom.slice(z.nom.indexOf(SEPARATEUR) + 1) }));
 
   const parTranche = TRANCHES_MEMBRES.map((t) => {
     const dedans = lignes.filter((l) => l.membres >= t.min && l.membres <= t.max);
@@ -106,6 +119,7 @@ export async function calculerStatistiques(): Promise<Statistiques> {
     districtsCouverts: parDistrict.filter((d) => d.nom !== DISTRICT_NON_RENSEIGNE).length,
     parDistrict,
     parRegion,
+    parCommune,
     parTranche,
   };
 }

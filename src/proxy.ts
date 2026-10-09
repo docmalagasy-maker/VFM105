@@ -1,27 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
+import { COOKIE_SESSION, lireJeton } from "@/lib/jeton";
 
 export const config = {
   matcher: ["/admin/:path*", "/api/admin/:path*"],
 };
 
-export function proxy(request: NextRequest) {
-  const utilisateur = process.env.ADMIN_USER;
-  const motDePasse = process.env.ADMIN_PASSWORD;
+// Pages d'administration accessibles sans être connecté
+const PAGES_PUBLIQUES = ["/admin/connexion", "/admin/inscription"];
 
-  if (!utilisateur || !motDePasse) {
+/**
+ * Premier contrôle (session présente et signature valide). Les droits fins
+ * (super-administrateur ou district) sont vérifiés dans chaque page et route.
+ */
+export function proxy(request: NextRequest) {
+  const { pathname, search } = request.nextUrl;
+  if (PAGES_PUBLIQUES.includes(pathname)) return NextResponse.next();
+
+  if (!process.env.ADMIN_USER || !process.env.ADMIN_PASSWORD) {
     return new NextResponse("Interface d'administration non configurée.", { status: 503 });
   }
 
-  const entete = request.headers.get("authorization");
-  if (entete?.startsWith("Basic ")) {
-    const [u, p] = Buffer.from(entete.slice(6), "base64").toString().split(":");
-    if (u === utilisateur && p === motDePasse) {
-      return NextResponse.next();
-    }
-  }
+  if (lireJeton(request.cookies.get(COOKIE_SESSION)?.value)) return NextResponse.next();
 
-  return new NextResponse("Authentification requise.", {
-    status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="VFM 105 Administration"' },
-  });
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.json({ erreur: "Connexion requise." }, { status: 401 });
+  }
+  const connexion = new URL("/admin/connexion", request.url);
+  connexion.searchParams.set("suite", pathname + search);
+  return NextResponse.redirect(connexion);
 }
