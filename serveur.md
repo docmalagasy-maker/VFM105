@@ -35,6 +35,8 @@ Journal de la migration du site **VFM 105** de Vercel vers un VPS géré par
 | A | `vfm` | `31.207.34.137` | Site VFM 105 → https://vfm.0550.site |
 | A | `coolify` | `31.207.34.137` | Créé, finalement inutile (le panneau est déjà en HTTPS sur `vps125329.serveur-vps.net`). Peut être supprimé ou réutilisé. |
 
+| A | `radio` | `31.207.34.137` | Radio VFM (AzuraCast) → https://radio.0550.site (15 octobre 2026) |
+
 `0550.site` lui-même (racine) pointe ailleurs (`216.198.79.1`) : ne pas y
 toucher sans raison.
 
@@ -252,6 +254,19 @@ Next.js 16.3.5 → **16.3.8** (faille critique) et sharp 0.35.4 →
 **0.35.5** (faille élevée) : `npm audit --omit=dev` → 0 vulnérabilité.
 Même commit : 114 communes du projet ONN Board ajoutées aux listes du
 formulaire.
+
+### Étape 14 — Radio VFM (AzuraCast) sur le même VPS (15 octobre 2026)
+
+- Projet Coolify distinct **Radio VFM**, service Docker Compose `azuracast`
+  (image `ghcr.io/azuracast/azuracast:stable`). Fichier et procédure :
+  `D:\PROJETS\RADIO NM\coolify\` (`docker-compose.yml`, `DEPLOIEMENT.md`).
+- Aucun port publié : Traefik → `https://radio.0550.site` → port 80 interne ;
+  flux par `/listen/...`. Ports 8000/8080 du VPS inchangés.
+- Coolify affiche « This service requires port 80 » à l'enregistrement du
+  domaine : choisir **Use This Port Anyway** (le port saisi est bien 80) ;
+  « Keep Required Port » annule l'enregistrement.
+- Relevé avant installation : 7,8 Go RAM (3,9 Go libres, pas de swap),
+  4 vCPU, 123 Go libres. VFM resté en 200 pendant tout le déploiement.
 
 ---
 

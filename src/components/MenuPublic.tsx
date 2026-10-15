@@ -6,7 +6,7 @@ import { useState } from "react";
 
 const EMAIL_CONTACT = "contact.vfm@0550.site";
 
-/** Menus publics « Dossier » (accueil) | « Sary » (galerie photos) | « Resaho izahay » (contact). */
+/** Menus publics « Dossier » (accueil) | « Sary » (galerie photos) | « Radio » (lecteur du direct) | « Resaho izahay » (contact). */
 export default function MenuPublic() {
   const accueil = usePathname() === "/";
   const [contactOuvert, setContactOuvert] = useState(false);
@@ -15,19 +15,22 @@ export default function MenuPublic() {
     <div className="flex flex-col items-center gap-3">
       <nav className="flex items-center gap-1 rounded-full border border-vfm-beige-bord bg-white/80 p-1 text-sm font-medium shadow-sm backdrop-blur">
         {!accueil && (
-          <Link href="/" className="rounded-full px-4 py-2 text-vfm-marine transition-colors hover:bg-vfm-beige">
+          <Link href="/" className="whitespace-nowrap rounded-full px-3 py-2 sm:px-4 text-vfm-marine transition-colors hover:bg-vfm-beige">
             Dossier
           </Link>
         )}
-        <Link href="/galerie" className="rounded-full px-4 py-2 text-vfm-marine transition-colors hover:bg-vfm-beige">
+        <Link href="/galerie" className="whitespace-nowrap rounded-full px-3 py-2 sm:px-4 text-vfm-marine transition-colors hover:bg-vfm-beige">
           Sary
+        </Link>
+        <Link href="/radio" className="whitespace-nowrap rounded-full px-3 py-2 sm:px-4 text-vfm-marine transition-colors hover:bg-vfm-beige">
+          Radio
         </Link>
         <span className="h-4 w-px bg-vfm-beige-bord" aria-hidden />
         <button
           type="button"
           onClick={() => setContactOuvert((o) => !o)}
           aria-expanded={contactOuvert}
-          className={`rounded-full px-4 py-2 transition-colors ${
+          className={`whitespace-nowrap rounded-full px-3 py-2 sm:px-4 transition-colors ${
             contactOuvert ? "bg-vfm-marine text-white" : "text-vfm-marine hover:bg-vfm-beige"
           }`}
         >

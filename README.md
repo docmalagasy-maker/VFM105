@@ -32,7 +32,9 @@ e-mail de confirmation (si une adresse a été donnée).**
   par la variable `SMS_ACTIF=true` dans Coolify.
 - Menus visibles sur toutes les pages : **Dossier** (retour à l'accueil,
   masqué sur l'accueil), **Sary** (`/galerie`, galerie de photos),
-  **Resaho izahay** (affiche l'adresse e-mail de contact).
+  **Radio** (`/radio`, lecteur du direct de la Radio VFM,
+  https://radio.0550.site), **Resaho izahay** (affiche l'adresse e-mail de
+  contact).
 
 ### Côté administration (en français)
 

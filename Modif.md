@@ -24,6 +24,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | D | 15 octobre 2026 | D2.4 — Communes ONN Board ajoutées aux listes (114) | Mis en ligne |
 | C | 15 octobre 2026 | C4 — Menus renommés : « Dossier », « Sary », « Resaho izahay » | Mis en ligne |
 | E | 15 octobre 2026 | E1 — SMS désactivé, e-mail de confirmation de dépôt | Mis en ligne |
+| F | 15 octobre 2026 | F1 — Menu « Radio » et page `/radio` avec lecteur du direct | Prêt en local (attente du GO) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 
 ---
@@ -717,6 +718,60 @@ corrects, page de remerciement annonçant l'e-mail ; dépôt sans e-mail →
 simple confirmation ; statut SMS « Désactivé » ; passerelle 503 ; renvoi
 SMS refusé ; colonne E-mail dans l'administration ; build de production
 réussi.
+
+---
+
+## Lot F — Radio VFM
+
+### F1 — Menu « Radio » et lecteur du direct (15 octobre 2026)
+
+**Contexte :** radio en ligne AzuraCast installée sur le même VPS (projet
+Coolify « Radio VFM », https://radio.0550.site, voir `serveur.md` étape 14).
+Flux commun à tous les auditeurs : MP3 128 kbit/s,
+`https://radio.0550.site/listen/vfm/radio.mp3`.
+
+**Avant :** menus Dossier | Sary | Resaho izahay ; aucune radio sur le site.
+
+**Après :**
+
+- nouveau menu **Radio** sur toutes les pages publiques, entre Sary et
+  Resaho izahay ;
+- page **`/radio`** (« Radio VFM — Henoy mivantana ny Radio VFM ») :
+  - grand bouton Play / Arrêt ; Play rejoint toujours le direct (l'arrêt
+    coupe le flux au lieu de le mettre en pause) ;
+  - titre en cours (« Mandeha ankehitriny ») et titre suivant
+    (« Manaraka »), avec pochette, rafraîchis toutes les 15 secondes par
+    l'API publique d'AzuraCast ;
+  - réglage du volume (« Feo ») ;
+  - message « Tsy mandeha ny radio amin'izao fotoana izao. » si la station
+    est arrêtée, et message d'erreur si le flux ne répond pas ;
+  - lien vers la page publique de la station (`/public/vfm`).
+- Sur téléphone (375 px), les quatre menus tiennent sur une ligne :
+  espacement des menus légèrement réduit sur petits écrans.
+
+Aucune donnée ni secret côté VFM : le lecteur lit directement le flux et
+l'API publique de `radio.0550.site` (CORS ouvert par AzuraCast).
+
+**Fichiers :**
+
+| Fichier | Modification |
+|---|---|
+| `src/app/radio/page.tsx` (nouveau) | Page Radio |
+| `src/app/radio/LecteurRadio.tsx` (nouveau) | Lecteur, titre en cours, volume |
+| `src/components/MenuPublic.tsx` | Menu Radio, espacement mobile |
+| `src/components/PublicShell.tsx` | Commentaire |
+
+**Vérifié en local :** page `/radio`, titre en cours affiché, lecture du
+direct (flux reçu, aucune erreur), arrêt (flux coupé), menus sur une ligne
+en 375 px sans défilement horizontal, accueil (Sary / Radio / Resaho
+izahay), console sans erreur, vérification des types, lint, build de
+production.
+
+### Mise en ligne du lot F
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
+- [ ] Test en ligne de `/radio` sur ordinateur et téléphone.
 
 ---
 
