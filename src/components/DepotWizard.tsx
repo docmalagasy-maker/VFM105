@@ -478,7 +478,7 @@ export default function DepotWizard() {
             <Section
               numero={3}
               titre="Fifandraisana"
-              sousTitre="Amin'ity laharana ity no handefasana ny SMS fanamarinana"
+              sousTitre="Raha manome mailaka ianao dia handray mailaka fanamarinana"
               icon={<IconPhone className="h-5 w-5" />}
             >
               <Champ label="Laharana finday" obligatoire>

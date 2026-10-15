@@ -55,6 +55,7 @@ toucher sans raison.
 |---|---|---|
 | `DATABASE_URL` | Copiée depuis la base Coolify → *General* → **Postgres URL (internal)** | Contient le mot de passe de la base |
 | `SMS_GATEWAY_SECRET` | Nouveau secret aléatoire de 64 caractères hexadécimaux | Identique dans l'appli Android |
+| `SMS_ACTIF` | *(non définie)* | Envoi de SMS désactivé depuis le 15 octobre 2026 ; `true` pour le réactiver |
 | `ADMIN_USER` | `admin` | Super-administrateur (page `/admin/connexion`) |
 | `ADMIN_PASSWORD` | Nouveau mot de passe aléatoire de 20 caractères | Super-administrateur |
 | `SMTP_HOST` | `mail77.lwspanel.com` | Pas `mail.0550.site` : certificat refusé (difficulté n° 14) |
@@ -85,6 +86,10 @@ ont donc été générés.
 - Depuis le 9 octobre 2026, le texte du SMS est en malgache et les
   références suivent le format `VFM-AAAA-NNNN` ; l'application Android
   n'a pas eu besoin d'être modifiée (le texte vient du serveur).
+- **Depuis le 15 octobre 2026, l'envoi de SMS est désactivé** (remplacé par
+  un e-mail de confirmation) : les routes de la passerelle répondent 503.
+  Arrêter la passerelle dans l'application Android. Réactivation :
+  `SMS_ACTIF=true` dans Coolify, *Deploy*, puis redémarrer la passerelle.
 
 ---
 

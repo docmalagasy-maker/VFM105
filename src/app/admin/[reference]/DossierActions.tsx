@@ -17,10 +17,15 @@ export default function DossierActions({
   reference,
   statut,
   statutSms,
+  smsActif,
+  emailConfirmation,
 }: {
   reference: string;
   statut: StatutDossier;
   statutSms: StatutSms;
+  /** Bloc SMS affiché seulement si l'envoi de SMS est actif (src/lib/sms.ts). */
+  smsActif: boolean;
+  emailConfirmation: string;
 }) {
   const router = useRouter();
   const [enCours, setEnCours] = useState(false);
@@ -69,17 +74,21 @@ export default function DossierActions({
         </select>
       </label>
 
-      <div className="flex items-center gap-3">
-        <span className="text-sm text-zinc-600">Statut SMS : {statutSms}</span>
-        <button
-          type="button"
-          onClick={renvoyerSms}
-          disabled={enCours}
-          className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
-        >
-          Renvoyer le SMS
-        </button>
-      </div>
+      <p className="text-sm text-zinc-600">E-mail de confirmation : {emailConfirmation}</p>
+
+      {smsActif && (
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-zinc-600">Statut SMS : {statutSms}</span>
+          <button
+            type="button"
+            onClick={renvoyerSms}
+            disabled={enCours}
+            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+          >
+            Renvoyer le SMS
+          </button>
+        </div>
+      )}
       {message && <p className="text-sm text-zinc-600">{message}</p>}
     </div>
   );

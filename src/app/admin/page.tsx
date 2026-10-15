@@ -4,6 +4,7 @@ import { listerAdministrateurs } from "@/lib/administrateurs";
 import { districtAutorise, obtenirSession } from "@/lib/auth";
 import { listerPhotos } from "@/lib/galerie";
 import { listerDossiers } from "@/lib/repository";
+import { SMS_ACTIF } from "@/lib/sms";
 import type { Dossier } from "@/lib/types";
 import AdministrateursVue from "./AdministrateursVue";
 import BoutonDeconnexion from "./BoutonDeconnexion";
@@ -11,7 +12,7 @@ import BoutonSupprimer from "./BoutonSupprimer";
 import CarteAdmin from "./CarteAdmin";
 import FichesDossiers from "./FichesDossiers";
 import GalerieAdmin from "./GalerieAdmin";
-import { LIBELLES_SMS, LIBELLES_STATUT } from "./libelles";
+import { libelleEmailConfirmation, LIBELLES_SMS, LIBELLES_STATUT } from "./libelles";
 import StatistiquesVue from "./StatistiquesVue";
 
 type Vue = "liste" | "fiches" | "stats" | "carte" | "galerie" | "admins";
@@ -88,13 +89,14 @@ export default async function AdminPage({
         </form>
       )}
 
-      {vue === "liste" && <ListeDossiers dossiers={await listerDossiers(q, 200, district)} estSuper={estSuper} />}
+      {vue === "liste" && <ListeDossiers dossiers={await listerDossiers(q, 200, district)} estSuper={estSuper} smsActif={SMS_ACTIF} />}
       {vue === "fiches" && (
         <FichesDossiers
           key={q ?? ""}
           dossiers={await listerDossiers(q, 200, district)}
           referenceInitiale={ref}
           peutGerer={estSuper}
+          smsActif={SMS_ACTIF}
         />
       )}
       {vue === "stats" && <StatistiquesVue district={district} />}
@@ -107,7 +109,16 @@ export default async function AdminPage({
   );
 }
 
-function ListeDossiers({ dossiers, estSuper }: { dossiers: Dossier[]; estSuper: boolean }) {
+function ListeDossiers({
+  dossiers,
+  estSuper,
+  smsActif,
+}: {
+  dossiers: Dossier[];
+  estSuper: boolean;
+  /** Colonne SMS seulement si l'envoi de SMS est actif (src/lib/sms.ts). */
+  smsActif: boolean;
+}) {
   return (
     <div className="mt-6 overflow-x-auto rounded-lg border border-zinc-200 bg-white">
       <table className="w-full text-left text-sm">
@@ -120,7 +131,8 @@ function ListeDossiers({ dossiers, estSuper }: { dossiers: Dossier[]; estSuper: 
             <th className="px-4 py-2">Responsable</th>
             <th className="px-4 py-2">Téléphone</th>
             <th className="px-4 py-2">Statut</th>
-            <th className="px-4 py-2">SMS</th>
+            <th className="px-4 py-2">E-mail</th>
+            {smsActif && <th className="px-4 py-2">SMS</th>}
             <th className="sticky right-0 bg-zinc-50 px-4 py-2" />
           </tr>
         </thead>
@@ -140,7 +152,8 @@ function ListeDossiers({ dossiers, estSuper }: { dossiers: Dossier[]; estSuper: 
               </td>
               <td className="px-4 py-2">{d.coordonnees.telephone}</td>
               <td className="px-4 py-2">{LIBELLES_STATUT[d.statut] ?? d.statut}</td>
-              <td className="px-4 py-2">{LIBELLES_SMS[d.statutSms] ?? d.statutSms}</td>
+              <td className="px-4 py-2">{libelleEmailConfirmation(d)}</td>
+              {smsActif && <td className="px-4 py-2">{LIBELLES_SMS[d.statutSms] ?? d.statutSms}</td>}
               <td className="sticky right-0 bg-white px-4 py-2 text-right shadow-[-8px_0_8px_-8px_rgba(0,0,0,0.15)]">
                 <div className="flex items-center justify-end gap-2">
                   <Link
@@ -156,7 +169,7 @@ function ListeDossiers({ dossiers, estSuper }: { dossiers: Dossier[]; estSuper: 
           ))}
           {dossiers.length === 0 && (
             <tr>
-              <td colSpan={9} className="px-4 py-8 text-center text-zinc-500">
+              <td colSpan={10} className="px-4 py-8 text-center text-zinc-500">
                 Aucun dossier trouvé.
               </td>
             </tr>

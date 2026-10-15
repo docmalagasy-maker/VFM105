@@ -1,6 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import { obtenirSession } from "@/lib/auth";
 import { obtenirDossierParReference } from "@/lib/repository";
+import { SMS_ACTIF } from "@/lib/sms";
+import { libelleEmailConfirmation } from "../libelles";
 import DossierActions from "./DossierActions";
 
 export default async function DossierAdminPage({
@@ -69,7 +71,13 @@ export default async function DossierAdminPage({
       </dl>
 
       {session.role === "super" && (
-        <DossierActions reference={dossier.reference} statut={dossier.statut} statutSms={dossier.statutSms} />
+        <DossierActions
+          reference={dossier.reference}
+          statut={dossier.statut}
+          statutSms={dossier.statutSms}
+          smsActif={SMS_ACTIF}
+          emailConfirmation={libelleEmailConfirmation(dossier)}
+        />
       )}
     </div>
   );

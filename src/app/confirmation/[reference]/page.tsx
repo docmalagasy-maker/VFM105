@@ -28,12 +28,10 @@ export default async function ConfirmationPage({
           {dossier.reference}
         </p>
         <p className="mt-4 text-sm text-zinc-600">
-          {dossier.statutSms === "envoye" &&
-            `Nalefa tamin'ny ${dossier.coordonnees.telephone} ny SMS fanamarinana.`}
-          {dossier.statutSms === "a_envoyer" &&
-            "Handray SMS avy eo hanamarina izany ianao."}
-          {dossier.statutSms === "echoue" &&
-            "Voarakitra ny fikambananao, saingy tsy voalefa ny SMS fanamarinana amin'izao fotoana izao."}
+          {/* Le SMS est désactivé (src/lib/sms.ts) : seul l'e-mail, s'il est parti, est annoncé */}
+          {dossier.emailConfirmation === "envoye" && dossier.coordonnees.email
+            ? `Nalefa tany amin'ny ${dossier.coordonnees.email} ny mailaka fanamarinana misy ity laharana ity.`
+            : "Tehirizo ity laharana ity."}
         </p>
         <Link
           href="/"

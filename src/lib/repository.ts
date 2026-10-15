@@ -1,6 +1,7 @@
 import { getPool } from "@/lib/db";
 import { verifierSchema } from "@/lib/schema";
 import { genererProchaineReference } from "@/lib/reference";
+import { statutSmsInitial } from "@/lib/sms";
 import { supprimerPieceJointe } from "@/lib/stockage";
 import type { Dossier, DossierInput, StatutDossier } from "@/lib/types";
 
@@ -12,6 +13,7 @@ function ligneVersDossier(row: Record<string, unknown>): Dossier {
     statut: row.statut as StatutDossier,
     statutSms: row.statut_sms as Dossier["statutSms"],
     smsDate: row.sms_date ? (row.sms_date as Date).toISOString() : undefined,
+    emailConfirmation: (row.email_confirmation as Dossier["emailConfirmation"]) ?? undefined,
     association: {
       nom: row.association_nom as string,
       adresse: row.association_adresse as string,
@@ -64,7 +66,7 @@ export async function creerDossier(input: DossierInput): Promise<{
        association_commune_pcode, association_fokontany, association_fokontany_pcode,
        association_activite, association_nombre_membres, responsables, telephone, email,
        autres_coordonnees, description, pieces
-     ) VALUES ($1,$2,$3,'recu','a_envoyer',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
+     ) VALUES ($1,$2,$3,'recu',$19,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
      ON CONFLICT (idempotency_key) DO NOTHING
      RETURNING *`,
     [
@@ -86,6 +88,7 @@ export async function creerDossier(input: DossierInput): Promise<{
       JSON.stringify(input.coordonnees.autres ?? []),
       input.description,
       JSON.stringify(input.pieces),
+      statutSmsInitial(),
     ]
   );
 
@@ -100,50 +103,16 @@ export async function creerDossier(input: DossierInput): Promise<{
 
   const dossier = ligneVersDossier(result.rows[0]);
 
-  // Le SMS n'est pas envoyé ici : il reste en statut "a_envoyer" et sera
-  // relevé par la passerelle Android au prochain sondage (voir
-  // /api/sms-gateway/pending). Découplé pour ne jamais bloquer ni faire
-  // échouer l'enregistrement du dossier à cause d'un problème réseau côté
-  // téléphone (§23 du cahier des charges).
+  // Aucun envoi ici. SMS (désactivé, voir src/lib/sms.ts) : statut « a_envoyer »,
+  // relevé plus tard par la passerelle Android. E-mail de confirmation : envoyé
+  // par la route /api/dossiers après l'enregistrement. Un échec d'envoi ne fait
+  // jamais perdre le dossier (§23 du cahier des charges).
   return { dossier, creeMaintenant: true };
 }
 
-export async function marquerStatutSms(
-  reference: string,
-  statutSms: Dossier["statutSms"]
-): Promise<void> {
-  const pool = getPool();
-  await pool.query(
-    `UPDATE dossiers SET statut_sms = $1, sms_date = now() WHERE reference = $2`,
-    [statutSms, reference]
-  );
-}
-
-/**
- * Remet le SMS en file d'attente : la passerelle Android le relèvera à son
- * prochain sondage. Utilisé pour le renvoi manuel depuis l'administration.
- */
-export async function remettreSmsEnAttente(reference: string): Promise<void> {
-  const dossier = await obtenirDossierParReference(reference);
-  if (!dossier) throw new Error("Dossier introuvable.");
-  await marquerStatutSms(reference, "a_envoyer");
-}
-
-export interface SmsEnAttente {
-  reference: string;
-  telephone: string;
-}
-
-export async function listerSmsEnAttente(limite = 20): Promise<SmsEnAttente[]> {
-  const pool = getPool();
-  const result = await pool.query<{ reference: string; telephone: string }>(
-    `SELECT reference, telephone FROM dossiers
-     WHERE statut_sms = 'a_envoyer'
-     ORDER BY date_depot ASC
-     LIMIT $1`,
-    [limite]
-  );
-  return result.rows;
+/** Résultat de l'e-mail de confirmation envoyé au déposant. */
+export async function marquerEmailConfirmation(reference: string, statut: "envoye" | "echoue"): Promise<void> {
+  await getPool().query(`UPDATE dossiers SET email_confirmation = $1 WHERE reference = $2`, [statut, reference]);
 }
 
 export async function obtenirDossierParReference(reference: string): Promise<Dossier | null> {

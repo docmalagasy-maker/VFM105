@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { listerSmsEnAttente } from "@/lib/repository";
-import { messageConfirmation } from "@/lib/sms";
+import { listerSmsEnAttente, messageConfirmation, SMS_ACTIF } from "@/lib/sms";
 
 /**
  * Interrogée périodiquement par l'application Android (voir
@@ -9,6 +8,9 @@ import { messageConfirmation } from "@/lib/sms";
  * un navigateur).
  */
 export async function GET(request: NextRequest) {
+  if (!SMS_ACTIF) {
+    return NextResponse.json({ erreur: "Envoi de SMS désactivé." }, { status: 503 });
+  }
   const secret = process.env.SMS_GATEWAY_SECRET;
   if (!secret) {
     return NextResponse.json({ erreur: "Passerelle SMS non configurée." }, { status: 503 });

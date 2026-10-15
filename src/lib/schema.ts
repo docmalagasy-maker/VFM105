@@ -15,6 +15,7 @@ export function verifierSchema(): Promise<unknown> {
        ALTER TABLE dossiers ADD COLUMN IF NOT EXISTS association_commune_pcode TEXT;
        ALTER TABLE dossiers ADD COLUMN IF NOT EXISTS association_fokontany TEXT;
        ALTER TABLE dossiers ADD COLUMN IF NOT EXISTS association_fokontany_pcode TEXT;
+       ALTER TABLE dossiers ADD COLUMN IF NOT EXISTS email_confirmation TEXT;
        CREATE INDEX IF NOT EXISTS idx_dossiers_district ON dossiers (association_district);
        CREATE TABLE IF NOT EXISTS administrateurs (
          id SERIAL PRIMARY KEY,

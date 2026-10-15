@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { exigerSession, reponseAccesRefuse } from "@/lib/auth";
-import { remettreSmsEnAttente } from "@/lib/repository";
+import { remettreSmsEnAttente, SMS_ACTIF } from "@/lib/sms";
 
 export async function POST(
   _request: NextRequest,
@@ -10,6 +10,9 @@ export async function POST(
     await exigerSession(true);
   } catch (err) {
     return reponseAccesRefuse(err);
+  }
+  if (!SMS_ACTIF) {
+    return NextResponse.json({ erreur: "Envoi de SMS désactivé." }, { status: 409 });
   }
   const { reference } = await params;
   try {

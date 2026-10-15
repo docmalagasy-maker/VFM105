@@ -17,15 +17,19 @@ Plateforme nationale, en malgache, permettant aux associations des
 
 Parcours : **Formulaire → Récapitulatif → Modification éventuelle →
 Validation définitive → Enregistrement → Référence `VFM-AAAA-NNNN` →
-SMS de confirmation.**
+e-mail de confirmation (si une adresse a été donnée).**
 
 - **Formulaire** (`/deposer`) : association, adresse, **District →
   Kaominina → Fokontany** (listes liées, avec saisie libre « Hafa »),
   responsables, activité, membres, coordonnées, projet, pièces jointes.
   Brouillon conservé dans le navigateur.
 - **Remerciement** personnalisé avec le district choisi.
-- **SMS** de confirmation envoyé par la passerelle Android (texte dans
-  `src/lib/sms.ts`).
+- **E-mail de confirmation** en malgache, avec la référence, envoyé depuis
+  `noreply@0550.site` si le déposant a renseigné son adresse
+  (`src/lib/confirmation.ts`).
+- **SMS de confirmation : désactivé** depuis le 15 octobre 2026. Le code
+  est conservé dans `src/lib/sms.ts` (passerelle Android) ; réactivation
+  par la variable `SMS_ACTIF=true` dans Coolify.
 - Menus visibles sur toutes les pages : **Dossier** (retour à l'accueil,
   masqué sur l'accueil), **Sary** (`/galerie`, galerie de photos),
   **Resaho izahay** (affiche l'adresse e-mail de contact).
@@ -40,8 +44,8 @@ SMS de confirmation.**
 Onglets : **Liste des dossiers**, **Consultation fiche par fiche**,
 **Statistiques** (exports CSV), **Carte** (districts et communes),
 **Galerie photos**, **Administrateurs** (super-administrateur). Une fiche
-de dossier permet de changer son statut, de renvoyer le SMS ou de
-supprimer le dossier (super-administrateur).
+de dossier permet de changer son statut ou de supprimer le dossier
+(super-administrateur), et indique si l'e-mail de confirmation est parti.
 
 ## Données géographiques
 
@@ -65,7 +69,7 @@ doublons) est dans [`Modif.md`](Modif.md), lots D2.1 à D2.4.
 - Carte : `d3-geo` ; e-mails : `nodemailer` (boîte LWS)
 - Hébergement : VPS avec **Coolify** (image Docker, voir
   [`Dockerfile`](Dockerfile))
-- Passerelle SMS Android séparée :
+- Passerelle SMS Android séparée (désactivée, voir `SMS_ACTIF`) :
   [`android-sms-gateway/README.md`](android-sms-gateway/README.md)
 
 ## Développement local
@@ -100,6 +104,7 @@ Voir [`.env.example`](.env.example). À définir dans Coolify (application →
 | `DATABASE_SSL` | `true` seulement pour une base externe exigeant SSL |
 | `UPLOAD_DIR` | Dossier des fichiers (fixé à `/app/data/uploads` par le `Dockerfile`) |
 | `SMS_GATEWAY_SECRET` | Secret partagé avec l'application Android |
+| `SMS_ACTIF` | `true` pour réactiver l'envoi de SMS (désactivé par défaut) |
 | `ADMIN_USER` / `ADMIN_PASSWORD` | Super-administrateur |
 | `SESSION_SECRET` | Clé des sessions admin (facultative, conseillée) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` | Envoi des e-mails de validation des administrateurs |

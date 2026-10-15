@@ -1,4 +1,5 @@
-export type StatutSms = "a_envoyer" | "envoye" | "echoue";
+/** « desactive » : dossier déposé pendant que l'envoi de SMS est désactivé (src/lib/sms.ts). */
+export type StatutSms = "a_envoyer" | "envoye" | "echoue" | "desactive";
 
 export type StatutDossier =
   | "recu"
@@ -56,4 +57,6 @@ export interface Dossier extends DossierInput {
   statut: StatutDossier;
   statutSms: StatutSms;
   smsDate?: string;
+  /** E-mail de confirmation au déposant : absent si aucune adresse fournie. */
+  emailConfirmation?: "envoye" | "echoue";
 }

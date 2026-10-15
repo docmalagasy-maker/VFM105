@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { marquerStatutSms } from "@/lib/repository";
+import { marquerStatutSms, SMS_ACTIF } from "@/lib/sms";
 
 const schema = z.object({
   reference: z.string().min(1),
@@ -12,6 +12,9 @@ const schema = z.object({
  * confirmer ou signaler l'échec. Même authentification que /pending.
  */
 export async function POST(request: NextRequest) {
+  if (!SMS_ACTIF) {
+    return NextResponse.json({ erreur: "Envoi de SMS désactivé." }, { status: 503 });
+  }
   const secret = process.env.SMS_GATEWAY_SECRET;
   if (!secret) {
     return NextResponse.json({ erreur: "Passerelle SMS non configurée." }, { status: 503 });

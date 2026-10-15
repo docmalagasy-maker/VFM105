@@ -23,6 +23,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | D | 9 octobre 2026 | D2.2 / D2.3 — Listes District > Commune > Fokontany, liées à la carte | Mis en ligne |
 | D | 15 octobre 2026 | D2.4 — Communes ONN Board ajoutées aux listes (114) | Mis en ligne |
 | C | 15 octobre 2026 | C4 — Menus renommés : « Dossier », « Sary », « Resaho izahay » | Mis en ligne |
+| E | 15 octobre 2026 | E1 — SMS désactivé, e-mail de confirmation de dépôt | Mis en ligne |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 
 ---
@@ -639,6 +640,83 @@ interne `ONN-…`), `src/lib/referentiel.ts` (traitement de ces communes),
 (ONN Board) ; Fokontany en saisie libre ; dossier enregistré avec la
 commune sans code ; carte : Beparasy dans la liste hors carte ; build de
 production réussi.
+
+---
+
+## Lot E — Confirmation du dépôt
+
+### E1 — Suppression provisoire du SMS, confirmation par e-mail (15 octobre 2026)
+
+**Avant :** après la validation définitive, la page de remerciement
+annonçait l'envoi d'un SMS, et la passerelle Android envoyait le SMS
+« VFM : Voaray ny antontan-taratasinao. Laharana : … ».
+
+**Après :**
+
+- **Envoi de SMS désactivé** : plus aucun SMS n'est préparé ni envoyé, et
+  plus aucune mention du SMS n'apparaît sur le site public. Les nouveaux
+  dossiers ont le statut SMS « Désactivé ».
+- **E-mail de confirmation** envoyé automatiquement, depuis
+  `noreply@0550.site`, si le déposant a renseigné son adresse e-mail :
+  - objet : « VFM — Voaray ny antontan-taratasinao (VFM-2026-0002) » ;
+  - contenu en malgache : nom de l'association, **référence du dossier**,
+    lieu (fokontany, commune, district), date et heure du dépôt, consigne
+    de conserver la référence, adresse de contact ;
+  - envoyé une seule fois par dossier (pas de doublon en cas de double
+    clic).
+- **Page de remerciement** :
+  - e-mail envoyé → « Nalefa tany amin'ny <adresse> ny mailaka
+    fanamarinana misy ity laharana ity. » ;
+  - pas d'adresse e-mail (ou échec d'envoi) → simple confirmation de
+    réception avec la référence : « Tehirizo ity laharana ity. » (aucune
+    annonce d'e-mail ni de SMS).
+- **Formulaire** : le sous-titre du bloc Coordonnées annonce désormais
+  l'e-mail : « Raha manome mailaka ianao dia handray mailaka
+  fanamarinana ».
+- **Administration** : colonne et badge **E-mail** (Envoyé / Échec / Pas
+  d'adresse) à la place du SMS ; bouton « Renvoyer le SMS » masqué.
+
+**Code SMS conservé, prêt à être réactivé :**
+
+- tout le code SMS est regroupé dans `src/lib/sms.ts` (texte du SMS, file
+  d'attente, statuts, renvoi), avec le mode d'emploi en tête de fichier ;
+- routes conservées mais coupées : `/api/sms-gateway/pending` et
+  `/api/sms-gateway/report` répondent « Envoi de SMS désactivé » (503),
+  le renvoi admin est refusé (409) ;
+- application Android inchangée (`android-sms-gateway/`).
+
+**Réactivation :** ajouter `SMS_ACTIF=true` dans Coolify (Environment
+Variables), *Deploy*, puis redémarrer la passerelle dans l'application
+Android. Les dossiers déposés pendant la désactivation ne recevront pas de
+SMS rétroactivement.
+
+> **À faire sur le téléphone :** arrêter la passerelle dans l'application
+> Android (« Arrêter la passerelle ») ; sinon elle affichera des erreurs de
+> sondage, sans conséquence.
+
+**Base de données :** nouvelle colonne `email_confirmation`
+(`migrations/004_email_confirmation.sql`), appliquée automatiquement.
+
+**Fichiers :**
+
+| Fichier | Modification |
+|---|---|
+| `src/lib/sms.ts` | Module SMS complet + interrupteur `SMS_ACTIF` |
+| `src/lib/confirmation.ts` (nouveau) | E-mail de confirmation en malgache |
+| `src/app/api/dossiers/route.ts` | Envoi de l'e-mail après l'enregistrement |
+| `src/lib/repository.ts`, `src/lib/types.ts`, `src/lib/schema.ts` | Statut SMS « desactive », statut de l'e-mail |
+| `src/app/confirmation/[reference]/page.tsx` | Nouveaux messages de remerciement |
+| `src/components/DepotWizard.tsx` | Sous-titre du bloc Coordonnées |
+| `src/app/api/sms-gateway/*`, `src/app/api/admin/dossiers/[reference]/resend-sms/` | Coupés tant que `SMS_ACTIF` n'est pas activé |
+| `src/app/admin/page.tsx`, `FichesDossiers.tsx`, `libelles.ts`, `[reference]/page.tsx`, `[reference]/DossierActions.tsx` | Affichage de l'e-mail, SMS masqué |
+| `migrations/004_email_confirmation.sql`, `.env.example` | Colonne et variable documentées |
+
+**Vérifié en local** (serveur mail de test qui capture les messages) :
+dépôt avec e-mail → e-mail reçu avec la référence, objet et contenu
+corrects, page de remerciement annonçant l'e-mail ; dépôt sans e-mail →
+simple confirmation ; statut SMS « Désactivé » ; passerelle 503 ; renvoi
+SMS refusé ; colonne E-mail dans l'administration ; build de production
+réussi.
 
 ---
 

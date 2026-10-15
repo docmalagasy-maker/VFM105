@@ -3,17 +3,19 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import type { Dossier } from "@/lib/types";
-import { LIBELLES_SMS, LIBELLES_STATUT } from "./libelles";
+import { libelleEmailConfirmation, LIBELLES_SMS, LIBELLES_STATUT } from "./libelles";
 
 export default function FichesDossiers({
   dossiers,
   referenceInitiale,
   peutGerer,
+  smsActif,
 }: {
   dossiers: Dossier[];
   referenceInitiale?: string;
   /** Lien vers la gestion du statut et du SMS (super-administrateur). */
   peutGerer: boolean;
+  smsActif: boolean;
 }) {
   const [index, setIndex] = useState(() =>
     Math.max(
@@ -105,14 +107,19 @@ export default function FichesDossiers({
               {LIBELLES_STATUT[d.statut] ?? d.statut}
             </span>
             <span className="rounded-full bg-zinc-100 px-2.5 py-1 font-medium text-zinc-700">
-              SMS : {LIBELLES_SMS[d.statutSms] ?? d.statutSms}
+              E-mail : {libelleEmailConfirmation(d)}
             </span>
+            {smsActif && (
+              <span className="rounded-full bg-zinc-100 px-2.5 py-1 font-medium text-zinc-700">
+                SMS : {LIBELLES_SMS[d.statutSms] ?? d.statutSms}
+              </span>
+            )}
             {peutGerer && (
               <Link
                 href={`/admin/${d.reference}`}
                 className="rounded-md border border-zinc-300 px-3 py-1 font-medium text-zinc-700 hover:bg-zinc-50"
               >
-                Gérer (statut, SMS)
+                {smsActif ? "Gérer (statut, SMS)" : "Gérer le statut"}
               </Link>
             )}
           </div>

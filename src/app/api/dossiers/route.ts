@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { dossierInputSchema } from "@/lib/validation";
+import { envoyerConfirmationDepot } from "@/lib/confirmation";
 import { rattacherAuReferentiel } from "@/lib/referentiel";
 import { creerDossier } from "@/lib/repository";
 import { isDatabaseConfigured } from "@/lib/db";
@@ -35,6 +36,11 @@ export async function POST(request: NextRequest) {
       ...parsed.data,
       association: { ...association, communePcode: undefined, fokontanyPcode: undefined, ...localisation },
     });
+    // E-mail de confirmation (si adresse fournie), une seule fois par dossier.
+    // Envoyé avant la réponse pour que la page de remerciement sache s'il est parti.
+    if (creeMaintenant) {
+      await envoyerConfirmationDepot(dossier).catch((err) => console.error("E-mail de confirmation", err));
+    }
     return NextResponse.json({ dossier, creeMaintenant }, { status: creeMaintenant ? 201 : 200 });
   } catch (err) {
     console.error("Erreur création dossier", err);
