@@ -24,7 +24,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | D | 15 octobre 2026 | D2.4 — Communes ONN Board ajoutées aux listes (114) | Mis en ligne |
 | C | 15 octobre 2026 | C4 — Menus renommés : « Dossier », « Sary », « Resaho izahay » | Mis en ligne |
 | E | 15 octobre 2026 | E1 — SMS désactivé, e-mail de confirmation de dépôt | Mis en ligne |
-| F | 15 octobre 2026 | F1 — Menu « Radio » et page `/radio` avec lecteur du direct | Prêt en local (attente du GO) |
+| F | 15 octobre 2026 | F1 — Menu « Radio » et page `/radio` avec lecteur du direct | Mis en ligne |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 
 ---
@@ -769,9 +769,12 @@ production.
 
 ### Mise en ligne du lot F
 
-- [ ] GO, commit et push sur `master`.
-- [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
-- [ ] Test en ligne de `/radio` sur ordinateur et téléphone.
+- [x] GO, commit `b5a92ef` et push sur `master` (15 octobre 2026).
+- [x] Déploiement Coolify réussi : `/radio` en ligne environ 1 min 30 après
+      le push ; l'accueil est resté accessible pendant la bascule.
+- [x] Test en ligne (ordinateur) : 4 menus présents, lecture du direct,
+      arrêt, titre en cours et suivant affichés, console sans erreur.
+- [ ] Test sur un vrai téléphone.
 
 ---
 

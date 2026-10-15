@@ -514,8 +514,8 @@ brièvement indisponible pendant le remplacement du conteneur.
 - [ ] Faille « élevée » dans `braces` (outil ESLint, poste de développement
       uniquement, non déployé) : à revoir à la prochaine version de
       `eslint-config-next`.
-- [ ] Ranger `secretssms.md` hors du dossier du projet (non protégé contre
-      un commit accidentel).
+- [x] `secretssms.md` rangé hors du dépôt, dans `D:\PROJETS\_PRIVE-VFM105\`
+      (15 octobre 2026) ; nom ajouté à `.git/info/exclude` par sécurité.
 - [x] Renforcer l'authentification `/admin` : page de connexion, mots de
       passe chiffrés, administrateurs de district (lot D, 9 octobre 2026).
 - [x] Dossier de test avec district déposé en ligne (9 octobre 2026).
