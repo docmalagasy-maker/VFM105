@@ -6,7 +6,6 @@ import { useEffect, useRef, useState } from "react";
 const RADIO_URL = "https://radio.0550.site";
 const FLUX_URL = `${RADIO_URL}/listen/vfm/radio.mp3`;
 const API_URL = `${RADIO_URL}/api/nowplaying/vfm`;
-const PAGE_PUBLIQUE_URL = `${RADIO_URL}/public/vfm`;
 const RAFRAICHISSEMENT_MS = 15_000;
 
 type Morceau = { titre: string; artiste: string; pochette: string | null };
@@ -178,15 +177,6 @@ export default function LecteurRadio() {
           Manaraka : <span className="font-medium text-zinc-700">{etat.suivant.titre}</span>
         </p>
       )}
-
-      <a
-        href={PAGE_PUBLIQUE_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-sm font-semibold text-vfm-vert-dark underline"
-      >
-        Pejin&apos;ny Radio VFM
-      </a>
     </div>
   );
 }

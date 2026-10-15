@@ -745,7 +745,8 @@ Flux commun à tous les auditeurs : MP3 128 kbit/s,
   - réglage du volume (« Feo ») ;
   - message « Tsy mandeha ny radio amin'izao fotoana izao. » si la station
     est arrêtée, et message d'erreur si le flux ne répond pas ;
-  - lien vers la page publique de la station (`/public/vfm`).
+  - ~~lien « Pejin'ny Radio VFM » vers la page publique de la station~~ :
+    retiré à la demande le 15 octobre 2026 (F1 bis).
 - Sur téléphone (375 px), les quatre menus tiennent sur une ligne :
   espacement des menus légèrement réduit sur petits écrans.
 
