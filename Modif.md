@@ -22,6 +22,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | D | 9 octobre 2026 | D2.1 — Carte interactive districts / communes | Mis en ligne |
 | D | 9 octobre 2026 | D2.2 / D2.3 — Listes District > Commune > Fokontany, liées à la carte | Mis en ligne |
 | D | 15 octobre 2026 | D2.4 — Communes ONN Board ajoutées aux listes (114) | Mis en ligne |
+| C | 15 octobre 2026 | C4 — Menus renommés : « Dossier », « Sary », « Resaho izahay » | Mis en ligne |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 
 ---
@@ -384,6 +385,23 @@ fourni par l'habillage).
 
 **Vérifié en local :** menus présents sur `/`, `/deposer` et `/galerie` ;
 « Fandraisana » absent de l'accueil uniquement.
+
+### C4 — Nouveaux intitulés des menus (15 octobre 2026)
+
+| Avant | Après | Action |
+|---|---|---|
+| Fandraisana | **Dossier** | Retour à l'accueil (masqué sur l'accueil) |
+| Sary | Sary | Galerie photos (inchangé) |
+| Fifandraisana | **Resaho izahay** | Affiche l'adresse e-mail de contact |
+
+Le titre de bloc « Fifandraisana » (coordonnées) du formulaire n'est pas
+un menu : inchangé.
+
+**Fichiers :** `src/components/MenuPublic.tsx` (intitulés),
+`src/components/PublicShell.tsx` (commentaire), `README.md`.
+
+**Vérifié en local :** intitulés affichés ; sur téléphone (375 px), les
+trois menus tiennent sur une ligne sans débordement.
 
 ---
 

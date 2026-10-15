@@ -1,81 +1,124 @@
-# VFM 105
+# VFM — dépôt de dossiers des associations
 
-Site de dépôt en ligne de dossiers pour les associations du district
-d'Ambohidratrimo auprès du VFM. Cahier des charges complet :
-[`LOCALSEND/VFM%20105.md`](LOCALSEND/VFM%20105.md).
+Plateforme nationale, en malgache, permettant aux associations des
+120 districts de Madagascar de déposer en ligne leur dossier auprès du VFM
+(Vovonan'ny Fihavaozan'i Madagasikara).
 
-Parcours : **Formulaire → Prévisualisation → Modification éventuelle →
-Validation définitive → Enregistrement → Référence `VFM-105-AAAA-NNNN` →
+- Site en ligne : **https://vfm.0550.site**
+- Administration : **https://vfm.0550.site/admin**
+- Cahier des charges d'origine : [`LOCALSEND/VFM%20105.md`](LOCALSEND/VFM%20105.md)
+  (certains points ont depuis évolué, voir [`Modif.md`](Modif.md))
+- Journal de toutes les modifications du site : [`Modif.md`](Modif.md)
+- Serveur, Coolify, DNS, e-mails, incidents : [`serveur.md`](serveur.md)
+
+## Fonctionnement
+
+### Côté public (en malgache)
+
+Parcours : **Formulaire → Récapitulatif → Modification éventuelle →
+Validation définitive → Enregistrement → Référence `VFM-AAAA-NNNN` →
 SMS de confirmation.**
+
+- **Formulaire** (`/deposer`) : association, adresse, **District →
+  Kaominina → Fokontany** (listes liées, avec saisie libre « Hafa »),
+  responsables, activité, membres, coordonnées, projet, pièces jointes.
+  Brouillon conservé dans le navigateur.
+- **Remerciement** personnalisé avec le district choisi.
+- **SMS** de confirmation envoyé par la passerelle Android (texte dans
+  `src/lib/sms.ts`).
+- Menus visibles sur toutes les pages : **Dossier** (retour à l'accueil,
+  masqué sur l'accueil), **Sary** (`/galerie`, galerie de photos),
+  **Resaho izahay** (affiche l'adresse e-mail de contact).
+
+### Côté administration (en français)
+
+| Rôle | Connexion | Accès |
+|---|---|---|
+| Super-administrateur | `ADMIN_USER` / `ADMIN_PASSWORD` (Coolify) | Tous les districts, toutes les actions, gestion des administrateurs |
+| Administrateur de district | Compte demandé sur `/admin/inscription`, validé par le super-administrateur (lien reçu par e-mail ou onglet Administrateurs) | Son district uniquement, en lecture ; statistiques, exports, carte, galerie |
+
+Onglets : **Liste des dossiers**, **Consultation fiche par fiche**,
+**Statistiques** (exports CSV), **Carte** (districts et communes),
+**Galerie photos**, **Administrateurs** (super-administrateur). Une fiche
+de dossier permet de changer son statut, de renvoyer le SMS ou de
+supprimer le dossier (super-administrateur).
+
+## Données géographiques
+
+| Fichier | Contenu | Source |
+|---|---|---|
+| `src/lib/districts.ts` | 24 régions, 120 districts | Projet ONN Board |
+| `src/data/referentiel-geo.json` | Communes et fokontany par district | BNGRC via OCHA/HDX (licence CC BY-IGO), complété par 114 communes d'ONN Board (code `ONN-…`, sans fokontany) |
+| `public/carte/` | Contours simplifiés des districts et des communes | BNGRC via OCHA/HDX |
+
+Le détail de la construction (correspondance des noms, filtrage des
+doublons) est dans [`Modif.md`](Modif.md), lots D2.1 à D2.4.
 
 ## Stack
 
 - [Next.js 16](https://nextjs.org/) (App Router) + React 19 + Tailwind CSS 4
-- Postgres (via `DATABASE_URL`) pour les dossiers et le compteur de référence
-- Stockage disque du serveur pour les pièces jointes (`UPLOAD_DIR`, volume persistant)
-- Hébergement : VPS avec Coolify (image Docker, voir [`Dockerfile`](Dockerfile))
-- Passerelle SMS Android séparée (voir [`android-sms-gateway/README.md`](android-sms-gateway/README.md))
+- PostgreSQL (`DATABASE_URL`) : dossiers, compteur de références,
+  administrateurs. Les migrations (`migrations/`) sont appliquées
+  automatiquement au démarrage (`src/lib/schema.ts`).
+- Pièces jointes et photos envoyées depuis l'admin : disque du serveur
+  (`UPLOAD_DIR`, volume persistant)
+- Carte : `d3-geo` ; e-mails : `nodemailer` (boîte LWS)
+- Hébergement : VPS avec **Coolify** (image Docker, voir
+  [`Dockerfile`](Dockerfile))
+- Passerelle SMS Android séparée :
+  [`android-sms-gateway/README.md`](android-sms-gateway/README.md)
 
 ## Développement local
 
 ```bash
 npm install
-cp .env.example .env.local   # puis renseigner les variables (voir ci-dessous)
+cp .env.example .env.local   # puis renseigner les variables
 npm run dev
 ```
 
-Sans `DATABASE_URL`, le formulaire fonctionne mais l'enregistrement d'un
-dossier échouera proprement (message d'erreur affiché). Pour tester
-complètement en local, pointez `DATABASE_URL` vers une base Postgres (locale
-ou de développement) et appliquez `migrations/001_init.sql`.
+Sans `DATABASE_URL`, les pages s'affichent mais l'enregistrement d'un
+dossier et l'administration échouent proprement. Pour tester complètement,
+pointer `DATABASE_URL` vers une base Postgres de test et appliquer
+`migrations/001_init.sql` (les migrations suivantes s'appliquent toutes
+seules).
+
+Vérifications avant toute mise en ligne :
+
+```bash
+npx tsc --noEmit
+npm run build
+```
 
 ## Variables d'environnement
 
 Voir [`.env.example`](.env.example). À définir dans Coolify (application →
-*Environment Variables*), jamais commitées :
+*Environment Variables*), jamais dans un fichier du dépôt :
 
 | Variable | Rôle |
 |---|---|
-| `DATABASE_URL` | Base Postgres (dossiers, séquence de référence) |
-| `UPLOAD_DIR` | Dossier des pièces jointes (fixé à `/app/data/uploads` par le `Dockerfile`) |
-| `DATABASE_SSL` | `true` seulement pour une base externe exigeant SSL (désactivé par défaut) |
-| `SMS_GATEWAY_SECRET` | Secret partagé avec l'app Android (voir ci-dessous) |
-| `ADMIN_USER` / `ADMIN_PASSWORD` | Accès à `/admin` |
+| `DATABASE_URL` | Base Postgres interne Coolify |
+| `DATABASE_SSL` | `true` seulement pour une base externe exigeant SSL |
+| `UPLOAD_DIR` | Dossier des fichiers (fixé à `/app/data/uploads` par le `Dockerfile`) |
+| `SMS_GATEWAY_SECRET` | Secret partagé avec l'application Android |
+| `ADMIN_USER` / `ADMIN_PASSWORD` | Super-administrateur |
+| `SESSION_SECRET` | Clé des sessions admin (facultative, conseillée) |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` | Envoi des e-mails de validation des administrateurs |
+| `SUPER_ADMIN_EMAIL` | Destinataire des demandes d'accès (par défaut doc.malagasy@gmail.com) |
+| `SITE_URL` | Adresse publique utilisée dans les liens des e-mails |
 
-## Mettre en ligne une nouvelle version (GitHub Desktop → GitHub → Coolify)
+## Mettre en ligne une nouvelle version
 
-Le site est hébergé sur un VPS géré par [Coolify](https://coolify.io/),
-relié au dépôt GitHub `docmalagasy-maker/VFM105` (branche `master`).
-Adresse publique : **https://vfm.0550.site**.
+1. Modifier le code, tester localement (`npm run dev`, puis `npm run build`).
+2. Consigner la modification dans [`Modif.md`](Modif.md).
+3. GitHub Desktop : *Commit to master*, puis *Push origin*.
+4. Coolify reconstruit automatiquement le site (2 à 3 minutes) ; suivi dans
+   Coolify → application → *Deployments*. En cas d'échec, voir
+   [`serveur.md`](serveur.md) §4.
 
-**Mises à jour :**
+## Galerie photos
 
-1. Modifier le code localement, tester avec `npm run dev`.
-2. Dans GitHub Desktop : vérifier les changements, écrire un message de
-   commit, *Commit to master*, puis *Push origin*.
-3. Coolify reçoit le push et reconstruit automatiquement le site (2 à
-   3 minutes). Suivi dans Coolify → application → *Deployments*.
-
-**Configuration Coolify (pour mémoire, déjà en place) :**
-
-- Application : build **Dockerfile**, port **3000**, domaine
-  `https://vfm.0550.site` (certificat HTTPS automatique).
-- Volume persistant monté sur `/app/data/uploads` (pièces jointes).
-- Base **PostgreSQL** dans le même projet, initialisée par
-  `migrations/001_init.sql` (script d'initialisation Coolify). Une future
-  migration SQL s'exécute depuis l'onglet *Terminal* de la base
-  (`psql -U postgres`).
-- Le site doit être servi en **HTTPS** : le bouton de validation utilise
-  `crypto.randomUUID()`, indisponible sur une page HTTP.
-
-## Ce qui reste à brancher avant une mise en production réelle
-
-- Installer et configurer l'application Android « passerelle SMS » sur le
-  téléphone du responsable (projet complet et instructions dans
-  [`android-sms-gateway/README.md`](android-sms-gateway/README.md)) — sans
-  elle, les dossiers sont enregistrés mais le SMS reste en statut « à
-  envoyer » indéfiniment.
-- Un renforcement de l'authentification `/admin` (actuellement basique,
-  suffisant en v1 mais à faire évoluer — plusieurs administrateurs, etc.,
-  voir §26 du cahier des charges).
-- Le logo, les couleurs et les textes définitifs du VFM (§2).
+- **Dossier `GALERIE/`** : ajouter, renommer ou supprimer des photos, puis
+  Commit et Push. Ordre alphabétique (préfixe `01-`, `02-`… non affiché),
+  légende tirée du nom du fichier.
+- **Admin → Galerie photos** : envoi immédiat, sans redéploiement (photos
+  stockées sur le serveur).

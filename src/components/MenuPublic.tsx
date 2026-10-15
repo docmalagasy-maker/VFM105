@@ -6,7 +6,7 @@ import { useState } from "react";
 
 const EMAIL_CONTACT = "contact.vfm@0550.site";
 
-/** Menus publics « Sary » (galerie photos) | « Fifandraisana » (contact). */
+/** Menus publics « Dossier » (accueil) | « Sary » (galerie photos) | « Resaho izahay » (contact). */
 export default function MenuPublic() {
   const accueil = usePathname() === "/";
   const [contactOuvert, setContactOuvert] = useState(false);
@@ -16,7 +16,7 @@ export default function MenuPublic() {
       <nav className="flex items-center gap-1 rounded-full border border-vfm-beige-bord bg-white/80 p-1 text-sm font-medium shadow-sm backdrop-blur">
         {!accueil && (
           <Link href="/" className="rounded-full px-4 py-2 text-vfm-marine transition-colors hover:bg-vfm-beige">
-            Fandraisana
+            Dossier
           </Link>
         )}
         <Link href="/galerie" className="rounded-full px-4 py-2 text-vfm-marine transition-colors hover:bg-vfm-beige">
@@ -31,7 +31,7 @@ export default function MenuPublic() {
             contactOuvert ? "bg-vfm-marine text-white" : "text-vfm-marine hover:bg-vfm-beige"
           }`}
         >
-          Fifandraisana
+          Resaho izahay
         </button>
       </nav>
 
