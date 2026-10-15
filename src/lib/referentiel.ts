@@ -5,6 +5,9 @@ import donnees from "@/data/referentiel-geo.json";
  * BNGRC, diffusées par OCHA/HDX sous licence CC BY-IGO). Clé : nom du district
  * tel qu'il figure dans le formulaire (src/lib/districts.ts).
  * Commune : [nom, pcode, [[fokontany, pcode], ...]].
+ *
+ * Complété par les communes du projet ONN Board absentes de la liste
+ * officielle : code « ONN-… », sans fokontany ni contour sur la carte.
  */
 type CommuneBrute = [string, string, [string, string][]];
 const REFERENTIEL = donnees as unknown as Record<string, { pcode: string; communes: CommuneBrute[] }>;
@@ -16,6 +19,11 @@ export interface CommuneReferentiel {
   nom: string;
   pcode: string;
   fokontany: { nom: string; pcode: string }[];
+}
+
+/** Commune ajoutée depuis ONN Board (absente de la liste officielle BNGRC). */
+export function estCommuneComplementaire(pcode: string): boolean {
+  return pcode.startsWith("ONN-");
 }
 
 /** Code (pcode) du district dans le référentiel officiel, utilisé par la carte. */
@@ -55,6 +63,8 @@ export function rattacherAuReferentiel(
 
   const nomFokontany = saisie.fokontany?.trim() || undefined;
   if (!commune) return { commune: nomCommune, fokontany: nomFokontany };
+  // Commune ONN Board : nom retenu, mais pas de code officiel (hors carte)
+  if (estCommuneComplementaire(commune[1])) return { commune: commune[0], fokontany: nomFokontany };
 
   const fokontany =
     commune[2].find((f) => saisie.fokontanyPcode && f[1] === saisie.fokontanyPcode) ??

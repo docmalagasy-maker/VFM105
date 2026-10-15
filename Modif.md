@@ -21,6 +21,8 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | D | 9 octobre 2026 | D1 — Administrateurs de district et droits d'accès | Mis en ligne |
 | D | 9 octobre 2026 | D2.1 — Carte interactive districts / communes | Mis en ligne |
 | D | 9 octobre 2026 | D2.2 / D2.3 — Listes District > Commune > Fokontany, liées à la carte | Mis en ligne |
+| D | 15 octobre 2026 | D2.4 — Communes ONN Board ajoutées aux listes (114) | Mis en ligne |
+| S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 
 ---
 
@@ -567,7 +569,96 @@ refusée ; carte nationale (120 districts) et carte de district
       dans Coolify (9 octobre 2026).
 - [x] Test depuis le VPS : ports 465 et 587 vers `mail77.lwspanel.com`
       ouverts.
-- [ ] `SMTP_PASSWORD` et `SESSION_SECRET` : à saisir par le responsable
-      (secrets), puis *Deploy*.
+- [x] `SMTP_PASSWORD` saisi par le responsable, *Deploy* (9 octobre 2026).
+- [x] E-mail de demande d'accès reçu sur doc.malagasy@gmail.com
+      (9 octobre 2026).
+- [ ] `SESSION_SECRET` : facultatif, non défini (clé de session dérivée des
+      secrets existants) ; à ajouter si souhaité.
+- Remarque : un e-mail n'est envoyé qu'à la création d'une demande ; une
+  demande supprimée disparaît de la base.
 - [ ] Test : demande d'accès pour un district, réception de l'e-mail,
       validation, connexion de l'administrateur de district.
+
+### D2.4 — Communes d'ONN Board ajoutées aux listes (15 octobre 2026)
+
+**Demande :** réutiliser les données administratives du projet ONN Board
+pour le formulaire (listes District > Commune > Fokontany liées, saisie
+manuelle conservée).
+
+**Constat :** les listes liées étaient déjà en ligne (D2.2). ONN Board
+contient 1 911 communes rattachées à leur district, mais **aucun nom de
+fokontany** ni contour cartographique : le référentiel officiel BNGRC reste
+la base (communes, fokontany, carte).
+
+**Après :** les communes d'ONN Board **absentes** de la liste officielle
+sont ajoutées aux listes déroulantes : **114 communes** (1 759 au total).
+
+Écartées automatiquement :
+
+- 1 763 communes déjà présentes sous la même écriture ou une variante
+  (Sud/Atsimo, Nord/Avaratra, « Ville », « Suburbaine », « Banlieue d' »,
+  fautes de frappe, nom contenu dans le nom officiel, nom officiel entre
+  parenthèses comme « Mahavelona (Foulpointe) ») ;
+- synonymes connus : Antsiranana = Diego Suarez, Fenoarivo Atsinanana =
+  Fenerive Est, Nosy-Be = Hell-Ville, Taolagnaro = Fort-Dauphin,
+  Belon'i Tsiribihina = Belo Sur Tsiribihina ;
+- 12 codes Wikidata (« Q21538633 ») à la place d'un nom, 12 communes sans
+  district, 6 entrées parasites (noms de région, « AMORON'I MANIA
+  (Suite) »), 4 doublons ;
+- précision après une virgule retirée (« Antanambe, Diana » → Antanambe).
+
+**Fonctionnement :** une commune ONN Board se choisit comme les autres ;
+n'ayant pas de liste de fokontany, le champ Fokontany passe directement en
+saisie libre. Elle est enregistrée **sans code officiel** : comptée dans
+les statistiques par commune, listée sur la carte dans « Communes hors
+carte (saisies à la main ou sans contour officiel) ».
+
+**Fichiers :** `src/data/referentiel-geo.json` (communes ajoutées, code
+interne `ONN-…`), `src/lib/referentiel.ts` (traitement de ces communes),
+`src/app/admin/CarteAdmin.tsx` (intitulé de la liste hors carte).
+
+**Vérifié en local :** district Moramanga → 24 communes dont Beparasy
+(ONN Board) ; Fokontany en saisie libre ; dossier enregistré avec la
+commune sans code ; carte : Beparasy dans la liste hors carte ; build de
+production réussi.
+
+---
+
+## Lot S — Maintenance et sécurité
+
+### S1 — Mise à jour de sécurité de Next.js et sharp (9 octobre 2026)
+
+**Constat :** l'audit des dépendances (`npm audit`) signalait des failles
+présentes depuis la création du site :
+
+| Composant | Rôle | Version | Gravité | Corrigé en |
+|---|---|---|---|---|
+| Next.js | Moteur du site | 16.3.5 | Critique | **16.3.8** |
+| sharp | Redimensionnement des images | 0.35.4 | Élevée (CVE-2026-96889) | **0.35.5** |
+| source-map-js | Outil interne de Next.js | 1.2.1 | Élevée | **1.2.2** |
+
+**Choix :** version corrective 16.3.8 (et non 16.4.0) pour changer le
+moins de choses possible. `eslint-config-next` aligné en 16.3.8.
+
+**Résultat :** `npm audit --omit=dev` → **0 vulnérabilité** dans ce qui
+tourne sur le serveur.
+
+**Reste (sans risque pour le site) :** une faille « élevée » dans `braces`,
+utilisé uniquement par l'outil de vérification du code ESLint sur le PC de
+développement ; il n'est pas déployé et n'analyse que les fichiers du
+projet. La seule correction proposée ramènerait ESLint à une version de
+2024 incompatible : non appliquée, à revoir lors d'une future version de
+`eslint-config-next`.
+
+**Fichiers :** `package.json`, `package-lock.json` (la version Alpine de
+sharp, nécessaire à l'image Docker, est toujours présente).
+
+**Vérifié en local :** vérification des types, build de production
+(Next.js 16.3.8), pages publiques, listes Commune/Fokontany, dépôt d'un
+dossier, optimisation des images (logo et galerie), connexion admin et
+les 6 onglets, carte, refus sans session (401).
+
+### Mise en ligne du lot S
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).

@@ -192,7 +192,7 @@ export default function CarteAdmin({ districtImpose }: { districtImpose?: string
               )}
               {communesManuelles.length > 0 && (
                 <section className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                  <h3 className="text-sm font-semibold text-amber-900">Communes saisies à la main (hors carte)</h3>
+                  <h3 className="text-sm font-semibold text-amber-900">Communes hors carte (saisies à la main ou sans contour officiel)</h3>
                   <ul className="mt-2 flex flex-col gap-1 text-sm">
                     {communesManuelles.map((c) => (
                       <li key={c.nom}>
