@@ -27,6 +27,8 @@ Journal de la migration du site **VFM 105** de Vercel vers un VPS géré par
 | Domaine | `0550.site` |
 | Messagerie du domaine | LWS : boîtes `noreply@0550.site` (envoi automatique du site) et `contact.vfm@0550.site` (contact public) |
 | Serveur mail LWS | `mail77.lwspanel.com` (IMAP 993, POP3 995, SMTP 465 SSL / 587) |
+| Ressources | 4 vCPU, 7,9 Go RAM, **swap 4 Go** (`/swapfile`, depuis le 16 octobre 2026), disque 148 Go |
+| Services hébergés | **VFM** (site + Postgres, projet MAIN SERVEUR) ; **messagerie « Core CRYPTED »** (Supabase auto-hébergé, projet MAIN SERVEUR, https://messagerie.0550.site, dépôt `D:\MessagerieAssociation`, voir son `modifications.md` M24) ; **Radio VFM** (AzuraCast, projet Radio VFM, https://radio.0550.site) |
 
 ### Enregistrements DNS chez LWS (zone `0550.site`)
 
@@ -34,8 +36,8 @@ Journal de la migration du site **VFM 105** de Vercel vers un VPS géré par
 |---|---|---|---|
 | A | `vfm` | `31.207.34.137` | Site VFM 105 → https://vfm.0550.site |
 | A | `coolify` | `31.207.34.137` | Créé, finalement inutile (le panneau est déjà en HTTPS sur `vps125329.serveur-vps.net`). Peut être supprimé ou réutilisé. |
-
 | A | `radio` | `31.207.34.137` | Radio VFM (AzuraCast) → https://radio.0550.site (15 octobre 2026) |
+| A | `messagerie` | `31.207.34.137` | Messagerie Core CRYPTED (Supabase, Kong) → https://messagerie.0550.site |
 
 `0550.site` lui-même (racine) pointe ailleurs (`216.198.79.1`) : ne pas y
 toucher sans raison.
@@ -267,6 +269,35 @@ formulaire.
   « Keep Required Port » annule l'enregistrement.
 - Relevé avant installation : 7,8 Go RAM (3,9 Go libres, pas de swap),
   4 vCPU, 123 Go libres. VFM resté en 200 pendant tout le déploiement.
+
+### Étape 15 — Mémoire de secours (swap) de 4 Go (16 octobre 2026)
+
+**Relevé avant** (terminal Coolify, lecture seule) : 7,9 Go de RAM, 4,7 Go
+utilisés, **3,2 Go disponibles**, **aucun swap** ; disque 148 Go, 22 Go
+utilisés (120 Go libres) ; Docker : images 18,9 Go, volumes 466 Mo, cache de
+build 2,2 Go (1,7 Go récupérables). Principaux consommateurs : messagerie
+Supabase ≈ 1,9 Go (plusieurs conteneurs `supabase-…`, `realtime-dev`,
+`imgproxy`), AzuraCast ≈ 630 Mo, Coolify ≈ 640 Mo, VFM ≈ 100 Mo.
+
+**Commande** (collée par le responsable dans Terminal → localhost) :
+
+```bash
+fallocate -l 4G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile && echo '/swapfile none swap sw 0 0' >> /etc/fstab && sysctl -w vm.swappiness=10 && echo 'vm.swappiness=10' > /etc/sysctl.d/99-swap.conf && swapon --show && free -m
+```
+
+- Fichier `/swapfile` de 4 Go, droits 600, déclaré dans `/etc/fstab` (gardé
+  après redémarrage) ;
+- `vm.swappiness=10` (`/etc/sysctl.d/99-swap.conf`) : la RAM reste utilisée
+  en priorité, le swap ne sert qu'en cas de pic ;
+- résultat : `Échange: 4095 Mo`, 0 utilisé ; aucune coupure ; VFM, radio et
+  messagerie vérifiés juste après (200 / 200 / 401 attendu).
+
+Annuler si besoin : `swapoff /swapfile`, retirer la ligne de `/etc/fstab`,
+supprimer `/swapfile` et `/etc/sysctl.d/99-swap.conf`.
+
+Le swap évite un plantage lors d'un pic de mémoire, mais il est beaucoup plus
+lent que la RAM : il ne permet **pas** d'ajouter un service lourd (par
+exemple un modèle d'IA local de 4 Go).
 
 ---
 
