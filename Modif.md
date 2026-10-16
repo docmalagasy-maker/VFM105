@@ -25,7 +25,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | C | 15 octobre 2026 | C4 — Menus renommés : « Dossier », « Sary », « Resaho izahay » | Mis en ligne |
 | E | 15 octobre 2026 | E1 — SMS désactivé, e-mail de confirmation de dépôt | Mis en ligne |
 | F | 15 octobre 2026 | F1 — Menu « Radio » et page `/radio` avec lecteur du direct | Mis en ligne |
-| G | 15 octobre 2026 | G1 — Sondages « Manehoa hevitra » (public, gestion, résultats, statistiques) | Prêt en local (attente du GO) |
+| G | 15 octobre 2026 | G1 — Sondages « Manehoa hevitra » (public, gestion, résultats, statistiques) | Mis en ligne (16 octobre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 
 ---
@@ -895,9 +895,16 @@ l'erreur déjà connue de `DepotWizard.tsx` (`serveur.md` §9).
 
 ### Mise en ligne du lot G
 
-- [ ] GO, commit et push sur `master`.
-- [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**) ;
-      les tables sont créées au premier accès.
+- [x] GO, commit `9749cea` et push sur `master` (16 octobre 2026).
+- [x] Déploiement : nouvelles pages en ligne environ 1 min 40 après le push,
+      accueil resté accessible ; `/sondages` interroge la base de
+      production (tables créées). Statut Coolify non consulté (session du
+      panneau expirée).
+- [x] Contrôles en ligne : menu « Manehoa hevitra » sur l'accueil, page
+      `/sondages` (« Tsy misy fanadihadiana… »), sondage inexistant (404),
+      création et export refusés sans session (401), page
+      `/admin/sondages/nouveau` redirigée vers la connexion ; `/`, `/radio`,
+      `/galerie`, `/deposer` en 200.
 - [ ] Créer un premier sondage depuis l'admin, l'activer, y répondre depuis
       un téléphone, consulter les résultats.
 
