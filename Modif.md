@@ -25,6 +25,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | C | 15 octobre 2026 | C4 — Menus renommés : « Dossier », « Sary », « Resaho izahay » | Mis en ligne |
 | E | 15 octobre 2026 | E1 — SMS désactivé, e-mail de confirmation de dépôt | Mis en ligne |
 | F | 15 octobre 2026 | F1 — Menu « Radio » et page `/radio` avec lecteur du direct | Mis en ligne |
+| G | 15 octobre 2026 | G1 — Sondages « Manehoa hevitra » (public, gestion, résultats, statistiques) | Prêt en local (attente du GO) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 
 ---
@@ -776,6 +777,129 @@ production.
 - [x] Test en ligne (ordinateur) : 4 menus présents, lecture du direct,
       arrêt, titre en cours et suivant affichés, console sans erreur.
 - [ ] Test sur un vrai téléphone.
+
+---
+
+## Lot G — Sondages « Manehoa hevitra »
+
+### G1 — Système de sondages (15 octobre 2026)
+
+**Demande :** menu « Donnez votre avis » (« Manehoa hevitra ») permettant
+aux internautes de répondre à des sondages sur différentes thématiques ;
+gestion (jusqu'à 30 thématiques), résultats, analyses et graphiques dans
+l'administration, avec les droits d'accès existants.
+
+**Choix validés le 15 octobre 2026 :**
+
+- types de questions : choix unique, choix multiples, note de 1 à 5,
+  texte libre, classement par ordre de préférence ;
+- renseignements demandés au participant : **sexe** et **district**
+  (obligatoires, pour regrouper et comparer) ; aucune donnée personnelle ;
+- un vote par sondage **et par navigateur** (cookie), et au plus 40 votes
+  par sondage depuis une même adresse IP (réseaux mobiles partagés) ;
+- résultats visibles **dans l'administration uniquement** ;
+- administrateur de district : résultats de **son district**, en lecture.
+
+**Côté public (en malgache) :**
+
+- nouveau menu **Manehoa hevitra** sur toutes les pages publiques ; sur
+  téléphone, les menus passent sur deux lignes au besoin ;
+- `/sondages` : liste des sondages actifs, avec « Hamaly » ou « Efa namaly »
+  (déjà répondu sur ce navigateur) ;
+- `/sondages/<n°>` : formulaire « Mombamomba anao » (Lahy / Vavy, Distrika),
+  puis les questions ; note en 5 boutons (« 1 = ratsy indrindra, 5 = tsara
+  indrindra »), classement par boutons ↑ ↓ (utilisable au doigt) ; messages
+  d'erreur en malgache ; remerciement « Misaotra nanome ny hevitrao! » ;
+- un sondage désactivé n'est plus visible ni ouvert aux réponses ;
+- protection contre les robots par champ piège invisible.
+
+**Administration, nouvel onglet « Sondages » :**
+
+- liste des thématiques (état, nombre de questions et de réponses) ;
+  compteur « n / 30 » ; bouton **Nouveau sondage** (super-administrateur,
+  masqué à 30) ;
+- **éditeur** : titre, présentation, activation, questions (ajout,
+  suppression, déplacement ↑ ↓, type, réponse obligatoire, 2 à 20
+  propositions). Dès qu'un sondage a reçu des réponses, ses questions et
+  propositions sont **figées** (seuls titre, présentation et activation
+  changent), pour ne pas fausser les résultats ;
+- **Activer / Désactiver / Supprimer** (suppression définitive du sondage et
+  de ses réponses, avec confirmation) ;
+- **page de résultats** :
+  - filtres sur une ligne : sexe, région, district, période (du / au),
+    **comparer par** (aucun, sexe, région, district), **tri** (ordre du
+    questionnaire ou réponses les plus choisies d'abord) ;
+  - chiffres clés : réponses, hommes, femmes (et %), districts et régions
+    représentés, période des réponses ;
+  - répartition par sexe (barre à deux couleurs avec légende), réponses
+    par jour, participation par district ;
+  - par question : barres avec nombre et % ; note moyenne et médiane avec
+    répartition 1 à 5 ; classement (score de préférence, rang moyen, nombre
+    de fois classée 1re) ; textes libres avec sexe, district et date ;
+  - comparaison par groupe : tableau croisé (une ligne par groupe, une
+    colonne par proposition, avec mini-barres) ;
+  - **exports CSV** : réponses détaillées (une ligne par participation) et
+    synthèse par question, avec les filtres choisis.
+- Couleurs Homme / Femme vérifiées pour la lisibilité et le daltonisme ;
+  chaque valeur est aussi écrite en chiffres.
+
+**Droits :** création, modification, activation et suppression réservées au
+super-administrateur (403 sinon, contrôlé côté serveur). Administrateur de
+district : onglet Sondages en lecture, résultats et exports limités à son
+district quel que soit le filtre demandé ; comparaison par sexe seulement.
+
+**Base de données :** tables `sondages` et `reponses_sondage`
+(`migrations/005_sondages.sql`), créées automatiquement au premier accès.
+L'adresse IP n'est jamais enregistrée (empreinte seulement).
+
+**Fichiers :**
+
+| Fichier | Rôle |
+|---|---|
+| `migrations/005_sondages.sql`, `src/lib/schema.ts` | Tables des sondages et réponses |
+| `src/lib/sondages-modele.ts` (nouveau) | Types, limites, validation (partagé public / admin) |
+| `src/lib/sondages.ts` (nouveau) | Lecture, création, modification, participation |
+| `src/lib/sondages-analyse.ts` (nouveau) | Statistiques, regroupements, tri |
+| `src/lib/sondages-filtres.ts` (nouveau) | Filtres de la page de résultats et de l'export |
+| `src/lib/csv.ts` (nouveau) | Fonctions CSV communes (reprises de l'export des dossiers) |
+| `src/app/sondages/` (nouveau) | Liste et formulaire publics |
+| `src/app/api/sondages/[id]/route.ts` (nouveau) | Enregistrement d'une participation |
+| `src/app/admin/SondagesVue.tsx`, `src/app/admin/sondages/` (nouveaux) | Onglet, éditeur, résultats |
+| `src/app/api/admin/sondages/` (nouveaux) | Création, modification, activation, suppression, export |
+| `src/app/admin/page.tsx` | Onglet « Sondages » |
+| `src/components/MenuPublic.tsx`, `PublicShell.tsx` | Menu « Manehoa hevitra » |
+| `src/app/api/admin/export/route.ts` | Utilise `src/lib/csv.ts` (sans changement de résultat) |
+
+**Vérifié en local** (base PostgreSQL de test temporaire, 101 participations
+fictives) — 43 contrôles automatiques réussis :
+
+- création refusée sans session (401) ; sondage invalide refusé (400) ;
+- sondage désactivé : page et vote refusés (404) ; activé : visible ;
+- 60 participations acceptées ; 2e vote du même navigateur refusé (409) et
+  page « Efa namaly » ; question obligatoire manquante, proposition hors
+  liste, classement incomplet, district inconnu, note 6 refusés (400) ;
+  robot ignoré ; 41e et 42e votes d'une même IP refusés (429) ;
+- questions figées après réponses (409), titre toujours modifiable ;
+- page de résultats avec chaque filtre, comparaison et tri (200) ; exports
+  réponses (100 lignes) et synthèse ; export refusé sans session (401) ;
+- administrateur de district : onglet en lecture sans boutons de gestion,
+  création / désactivation / suppression refusées (403), page de
+  modification refusée (404), résultats et export limités à son district
+  même en demandant un autre district.
+
+Contrôle visuel : liste et formulaire publics sur téléphone (375 px, sans
+défilement horizontal), message d'erreur, remerciement ; onglet, éditeur
+(questions figées signalées) et résultats sur ordinateur et téléphone.
+Vérification des types et build de production réussis. Lint : seule
+l'erreur déjà connue de `DepotWizard.tsx` (`serveur.md` §9).
+
+### Mise en ligne du lot G
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**) ;
+      les tables sont créées au premier accès.
+- [ ] Créer un premier sondage depuis l'admin, l'activer, y répondre depuis
+      un téléphone, consulter les résultats.
 
 ---
 

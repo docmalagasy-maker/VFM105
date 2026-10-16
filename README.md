@@ -33,8 +33,11 @@ e-mail de confirmation (si une adresse a été donnée).**
 - Menus visibles sur toutes les pages : **Dossier** (retour à l'accueil,
   masqué sur l'accueil), **Sary** (`/galerie`, galerie de photos),
   **Radio** (`/radio`, lecteur du direct de la Radio VFM,
-  https://radio.0550.site), **Resaho izahay** (affiche l'adresse e-mail de
+  https://radio.0550.site), **Manehoa hevitra** (`/sondages`, sondages
+  ouverts au public), **Resaho izahay** (affiche l'adresse e-mail de
   contact).
+- **Sondages** : un vote par sondage et par navigateur ; le participant
+  indique son sexe et son district, sans autre donnée personnelle.
 
 ### Côté administration (en français)
 
@@ -45,7 +48,10 @@ e-mail de confirmation (si une adresse a été donnée).**
 
 Onglets : **Liste des dossiers**, **Consultation fiche par fiche**,
 **Statistiques** (exports CSV), **Carte** (districts et communes),
-**Galerie photos**, **Administrateurs** (super-administrateur). Une fiche
+**Galerie photos**, **Sondages** (30 thématiques au plus ; création et
+gestion par le super-administrateur, résultats filtrables, comparaisons,
+graphiques et exports CSV ; résultats du seul district pour un
+administrateur de district), **Administrateurs** (super-administrateur). Une fiche
 de dossier permet de changer son statut ou de supprimer le dossier
 (super-administrateur), et indique si l'e-mail de confirmation est parti.
 

@@ -25,7 +25,7 @@ export default function PublicShell({
           />
         </div>
 
-        {/* Menus Dossier | Sary | Radio | Resaho izahay, visibles sur toutes les pages publiques */}
+        {/* Menus Dossier | Sary | Radio | Manehoa hevitra | Resaho izahay, visibles sur toutes les pages publiques */}
         <div className="mb-6 w-full">
           <MenuPublic />
         </div>

@@ -48,7 +48,7 @@ toucher sans raison.
 |---|---|
 | **Application** `v-f-m105:master-…` | Build **Dockerfile** (`/Dockerfile`, base `/`), port exposé **3000**, domaine **https://vfm.0550.site**, redirection HTTP → HTTPS activée, déploiement automatique à chaque push sur `master` (webhook GitHub App) |
 | **Volume persistant** | Nom `…-vfm105-uploads`, monté sur **`/app/data/uploads`** : pièces jointes (`dossiers/`) et photos envoyées depuis l'admin (`galerie/`) |
-| **Base de données** `postgresql-database-…` | Image `postgres:18-alpine`, base `postgres`, utilisateur `postgres`, accès **privé** (réseau Docker interne uniquement), SSL désactivé, script d'initialisation `001_init.sql`. Migrations suivantes (`002`, `003`) appliquées automatiquement par l'application. Tables : `dossiers`, `reference_sequences`, `administrateurs` |
+| **Base de données** `postgresql-database-…` | Image `postgres:18-alpine`, base `postgres`, utilisateur `postgres`, accès **privé** (réseau Docker interne uniquement), SSL désactivé, script d'initialisation `001_init.sql`. Migrations suivantes (`002` à `005`) appliquées automatiquement par l'application. Tables : `dossiers`, `reference_sequences`, `administrateurs`, `sondages`, `reponses_sondage` |
 | **Sauvegardes** | Quotidiennes, `0 2 * * *` (02:00 UTC = 05:00 Madagascar), timeout 3600 s, stockées dans `/data/coolify/backups/databases/…` sur le VPS |
 
 ### Variables d'environnement de l'application

@@ -6,14 +6,15 @@ import { useState } from "react";
 
 const EMAIL_CONTACT = "contact.vfm@0550.site";
 
-/** Menus publics « Dossier » (accueil) | « Sary » (galerie photos) | « Radio » (lecteur du direct) | « Resaho izahay » (contact). */
+/** Menus publics « Dossier » (accueil) | « Sary » (galerie photos) | « Radio » (lecteur du direct) | « Manehoa hevitra » (sondages) | « Resaho izahay » (contact). */
 export default function MenuPublic() {
   const accueil = usePathname() === "/";
   const [contactOuvert, setContactOuvert] = useState(false);
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <nav className="flex items-center gap-1 rounded-full border border-vfm-beige-bord bg-white/80 p-1 text-sm font-medium shadow-sm backdrop-blur">
+      {/* Sur téléphone, les menus passent sur deux lignes au besoin */}
+      <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-3xl border border-vfm-beige-bord bg-white/80 p-1 text-sm font-medium shadow-sm backdrop-blur">
         {!accueil && (
           <Link href="/" className="whitespace-nowrap rounded-full px-3 py-2 sm:px-4 text-vfm-marine transition-colors hover:bg-vfm-beige">
             Dossier
@@ -24,6 +25,9 @@ export default function MenuPublic() {
         </Link>
         <Link href="/radio" className="whitespace-nowrap rounded-full px-3 py-2 sm:px-4 text-vfm-marine transition-colors hover:bg-vfm-beige">
           Radio
+        </Link>
+        <Link href="/sondages" className="whitespace-nowrap rounded-full px-3 py-2 sm:px-4 text-vfm-marine transition-colors hover:bg-vfm-beige">
+          Manehoa hevitra
         </Link>
         <span className="h-4 w-px bg-vfm-beige-bord" aria-hidden />
         <button

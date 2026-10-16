@@ -13,9 +13,10 @@ import CarteAdmin from "./CarteAdmin";
 import FichesDossiers from "./FichesDossiers";
 import GalerieAdmin from "./GalerieAdmin";
 import { libelleEmailConfirmation, LIBELLES_SMS, LIBELLES_STATUT } from "./libelles";
+import SondagesVue from "./SondagesVue";
 import StatistiquesVue from "./StatistiquesVue";
 
-type Vue = "liste" | "fiches" | "stats" | "carte" | "galerie" | "admins";
+type Vue = "liste" | "fiches" | "stats" | "carte" | "galerie" | "sondages" | "admins";
 
 const ONGLETS: { vue: Vue; libelle: string; superSeulement?: boolean }[] = [
   { vue: "liste", libelle: "Liste des dossiers" },
@@ -23,6 +24,7 @@ const ONGLETS: { vue: Vue; libelle: string; superSeulement?: boolean }[] = [
   { vue: "stats", libelle: "Statistiques" },
   { vue: "carte", libelle: "Carte" },
   { vue: "galerie", libelle: "Galerie photos" },
+  { vue: "sondages", libelle: "Sondages" },
   { vue: "admins", libelle: "Administrateurs", superSeulement: true },
 ];
 
@@ -104,6 +106,7 @@ export default async function AdminPage({
       {vue === "galerie" && (
         <GalerieAdmin photos={await listerPhotos()} auteur={estSuper ? "super" : session.id} />
       )}
+      {vue === "sondages" && <SondagesVue estSuper={estSuper} district={district} />}
       {vue === "admins" && estSuper && <AdministrateursVue administrateurs={await listerAdministrateurs()} />}
     </div>
   );
