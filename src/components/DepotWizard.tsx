@@ -332,7 +332,7 @@ export default function DepotWizard() {
         </span>
         <h1 className="text-2xl font-bold text-vfm-marine sm:text-3xl">VFM</h1>
         <p className="max-w-xl text-sm text-zinc-600 sm:text-base">
-          Apetraho an-tserasera eo amin&apos;ny VFM ny antontan-taratasin&apos;ny fikambananao.
+          Apetraho ny Dosie-nao eo amin&apos;ny VFM ny antontan-taratasin&apos;ny fikambananao.
           Tsy maintsy fenoina ireo saha misy marika <span className="text-vfm-rouge">*</span>.
         </p>
       </div>
@@ -621,7 +621,7 @@ export default function DepotWizard() {
   );
 }
 
-function Section({
+export function Section({
   numero,
   titre,
   sousTitre,
@@ -653,7 +653,7 @@ function Section({
   );
 }
 
-function Champ({
+export function Champ({
   label,
   obligatoire,
   children,
@@ -698,7 +698,7 @@ function BoutonRetirer({ onClick }: { onClick: () => void }) {
   );
 }
 
-function Ligne({ label, children }: { label: string; children: React.ReactNode }) {
+export function Ligne({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:gap-4">
       <dt className="w-full shrink-0 text-sm font-medium text-zinc-500 sm:w-48">{label}</dt>

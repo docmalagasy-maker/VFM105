@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import path from "node:path";
 import { exigerSession, reponseAccesRefuse } from "@/lib/auth";
+import { cvDuDistrict } from "@/lib/personnes";
 import { pieceDuDistrict } from "@/lib/repository";
 import { lirePieceJointe } from "@/lib/stockage";
 
@@ -17,7 +18,12 @@ export async function GET(
   const chemin = pathname.join("/");
   try {
     const session = await exigerSession();
-    if (session.role === "district" && !(await pieceDuDistrict(chemin, session.district))) {
+    // Pièce d'un dossier d'association, ou CV d'une personne, du même district
+    if (
+      session.role === "district" &&
+      !(await pieceDuDistrict(chemin, session.district)) &&
+      !(await cvDuDistrict(chemin, session.district))
+    ) {
       return NextResponse.json({ erreur: "Pièce jointe introuvable." }, { status: 404 });
     }
   } catch (err) {

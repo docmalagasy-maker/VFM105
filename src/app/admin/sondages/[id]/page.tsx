@@ -8,6 +8,7 @@ import { lireFiltres, versRequete, type ParametresResultats } from "@/lib/sondag
 import { SEXES } from "@/lib/sondages-modele";
 import ActionsSondage from "../ActionsSondage";
 import { QuestionVue, SyntheseVue, Tuile } from "./Resultats";
+import EnteteAdmin from "../../EnteteAdmin";
 
 const nombre = (n: number) => n.toLocaleString("fr-FR");
 const dateFr = (iso?: string) =>
@@ -43,6 +44,8 @@ export default async function ResultatsSondagePage({
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
+      <EnteteAdmin session={session} section="sondages" />
+      <div className="mt-6">
       <Link href="/admin?vue=sondages" className="text-sm text-zinc-500 hover:underline">
         ← Sondages
       </Link>
@@ -174,6 +177,7 @@ export default async function ResultatsSondagePage({
         {resultats.map((r, i) => (
           <QuestionVue key={r.question.id} r={r} numero={i + 1} groupeLibelle={libelleGroupe} />
         ))}
+      </div>
       </div>
     </div>
   );

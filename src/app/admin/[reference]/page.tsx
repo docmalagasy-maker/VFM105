@@ -4,6 +4,7 @@ import { obtenirDossierParReference } from "@/lib/repository";
 import { SMS_ACTIF } from "@/lib/sms";
 import { libelleEmailConfirmation } from "../libelles";
 import DossierActions from "./DossierActions";
+import EnteteAdmin from "../EnteteAdmin";
 
 export default async function DossierAdminPage({
   params,
@@ -18,7 +19,9 @@ export default async function DossierAdminPage({
   if (!dossier || (session.role === "district" && dossier.association.district !== session.district)) notFound();
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-10">
+    <div className="mx-auto w-full max-w-6xl px-4 py-10">
+      <EnteteAdmin session={session} section="liste" />
+      <div className="mt-6 max-w-3xl">
       <h1 className="text-2xl font-semibold text-zinc-900">{dossier.reference}</h1>
       <p className="text-sm text-zinc-500">
         Déposé le {new Date(dossier.dateDepot).toLocaleString("fr-FR")}
@@ -79,6 +82,7 @@ export default async function DossierAdminPage({
           emailConfirmation={libelleEmailConfirmation(dossier)}
         />
       )}
+      </div>
     </div>
   );
 }

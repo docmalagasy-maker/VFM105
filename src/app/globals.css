@@ -48,6 +48,27 @@ body {
     radial-gradient(ellipse 60% 40% at 50% 100%, rgba(230, 218, 195, 0.6), transparent 70%);
 }
 
+/* Bouton « Radio » pendant la diffusion : mot qui pulse et point LIVE qui clignote,
+   uniquement si le visiteur n'a pas demandé à réduire les animations. */
+@media (prefers-reduced-motion: no-preference) {
+  .radio-pulse {
+    animation: radio-pulse 1.6s ease-in-out infinite;
+  }
+  .radio-point {
+    animation: radio-point 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes radio-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+@keyframes radio-point {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.75); }
+}
+
 /* Liseré aux couleurs du logo (rouge, vert, bleu) */
 .vfm-lisere {
   background: linear-gradient(

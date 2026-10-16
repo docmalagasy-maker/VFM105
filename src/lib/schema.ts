@@ -3,7 +3,7 @@ import { getPool } from "@/lib/db";
 let schemaVerifie: Promise<unknown> | undefined;
 
 /**
- * Applique les migrations 002 à 005 si besoin (idempotent, une fois par
+ * Applique les migrations 002 à 006 si besoin (idempotent, une fois par
  * démarrage du serveur), pour qu'un déploiement ne casse jamais le site avant
  * une migration manuelle de la base.
  */
@@ -54,7 +54,31 @@ export function verifierSchema(): Promise<unknown> {
        );
        CREATE UNIQUE INDEX IF NOT EXISTS idx_reponses_participant ON reponses_sondage (sondage_id, participant);
        CREATE INDEX IF NOT EXISTS idx_reponses_sondage_district ON reponses_sondage (sondage_id, district);
-       CREATE INDEX IF NOT EXISTS idx_reponses_sondage_ip ON reponses_sondage (sondage_id, ip_empreinte);`
+       CREATE INDEX IF NOT EXISTS idx_reponses_sondage_ip ON reponses_sondage (sondage_id, ip_empreinte);
+       CREATE TABLE IF NOT EXISTS reference_sequences_personnes (
+         annee INTEGER PRIMARY KEY,
+         dernier_numero INTEGER NOT NULL DEFAULT 0
+       );
+       CREATE TABLE IF NOT EXISTS dossiers_personnes (
+         reference TEXT PRIMARY KEY,
+         idempotency_key UUID NOT NULL UNIQUE,
+         date_depot TIMESTAMPTZ NOT NULL,
+         statut TEXT NOT NULL DEFAULT 'recu',
+         nom TEXT NOT NULL,
+         prenom TEXT NOT NULL,
+         date_naissance DATE NOT NULL,
+         district TEXT NOT NULL,
+         activite TEXT NOT NULL,
+         description_activite TEXT NOT NULL,
+         projet TEXT NOT NULL,
+         telephone TEXT NOT NULL,
+         email TEXT,
+         cv JSONB,
+         email_confirmation TEXT,
+         cree_le TIMESTAMPTZ NOT NULL DEFAULT now()
+       );
+       CREATE INDEX IF NOT EXISTS idx_personnes_district ON dossiers_personnes (district);
+       CREATE INDEX IF NOT EXISTS idx_personnes_date_depot ON dossiers_personnes (date_depot);`
     )
     .catch((err) => {
       schemaVerifie = undefined;

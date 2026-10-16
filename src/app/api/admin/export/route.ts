@@ -4,6 +4,7 @@ import { listerDossiers } from "@/lib/repository";
 import { calculerStatistiques } from "@/lib/statistiques";
 import { LIBELLES_STATUT } from "@/app/admin/libelles";
 import { arrondi, csv } from "@/lib/csv";
+import { listerPersonnes } from "@/lib/personnes";
 
 export async function GET(request: NextRequest) {
   let district: string | undefined;
@@ -17,7 +18,30 @@ export async function GET(request: NextRequest) {
   const date = new Date().toISOString().slice(0, 10);
   let contenu: string;
 
-  if (type === "dossiers") {
+  if (type === "personnes") {
+    const personnes = await listerPersonnes(undefined, 100000, district);
+    contenu = csv(
+      [
+        "Référence", "Date de dépôt", "Statut", "Nom", "Prénom", "Date de naissance", "District",
+        "Activité actuelle", "Description de l'activité", "Projet personnel", "Téléphone", "E-mail", "CV",
+      ],
+      personnes.map((p) => [
+        p.reference,
+        new Date(p.dateDepot).toLocaleString("fr-FR", { timeZone: "Indian/Antananarivo" }),
+        LIBELLES_STATUT[p.statut] ?? p.statut,
+        p.nom,
+        p.prenom,
+        p.dateNaissance.split("-").reverse().join("/"),
+        p.district,
+        p.activite,
+        p.descriptionActivite,
+        p.projet,
+        p.telephone,
+        p.email,
+        p.cv ? p.cv.nom : "",
+      ])
+    );
+  } else if (type === "dossiers") {
     // Export complet (jusqu'à 100 000 dossiers), sans la limite d'affichage de la liste.
     const dossiers = await listerDossiers(undefined, 100000, district);
     contenu = csv(

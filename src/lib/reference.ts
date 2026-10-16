@@ -19,3 +19,16 @@ export async function genererProchaineReference(annee: number): Promise<string> 
   const numeroFormate = String(numero).padStart(4, "0");
   return `VFM-${annee}-${numeroFormate}`;
 }
+
+/** Même principe pour les dossiers de personnes : VFM-P-AAAA-NNNN, compteur séparé. */
+export async function genererProchaineReferencePersonne(annee: number): Promise<string> {
+  const result = await getPool().query<{ dernier_numero: number }>(
+    `INSERT INTO reference_sequences_personnes (annee, dernier_numero)
+     VALUES ($1, 1)
+     ON CONFLICT (annee)
+     DO UPDATE SET dernier_numero = reference_sequences_personnes.dernier_numero + 1
+     RETURNING dernier_numero`,
+    [annee]
+  );
+  return `VFM-P-${annee}-${String(result.rows[0].dernier_numero).padStart(4, "0")}`;
+}

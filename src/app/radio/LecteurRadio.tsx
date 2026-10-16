@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { API_RADIO_URL as API_URL, FLUX_URL } from "@/lib/radio";
 
-// Station AzuraCast hébergée sur le même VPS (projet Coolify « Radio VFM »).
-const RADIO_URL = "https://radio.0550.site";
-const FLUX_URL = `${RADIO_URL}/listen/vfm/radio.mp3`;
-const API_URL = `${RADIO_URL}/api/nowplaying/vfm`;
 const RAFRAICHISSEMENT_MS = 15_000;
 
 type Morceau = { titre: string; artiste: string; pochette: string | null };

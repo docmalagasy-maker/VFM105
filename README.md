@@ -15,6 +15,11 @@ Plateforme nationale, en malgache, permettant aux associations des
 
 ### Côté public (en malgache)
 
+Le bouton vert de l'accueil propose deux dossiers : **Fikambanana**
+(association, parcours ci-dessous) ou **Olona tsirairay** (personne physique :
+`/deposer/olona`, référence `VFM-P-AAAA-NNNN`, CV facultatif ; consultation
+dans l'onglet admin « Personnes »).
+
 Parcours : **Formulaire → Récapitulatif → Modification éventuelle →
 Validation définitive → Enregistrement → Référence `VFM-AAAA-NNNN` →
 e-mail de confirmation (si une adresse a été donnée).**
@@ -30,10 +35,12 @@ e-mail de confirmation (si une adresse a été donnée).**
 - **SMS de confirmation : désactivé** depuis le 15 octobre 2026. Le code
   est conservé dans `src/lib/sms.ts` (passerelle Android) ; réactivation
   par la variable `SMS_ACTIF=true` dans Coolify.
-- Menus visibles sur toutes les pages : **Dossier** (retour à l'accueil,
-  masqué sur l'accueil), **Sary** (`/galerie`, galerie de photos),
-  **Radio** (`/radio`, lecteur du direct de la Radio VFM,
-  https://radio.0550.site), **Manehoa hevitra** (`/sondages`, sondages
+- Menus visibles sur toutes les pages, toujours dans le même ordre (le
+  bouton de la page en cours est grisé et inactif) : **Dossier** (accueil),
+  **Birao** (`/birao`, Bureau national ; membres dans `src/data/birao.ts`),
+  **Sary** (`/galerie`, galerie de photos), **Radio** (`/radio`, lecteur du
+  direct de la Radio VFM, https://radio.0550.site ; bouton distinctif avec
+  indicateur « LIVE » quand la station diffuse), **Manehoa hevitra** (`/sondages`, sondages
   ouverts au public), **Resaho izahay** (affiche l'adresse e-mail de
   contact).
 - **Sondages** : un vote par sondage et par navigateur ; le participant

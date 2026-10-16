@@ -7,26 +7,15 @@ import { listerDossiers } from "@/lib/repository";
 import { SMS_ACTIF } from "@/lib/sms";
 import type { Dossier } from "@/lib/types";
 import AdministrateursVue from "./AdministrateursVue";
-import BoutonDeconnexion from "./BoutonDeconnexion";
 import BoutonSupprimer from "./BoutonSupprimer";
 import CarteAdmin from "./CarteAdmin";
+import EnteteAdmin, { ongletsVisibles, type Vue } from "./EnteteAdmin";
 import FichesDossiers from "./FichesDossiers";
 import GalerieAdmin from "./GalerieAdmin";
+import PersonnesVue from "./PersonnesVue";
 import { libelleEmailConfirmation, LIBELLES_SMS, LIBELLES_STATUT } from "./libelles";
 import SondagesVue from "./SondagesVue";
 import StatistiquesVue from "./StatistiquesVue";
-
-type Vue = "liste" | "fiches" | "stats" | "carte" | "galerie" | "sondages" | "admins";
-
-const ONGLETS: { vue: Vue; libelle: string; superSeulement?: boolean }[] = [
-  { vue: "liste", libelle: "Liste des dossiers" },
-  { vue: "fiches", libelle: "Consultation fiche par fiche" },
-  { vue: "stats", libelle: "Statistiques" },
-  { vue: "carte", libelle: "Carte" },
-  { vue: "galerie", libelle: "Galerie photos" },
-  { vue: "sondages", libelle: "Sondages" },
-  { vue: "admins", libelle: "Administrateurs", superSeulement: true },
-];
 
 export default async function AdminPage({
   searchParams,
@@ -40,43 +29,13 @@ export default async function AdminPage({
   const district = districtAutorise(session);
 
   const { q, vue: vueDemandee, ref } = await searchParams;
-  const onglets = ONGLETS.filter((o) => estSuper || !o.superSeulement);
+  const onglets = ongletsVisibles(session);
   const vue: Vue = onglets.find((o) => o.vue === vueDemandee)?.vue ?? "liste";
-  const avecRecherche = vue === "liste" || vue === "fiches";
+  const avecRecherche = vue === "liste" || vue === "fiches" || vue === "personnes";
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">
-            {district ? `Dossiers — district ${district}` : "Dossiers reçus"}
-          </h1>
-          <p className="text-sm text-zinc-500">
-            {estSuper ? "Super-administrateur — tous les districts" : `Administrateur : ${session.nom}`}
-          </p>
-        </div>
-        <BoutonDeconnexion />
-      </header>
-
-      <nav className="mt-4 flex flex-wrap gap-1 border-b border-zinc-200">
-        {onglets.map((o) => (
-          <Link
-            key={o.vue}
-            href={
-              (o.vue === "liste" || o.vue === "fiches") && q
-                ? `/admin?vue=${o.vue}&q=${encodeURIComponent(q)}`
-                : `/admin?vue=${o.vue}`
-            }
-            className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${
-              vue === o.vue
-                ? "border-zinc-900 text-zinc-900"
-                : "border-transparent text-zinc-500 hover:text-zinc-800"
-            }`}
-          >
-            {o.libelle}
-          </Link>
-        ))}
-      </nav>
+      <EnteteAdmin session={session} vue={vue} q={q} />
 
       {avecRecherche && (
         <form className="mt-4" method="get">
@@ -86,7 +45,11 @@ export default async function AdminPage({
             type="search"
             name="q"
             defaultValue={q}
-            placeholder="Rechercher par référence, association, commune, responsable, téléphone..."
+            placeholder={
+              vue === "personnes"
+                ? "Rechercher par référence, nom, prénom, district, activité, téléphone..."
+                : "Rechercher par référence, association, commune, responsable, téléphone..."
+            }
           />
         </form>
       )}
@@ -101,6 +64,7 @@ export default async function AdminPage({
           smsActif={SMS_ACTIF}
         />
       )}
+      {vue === "personnes" && <PersonnesVue q={q} district={district} estSuper={estSuper} />}
       {vue === "stats" && <StatistiquesVue district={district} />}
       {vue === "carte" && <CarteAdmin districtImpose={district} />}
       {vue === "galerie" && (

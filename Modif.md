@@ -26,6 +26,11 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | E | 15 octobre 2026 | E1 — SMS désactivé, e-mail de confirmation de dépôt | Mis en ligne |
 | F | 15 octobre 2026 | F1 — Menu « Radio » et page `/radio` avec lecteur du direct | Mis en ligne |
 | G | 15 octobre 2026 | G1 — Sondages « Manehoa hevitra » (public, gestion, résultats, statistiques) | Mis en ligne (16 octobre 2026) |
+| H | 16 octobre 2026 | H1 — Menus stables : page en cours grisée | Prêt en local (attente du GO) |
+| H | 16 octobre 2026 | H2 — Menu et page « Birao » (Birao Nasionaly) | Prêt en local (attente du GO) |
+| H | 16 octobre 2026 | H3 — Bouton « Radio » distinctif et indicateur LIVE | Prêt en local (attente du GO) |
+| H | 16 octobre 2026 | H4 — Menus de l'administration toujours visibles | Prêt en local (attente du GO) |
+| I | 16 octobre 2026 | I1 — Dossiers de personnes physiques (références VFM-P) | Prêt en local (attente du GO) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 
 ---
@@ -907,6 +912,239 @@ l'erreur déjà connue de `DepotWizard.tsx` (`serveur.md` §9).
       `/galerie`, `/deposer` en 200.
 - [ ] Créer un premier sondage depuis l'admin, l'activer, y répondre depuis
       un téléphone, consulter les résultats.
+
+---
+
+## Lot H — Menus, Birao et bouton Radio (16 octobre 2026)
+
+Demande : `MARKDOWN/modifE.md` (« Modification E » E1 à E3), numérotée ici
+H1 à H3 pour ne pas la confondre avec le lot E (confirmation par e-mail).
+
+### H1 — Menus stables, page en cours grisée
+
+**Avant :** le bouton de la page affichée disparaissait (« Dossier » masqué
+sur l'accueil), ce qui décalait les autres boutons.
+
+**Après :** les six boutons sont toujours présents, dans le même ordre :
+**Dossier · Birao · Sary · Radio · Manehoa hevitra · Resaho izahay**. Le
+bouton de la page en cours reste à sa place, **grisé et inactif** (non
+cliquable, signalé comme page en cours aux lecteurs d'écran) :
+
+- Dossier sur l'accueil (il reste actif sur le formulaire de dépôt et la
+  page de remerciement, pour revenir à l'accueil) ;
+- Birao sur `/birao`, Sary sur `/galerie`, Radio sur `/radio` ;
+- Manehoa hevitra sur `/sondages` et sur chaque sondage.
+
+« Resaho izahay » n'ouvre pas de page (il affiche l'adresse e-mail) : il
+garde son fonctionnement. Le petit séparateur vertical avant ce bouton est
+supprimé (il restait seul en fin de ligne quand le menu passe sur deux
+lignes). Ordinateur et tablette : une ligne ; téléphone : deux lignes.
+
+### H2 — Menu et page « Birao »
+
+- Nouveau bouton **Birao** et page **`/birao`** « Birao Nasionaly — Ireo
+  mpikambana ao amin'ny Birao Nasionaly VFM ».
+- Le président est mis en avant, les quatre autres membres en grille
+  (1 colonne sur téléphone, 2 sur tablette, 4 sur ordinateur). Chaque fiche :
+  initiales (en attendant une photo), nom, fonction en malgache, district.
+
+| Nom et prénom | Fonction affichée | Distrika |
+|---|---|---|
+| Fanomezantsoa ANDRIANJANAHARY | Filoha nasionalin'ny VFM | Manandriana |
+| Pety RAKOTONIAINA | Filoha lefitra nasionalin'ny VFM | Ikalamavony |
+| Nirina Fenohery Johnny RAKOTOARISOA | Filoha lefitra nasionalin'ny VFM | Ambohidratrimo |
+| Namiandrazana François AROSY | Filoha lefitra nasionalin'ny VFM | Nosy Be |
+| Marco TSARADIA | Sekretera jeneraly nasionalin'ny VFM | Ampanihy |
+
+**Faire évoluer la page :** tout est dans `src/data/birao.ts` (mode d'emploi
+en tête du fichier) — ajouter une ligne pour un membre ; photo : déposer
+l'image dans `public/images/birao/` et indiquer son nom (`photo`) ;
+biographie : champ `tantara`. Puis commit et push.
+
+### H3 — Bouton « Radio » distinctif et indicateur LIVE
+
+- Le bouton **Radio** a son propre style sur toutes les pages : fond bleu
+  marine, texte blanc, icône d'ondes.
+- **Pendant la diffusion** (choix du 16 octobre 2026 : dès que la station
+  est en marche, playlist automatique comprise) : pastille rouge **LIVE**
+  avec point clignotant, et le mot « Radio » qui pulse doucement.
+- **Radio arrêtée ou injoignable :** bouton visible, sans animation ni
+  LIVE. L'indicateur n'apparaît qu'après confirmation par la station
+  (jamais de LIVE « par défaut »).
+- État vérifié toutes les 30 secondes auprès de l'API publique d'AzuraCast
+  (`radio.0550.site`), et à chaque retour sur l'onglet ; aucune requête quand
+  l'onglet est en arrière-plan.
+- Animations désactivées si le visiteur a demandé à réduire les animations
+  (réglage du téléphone ou de l'ordinateur).
+- Sur la page Radio, le bouton est grisé (H1) mais garde l'indication LIVE.
+
+### H4 — Menus de l'administration toujours visibles
+
+Demande : « Modification E4 ».
+
+**Avant :** les onglets de l'administration (Liste des dossiers,
+Consultation fiche par fiche, Statistiques, Carte, Galerie photos,
+Sondages, Administrateurs) disparaissaient dès qu'on ouvrait une page
+intérieure : fiche d'un dossier, résultats, création ou modification d'un
+sondage.
+
+**Après :** même en-tête (« Administration VFM », rôle, Se déconnecter) et
+mêmes onglets, au même endroit et dans le même ordre, sur **toutes** les
+pages de l'administration :
+
+- rubrique affichée (ex. `/admin?vue=sondages`) : son onglet est **grisé et
+  inactif** ;
+- page intérieure d'une rubrique (fiche d'un dossier, résultats d'un
+  sondage, éditeur) : l'onglet de la rubrique est souligné et **reste
+  cliquable** pour revenir à sa liste ; les liens « ← » existants sont
+  conservés ;
+- les autres onglets restent actifs ; l'onglet Administrateurs reste
+  réservé au super-administrateur ;
+- une future rubrique s'ajoute à un seul endroit
+  (`src/app/admin/EnteteAdmin.tsx`) et apparaît partout ;
+- le titre de l'en-tête devient « Administration VFM » sur toutes les pages
+  (le district de l'administrateur de district est rappelé dessous).
+
+Pages de connexion, de demande d'accès et de validation par e-mail :
+inchangées (pas de menu avant connexion).
+
+**Également :**
+
+- titre de la page Birao « Birao Nasionaly » (au lieu de
+  « Biraom-pirenena ») ;
+- page d'accueil : « Apetraho an-tserasera eo amin'ny VFM… » devient
+  « Apetraho ny Dosie-nao eo amin'ny VFM ny antontan-taratasin'ny
+  fikambananao. », sur l'accueil (`src/app/page.tsx`) et en tête du
+  formulaire de dépôt (`src/components/DepotWizard.tsx`).
+
+**Vérifié en local** (base de test) : sur les 10 pages d'administration
+(7 rubriques, résultats, modification et création d'un sondage), menu à la
+même position avec les 7 onglets ; onglet de la rubrique grisé, ou
+souligné et cliquable sur les pages intérieures ; téléphone 375 px sans
+défilement horizontal ; tests automatiques des sondages et des droits de
+district rejoués (43 / 43) ; types et build de production.
+
+**Fichiers (lot H) :**
+
+| Fichier | Modification |
+|---|---|
+| `src/components/MenuPublic.tsx` | Menus fixes, page en cours grisée, Birao, bouton Radio et LIVE |
+| `src/components/PublicShell.tsx` | Commentaire |
+| `src/app/globals.css` | Animations du bouton Radio |
+| `src/lib/radio.ts` (nouveau) | Adresses de la station (partagées) |
+| `src/app/radio/LecteurRadio.tsx` | Utilise `src/lib/radio.ts` |
+| `src/data/birao.ts` (nouveau) | Membres du Bureau national |
+| `src/app/birao/page.tsx` (nouveau) | Page Birao |
+| `src/app/admin/EnteteAdmin.tsx` (nouveau) | En-tête et onglets communs de l'administration |
+| `src/app/admin/page.tsx`, `[reference]/page.tsx`, `sondages/nouveau/page.tsx`, `sondages/[id]/page.tsx`, `sondages/[id]/modifier/page.tsx` | Utilisent l'en-tête commun |
+
+**Vérifié en local :** menus sur `/`, `/birao`, `/radio` (page en cours
+grisée et non cliquable, ordre identique) ; téléphone 375 px (deux lignes,
+sans défilement horizontal), tablette 768 px (une ligne), ordinateur ;
+LIVE affiché avec la station en marche ; LIVE et animation retirés quand la
+station est indiquée arrêtée (simulation) ; page Birao (5 fiches, président
+en tête) ; console sans erreur ; types, lint, build de production.
+
+### Mise en ligne du lot H
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
+- [ ] Test en ligne sur téléphone : menus, page Birao, LIVE.
+
+---
+
+## Lot I — Dossiers de personnes physiques (16 octobre 2026)
+
+Demande « Modification F1 », numérotée ici I1 (un lot F existe déjà : la
+radio).
+
+### I1 — Enregistrement des personnes physiques
+
+**Avant :** le bouton vert « Hametraka antontan-taratasy » de l'accueil
+ouvrait directement le formulaire des associations.
+
+**Après :** le bouton propose d'abord **« Iza no ametrahana ny dosie ? »** :
+
+- **Fikambanana** → formulaire des associations, **inchangé** (`/deposer`) ;
+- **Olona tsirairay** → nouveau formulaire des personnes (`/deposer/olona`).
+
+**Choix validés le 16 octobre 2026 :** référence `VFM-P-AAAA-NNNN` avec sa
+propre numérotation ; téléphone obligatoire et e-mail facultatif (pour
+recontacter la personne et lui envoyer sa référence) ; CV facultatif ; nouvel
+onglet « Personnes » dans l'administration.
+
+**Formulaire personne (en malgache) :** 1. Mombamomba anao (Anarana,
+Fanampin'anarana, Daty nahaterahana, Distrika) · 2. Ny asanao (Asa
+ankehitriny, Fanazavana momba ny asanao) · 3. Tetikasa manokana ·
+4. Fifandraisana (Finday obligatoire, Mailaka) · 5. CV (un fichier, PDF,
+Word ou image, 10 Mo au plus, facultatif). Même parcours que les
+associations : vérification des champs, **famintinana** (récapitulatif),
+« Hanova ny mombamomba » ou « Handefa farany ny dosie-ko », protection contre
+le double envoi, brouillon gardé dans le navigateur (séparé de celui des
+associations).
+
+**Après l'envoi :** page « Misaotra anao ny VFM <district> » avec la
+référence `VFM-P-…` ; e-mail de confirmation en malgache si une adresse a
+été donnée (« VFM — Voaray ny dosie-nao (VFM-P-2026-0001) »).
+
+**Administration — nouvel onglet « Personnes »** (après « Consultation fiche
+par fiche ») :
+
+- liste (référence, date, nom, âge, district, activité, téléphone, statut,
+  CV, e-mail de confirmation), recherche par référence, nom, prénom,
+  district, activité, téléphone ;
+- fiche de la personne : toutes les informations, âge, lien vers le CV,
+  téléphone et e-mail cliquables ; super-administrateur : changement de
+  statut (mêmes statuts que les associations) et suppression définitive
+  (dossier et CV) ;
+- **export CSV** des personnes ;
+- administrateur de district : uniquement les personnes de son district
+  (liste, fiche, CV, export), en lecture seule.
+
+Les dossiers d'associations, leur liste, leurs statistiques, la carte et
+leur numérotation `VFM-AAAA-NNNN` sont inchangés.
+
+**Base de données :** tables `dossiers_personnes` et
+`reference_sequences_personnes` (`migrations/006_personnes.sql`), créées
+automatiquement au premier accès.
+
+**Fichiers :**
+
+| Fichier | Rôle |
+|---|---|
+| `migrations/006_personnes.sql`, `src/lib/schema.ts` | Tables des personnes |
+| `src/lib/reference.ts` | Numérotation `VFM-P-AAAA-NNNN` |
+| `src/lib/personnes-modele.ts`, `src/lib/personnes.ts` (nouveaux) | Champs, validation, accès aux données |
+| `src/lib/confirmation-personne.ts` (nouveau) | E-mail de confirmation |
+| `src/app/ChoixDepot.tsx` (nouveau), `src/app/page.tsx` | Choix Fikambanana / Olona tsirairay |
+| `src/app/deposer/olona/` (nouveau) | Formulaire des personnes |
+| `src/app/confirmation/olona/[reference]/` (nouveau) | Page de remerciement |
+| `src/app/api/personnes/route.ts` (nouveau) | Enregistrement |
+| `src/app/admin/PersonnesVue.tsx`, `src/app/admin/olona/` (nouveaux) | Onglet, fiche, statut, suppression |
+| `src/app/api/admin/personnes/` (nouveaux) | Statut et suppression |
+| `src/app/admin/EnteteAdmin.tsx`, `src/app/admin/page.tsx` | Onglet « Personnes » |
+| `src/app/api/admin/export/route.ts` | Export `type=personnes` |
+| `src/app/api/admin/pieces/[...pathname]/route.ts` | CV accessible à l'administrateur du district |
+| `src/components/DepotWizard.tsx` | Blocs de présentation réutilisés (sans changement du formulaire) |
+
+**Vérifié en local** (base PostgreSQL de test) — 40 contrôles automatiques
+réussis : envoi du CV ; dépôt avec CV → `VFM-P-2026-0001`, double envoi →
+même dossier ; dépôt sans CV → `0002` ; nom, date future ou impossible,
+district inconnu, téléphone, e-mail, projet → refusés avec message en
+malgache ; dossier d'association toujours `VFM-2026-0001` ; pages
+publiques ; remerciement ; onglet, recherche, fiche, CV, statut, export ;
+refus sans session ; administrateur de district limité à son district
+(liste, fiche, CV, export) et sans droit de gestion (403) ; suppression du
+dossier et du fichier CV ; numérotation continue. Tests des sondages et des
+droits de district rejoués (43 / 43). Contrôle visuel sur téléphone (choix
+de l'accueil, formulaire). Types et build de production.
+
+### Mise en ligne du lot I
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
+- [ ] Test en ligne : dépôt d'un dossier de personne, consultation dans
+      l'onglet Personnes, puis suppression du dossier de test.
 
 ---
 
