@@ -26,11 +26,11 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | E | 15 octobre 2026 | E1 — SMS désactivé, e-mail de confirmation de dépôt | Mis en ligne |
 | F | 15 octobre 2026 | F1 — Menu « Radio » et page `/radio` avec lecteur du direct | Mis en ligne |
 | G | 15 octobre 2026 | G1 — Sondages « Manehoa hevitra » (public, gestion, résultats, statistiques) | Mis en ligne (16 octobre 2026) |
-| H | 16 octobre 2026 | H1 — Menus stables : page en cours grisée | Prêt en local (attente du GO) |
-| H | 16 octobre 2026 | H2 — Menu et page « Birao » (Birao Nasionaly) | Prêt en local (attente du GO) |
-| H | 16 octobre 2026 | H3 — Bouton « Radio » distinctif et indicateur LIVE | Prêt en local (attente du GO) |
-| H | 16 octobre 2026 | H4 — Menus de l'administration toujours visibles | Prêt en local (attente du GO) |
-| I | 16 octobre 2026 | I1 — Dossiers de personnes physiques (références VFM-P) | Prêt en local (attente du GO) |
+| H | 16 octobre 2026 | H1 — Menus stables : page en cours grisée | Mis en ligne (16 octobre 2026) |
+| H | 16 octobre 2026 | H2 — Menu et page « Birao » (Birao Nasionaly) | Mis en ligne (16 octobre 2026) |
+| H | 16 octobre 2026 | H3 — Bouton « Radio » distinctif et indicateur LIVE | Mis en ligne (16 octobre 2026) |
+| H | 16 octobre 2026 | H4 — Menus de l'administration toujours visibles | Mis en ligne (16 octobre 2026) |
+| I | 16 octobre 2026 | I1 — Dossiers de personnes physiques (références VFM-P) | Mis en ligne (16 octobre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 
 ---
@@ -1047,8 +1047,13 @@ en tête) ; console sans erreur ; types, lint, build de production.
 
 ### Mise en ligne du lot H
 
-- [ ] GO, commit et push sur `master`.
-- [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
+- [x] GO, commit `a6de5e5` et push sur `master` (16 octobre 2026, avec le lot I).
+- [x] Nouvelles pages en ligne environ 1 min 30 après le push, accueil
+      resté accessible ; statut Coolify non consulté (session du panneau
+      expirée).
+- [x] Contrôles en ligne : six menus avec « Dossier » grisé sur l'accueil,
+      Radio avec LIVE (station en marche), page Birao Nasionaly, phrase
+      « Apetraho ny Dosie-nao », console sans erreur.
 - [ ] Test en ligne sur téléphone : menus, page Birao, LIVE.
 
 ---
@@ -1141,8 +1146,11 @@ de l'accueil, formulaire). Types et build de production.
 
 ### Mise en ligne du lot I
 
-- [ ] GO, commit et push sur `master`.
-- [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
+- [x] GO, commit `a6de5e5` et push sur `master` (16 octobre 2026).
+- [x] Contrôles en ligne : choix Fikambanana / Olona tsirairay sur
+      l'accueil, `/deposer` et `/deposer/olona` en 200, envoi vide refusé
+      (400), remerciement inexistant (404), onglet Personnes redirigé vers
+      la connexion sans session, export et statut refusés sans session (401).
 - [ ] Test en ligne : dépôt d'un dossier de personne, consultation dans
       l'onglet Personnes, puis suppression du dossier de test.
 
