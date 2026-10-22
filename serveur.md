@@ -28,6 +28,7 @@ Journal de la migration du site **VFM 105** de Vercel vers un VPS géré par
 | Messagerie du domaine | LWS : boîtes `noreply@0550.site` (envoi automatique du site) et `contact.vfm@0550.site` (contact public) |
 | Serveur mail LWS | `mail77.lwspanel.com` (IMAP 993, POP3 995, SMTP 465 SSL / 587) |
 | Ressources | 4 vCPU, 7,9 Go RAM, **swap 4 Go** (`/swapfile`, depuis le 16 octobre 2026), disque 148 Go |
+| PHP | Aucun sur l'hôte ; uniquement dans les conteneurs Coolify et AzuraCast (voir étape 16) |
 | Services hébergés | **VFM** (site + Postgres, projet MAIN SERVEUR) ; **messagerie « Core CRYPTED »** (Supabase auto-hébergé, projet MAIN SERVEUR, https://messagerie.0550.site, dépôt `D:\MessagerieAssociation`, voir son `modifications.md` M24) ; **Radio VFM** (AzuraCast, projet Radio VFM, https://radio.0550.site) |
 
 ### Enregistrements DNS chez LWS (zone `0550.site`)
@@ -298,6 +299,41 @@ supprimer `/swapfile` et `/etc/sysctl.d/99-swap.conf`.
 Le swap évite un plantage lors d'un pic de mémoire, mais il est beaucoup plus
 lent que la RAM : il ne permet **pas** d'ajouter un service lourd (par
 exemple un modèle d'IA local de 4 Go).
+
+### Étape 16 — Failles PHP « php2shell » (22 octobre 2026)
+
+**Alerte LWS** du 22 octobre 2026 : CVE-2026-109618 et CVE-2026-109619
+(9.2/10, prise de contrôle à distance), attaques observées depuis le
+21 octobre. Versions corrigées : 8.2.35, 8.3.36, 8.4.27, 8.5.12.
+
+**Constat** (terminal Coolify → localhost) : aucun PHP sur l'hôte (le
+conseil `apt upgrade` de LWS ne s'applique pas) ; PHP uniquement dans deux
+conteneurs exposés :
+
+| Conteneur | Image | PHP avant | Action |
+|---|---|---|---|
+| `coolify` | `coollabsio/coolify:4.4.7` | 8.4.27 (corrigé) | Aucune ; Coolify à jour, mises à jour automatiques actives |
+| `web-nsoocwyd53tevzn1keismpyd` (AzuraCast) | `ghcr.io/azuracast/azuracast:stable` | **8.5.9 (vulnérable)** | Nouvelle image vérifiée en PHP 8.5.12, puis *Restart (pull latest)* dans Coolify |
+
+**Contrôle de compromission avant la mise à jour** (le redémarrage recrée
+le conteneur et efface ses traces) : aucun fichier PHP inconnu modifié
+depuis le 20 octobre (seul `app_routes.cache.php`, cache normal
+d'AzuraCast) ; aucun script récent dans `/tmp` ; aucun processus suspect ;
+hôte : 37 connexions SSH depuis le 20 octobre, toutes de Coolify
+(`10.0.1.8`, clé de Coolify), aucune tâche cron ajoutée. Aucun signe
+d'intrusion : pas de changement de mot de passe nécessaire.
+
+**Après :** conteneur AzuraCast relancé le 22 octobre 2026 à 05:13 UTC,
+**PHP 8.5.12 confirmé** ; Coolify toujours en 8.4.27. Radio en ligne (API
+200, flux 206), VFM 200. Les journaux
+d'accès HTTP (requêtes POST) n'ont pas pu être vérifiés : Traefik ne les
+enregistre pas.
+
+Vérifier une version PHP (à refaire à chaque alerte) :
+
+```bash
+for c in $(docker ps -q); do v=$(docker exec $c php -r 'echo PHP_VERSION;' 2>/dev/null) && echo "$(docker inspect -f '{{.Name}} {{.Config.Image}}' $c) -> PHP $v"; done
+```
 
 ---
 
