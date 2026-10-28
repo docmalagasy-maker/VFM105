@@ -274,7 +274,7 @@ neutralisée dans l'export.
 
 ### Mise en ligne du lot B
 
-- [x] GO (28 octobre 2026), commit et push sur `master`.
+- [ ] GO, commit et push sur `master`.
 - [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
 - [ ] Test en ligne des trois onglets de `/admin` et d'un export CSV.
 
@@ -377,7 +377,7 @@ lot C (sans légende, noms automatiques).
 
 ### Mise en ligne du lot C
 
-- [x] GO (28 octobre 2026), commit et push sur `master`.
+- [ ] GO, commit et push sur `master`.
 - [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
 - [ ] Ajouter de vraies photos (dossier `GALERIE` ou admin) et vérifier
       `/galerie` sur téléphone et ordinateur.
@@ -1333,8 +1333,14 @@ saisie vide.
 
 ### Mise en ligne du lot K
 
-- [x] GO (28 octobre 2026), commit et push sur `master`.
-- [ ] Contrôle en ligne : dépôt d'un dossier de personne test (commune,
+- [x] GO (28 octobre 2026), commit `62f59b1` et push sur `master`.
+- [x] Contrôles en ligne (https://vfm105.com) : `/`, `/deposer`,
+      `/deposer/olona` en 200 ; formulaire personne avec listes Distrika →
+      Kaominina → Fokontany, sans date de naissance ni CV ; formulaire
+      association avec « Ny hevitrao », sans pièces jointes ; `/api/upload`
+      en 404 ; refus sans kaominina (personne) et sans avis (association)
+      en 400 avec les nouveaux messages.
+- [ ] Test en ligne : dépôt d'un dossier de personne test (commune,
       fokontany), consultation dans l'admin, puis suppression du dossier test.
 
 ---
@@ -1375,5 +1381,5 @@ les 6 onglets, carte, refus sans session (401).
 
 ### Mise en ligne du lot S
 
-- [x] GO (28 octobre 2026), commit et push sur `master`.
+- [ ] GO, commit et push sur `master`.
 - [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
