@@ -1247,8 +1247,8 @@ Le domaine pointait sur la page de parking LWS. Étapes (détail dans
 
 ### Mise en ligne du lot J
 
-- [x] GO (28 octobre 2026), commit et push sur `master`.
-- [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
+- [x] GO (28 octobre 2026), commit `d43ca01` et push sur `master`.
+- [x] Déploiement en ligne contrôlé : https://vfm.0550.site en 200, nouvelle affiche, boutons et « Ambohidratrimo » présents.
 
 ---
 
