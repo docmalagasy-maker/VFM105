@@ -9,7 +9,7 @@ import FormulaireSondage from "./FormulaireSondage";
 import MessageFin from "./MessageFin";
 
 export const metadata: Metadata = {
-  title: "Manehoa hevitra — VFM",
+  title: "Manehoa hevitra — VFM 105",
 };
 
 export default async function SondagePage({ params }: { params: Promise<{ id: string }> }) {

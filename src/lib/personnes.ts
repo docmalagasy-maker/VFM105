@@ -34,6 +34,7 @@ function ligneVersPersonne(row: Record<string, unknown>): DossierPersonne {
     email: (row.email as string) ?? undefined,
     cv: (row.cv as DossierPersonne["cv"]) ?? undefined,
     emailConfirmation: (row.email_confirmation as DossierPersonne["emailConfirmation"]) ?? undefined,
+    qrJeton: row.qr_jeton as string,
   };
 }
 
@@ -87,6 +88,13 @@ export async function creerPersonne(input: PersonneInput): Promise<{ dossier: Do
 export async function obtenirPersonne(reference: string): Promise<DossierPersonne | null> {
   await verifierSchema();
   const r = await getPool().query(`SELECT * FROM dossiers_personnes WHERE reference = $1`, [reference]);
+  return r.rows[0] ? ligneVersPersonne(r.rows[0]) : null;
+}
+
+/** Dossier de personne correspondant au code d'un QR code d'inscription. */
+export async function obtenirPersonneParQrJeton(jeton: string): Promise<DossierPersonne | null> {
+  await verifierSchema();
+  const r = await getPool().query(`SELECT * FROM dossiers_personnes WHERE qr_jeton = $1`, [jeton]);
   return r.rows[0] ? ligneVersPersonne(r.rows[0]) : null;
 }
 

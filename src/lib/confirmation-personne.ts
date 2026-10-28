@@ -29,7 +29,7 @@ export async function envoyerConfirmationPersonne(dossier: DossierPersonne): Pro
     `Voaray soa aman-tsara ny dosie-nao.\n\n` +
     lignes.map(([l, v]) => `${l} : ${v}`).join("\n") +
     `\n\nTehirizo ity laharana ity raha hifandray aminay ianao.\n\n` +
-    `Misaotra anao,\nNy VFM\n\n` +
+    `Misaotra anao,\nNy VFM 105\n\n` +
     `-- \nMailaka alefa ho azy ity, aza valiana. Raha misy fanontaniana : contact.vfm@0550.site`;
 
   const html = `
@@ -49,7 +49,7 @@ export async function envoyerConfirmationPersonne(dossier: DossierPersonne): Pro
           .join("")}
       </table>
       <p>Tehirizo ity laharana ity raha hifandray aminay ianao.</p>
-      <p>Misaotra anao,<br>Ny VFM</p>
+      <p>Misaotra anao,<br>Ny VFM 105</p>
       <p style="margin-top:24px;font-size:12px;color:#a1a1aa">
         Mailaka alefa ho azy ity, aza valiana. Raha misy fanontaniana :
         contact.vfm@0550.site
@@ -58,7 +58,7 @@ export async function envoyerConfirmationPersonne(dossier: DossierPersonne): Pro
 
   const envoye = await envoyerEmail(
     destinataire,
-    `VFM — Voaray ny dosie-nao (${dossier.reference})`,
+    `VFM 105 — Voaray ny dosie-nao (${dossier.reference})`,
     texte,
     html
   );

@@ -40,6 +40,11 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | K | 28 octobre 2026 | K1 — Associations : pièces jointes supprimées | Mis en ligne (28 octobre 2026) |
 | K | 28 octobre 2026 | K2 — Personnes : sans date de naissance ni CV, avec commune et fokontany | Mis en ligne (28 octobre 2026) |
 | K | 28 octobre 2026 | K3 — Associations : section « Ny hevitrao » | Mis en ligne (28 octobre 2026) |
+| L | 28 octobre 2026 | L1 — Menu « Fisoratana anarana » | Mis en ligne (28 octobre 2026) |
+| L | 28 octobre 2026 | L2 — Formulaire associations (un seul nom, 2 activités, nouveaux textes) | Mis en ligne (28 octobre 2026) |
+| L | 28 octobre 2026 | L3 — Formulaire personnes (nouveaux textes) | Mis en ligne (28 octobre 2026) |
+| L | 28 octobre 2026 | L4 — « VFM 105 » et « Radio VFM 105 » (site ; AzuraCast à faire) | Mis en ligne (28 octobre 2026) |
+| L | 28 octobre 2026 | L5 — QR code d'inscription Tafa & Dinika | Mis en ligne (28 octobre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 
 ---
@@ -1342,6 +1347,104 @@ saisie vide.
       en 400 avec les nouveaux messages.
 - [ ] Test en ligne : dépôt d'un dossier de personne test (commune,
       fokontany), consultation dans l'admin, puis suppression du dossier test.
+
+---
+
+## Lot L — Fisoratana anarana, VFM 105 et QR code Tafa & Dinika (28 octobre 2026)
+
+Demandes : `modif X.md` et `modif Y.md`.
+
+### L1 — Menu « Fisoratana anarana » (X1)
+
+Le bouton « Dossier » du menu public devient « Fisoratana anarana » (même
+destination : l'accueil). **Fichier :** `src/components/MenuPublic.tsx`.
+
+### L2 — Formulaire des associations (X2)
+
+| Élément | Avant | Après |
+|---|---|---|
+| Badge d'en-tête | Fametrahana Dosie | Fisoratana anarana |
+| Texte d'introduction | Apetraho ny Dosie-nao eo amin'ny VFM… | Fenoina tsara ho mariky ny fisoratana anarana ho an'ny fikambanana misy anao. |
+| Champ | Tompon'andraikitra (plusieurs possibles) | Anaran'izay hanatrika ny Tafa sy Dinika (un seul nom) |
+| Bouton « Hanampy tompon'andraikitra » | présent | supprimé |
+| Asan'ny fikambanana | 9 choix | + Fanabeazana, Fialamboly (avant « Hafa ») |
+| Bouton de validation | Hamarino ny antontan-taratasiko | Tsindrio rehefa tsy misy adino na diso |
+
+La phrase « Tsy maintsy fenoina ireo saha misy marika * » est conservée
+après le nouveau texte. Le serveur ne garde qu'un seul nom si une ancienne
+page en envoie plusieurs. **Fichiers :** `src/components/DepotWizard.tsx`,
+`src/lib/validation.ts`.
+
+### L3 — Formulaire des personnes (X3)
+
+| Élément | Avant | Après |
+|---|---|---|
+| Badge d'en-tête | Fametrahana Dosie — Olona tsirairay | Fisoratana anarana (affiché en majuscules) |
+| Texte d'introduction | Apetraho ny Dosie-nao manokana… | Fenoy tsara ho mariky ny fisoratanao anarana. |
+| Section 3 | Ny tetikasanao manokana / Ny zavatra tianao ho tanterahina | Ny zavatra handrasanao amin'ny Tafa sy Dinika (sans sous-titre) |
+| Champ | Tetikasa manokana, avec texte d'exemple | Soraty eto ambany, zone vide |
+
+**Fichiers :** `src/app/deposer/olona/FormulairePersonne.tsx`,
+`src/lib/personnes-modele.ts`, `src/components/DepotWizard.tsx` (sous-titre
+de section facultatif).
+
+### L4 — « VFM 105 » et « Radio VFM 105 » (Y1, Y2)
+
+Tous les textes visibles du site : titres des pages et onglets, en-têtes
+des formulaires, remerciements (« Misaotra anao ny VFM 105 … »), page
+Birao, galerie, radio, menu Radio, administration, e-mails et SMS.
+**Inchangés :** le logo et l'affiche (images « V.F.M »), les références des
+dossiers (`VFM-2026-…`, `VFM-P-…`), et l'expéditeur réel des e-mails, fixé
+par la variable `SMTP_FROM` dans Coolify.
+
+**Reste à faire (Y2) :** renommer la station dans l'administration
+AzuraCast (https://radio.0550.site) en « Radio VFM 105 ».
+
+### L5 — QR code d'inscription Tafa & Dinika (Y3)
+
+- **Code unique :** chaque dossier (association ou personne) reçoit un
+  code secret de 32 caractères aléatoires (colonne `qr_jeton`, index
+  unique), généré par la base, y compris pour les dossiers déjà déposés.
+- **Contenu du QR code :** uniquement l'adresse
+  `https://vfm105.com/admin/verifier/<code>` ; aucune donnée personnelle
+  n'y est lisible.
+- **Après l'inscription :** la page de remerciement affiche la carte
+  « TAFA & DINIKA » (logo, thème, date et lieu, QR code, nom, prénom,
+  association, téléphone, référence) et le bouton **« Télécharger mon QR
+  code »** (image PNG 1080 × 1620, `QR-<référence>.png`). La carte n'apparaît
+  qu'avec le code secret transmis à l'envoi du formulaire : une personne qui
+  tape une autre référence ne voit ni nom ni téléphone.
+- **Le jour de la conférence :** scanner le QR code ouvre la page de
+  vérification, réservée aux administrateurs connectés (sinon : page de
+  connexion, puis retour automatique). Bandeau vert « Inscription valide »
+  avec nom, association, téléphone, district, commune, statut ; orange pour
+  un inscrit d'un autre district (administrateur de district) ; rouge si le
+  QR code est inconnu.
+- **Administration :** la carte QR (avec téléchargement) figure aussi sur la
+  fiche de chaque dossier, pour la renvoyer à un participant.
+
+**Fichiers :** `src/components/CarteQr.tsx` (nouveau),
+`src/app/admin/verifier/[jeton]/page.tsx` (nouveau),
+`src/app/confirmation/[reference]/page.tsx`,
+`src/app/confirmation/olona/[reference]/page.tsx`,
+`src/app/admin/[reference]/page.tsx`, `src/app/admin/olona/[reference]/page.tsx`,
+`src/lib/schema.ts`, `src/lib/repository.ts`, `src/lib/personnes.ts`,
+`src/lib/types.ts`, `src/app/api/personnes/route.ts`,
+`package.json` (bibliothèque `qrcode` 1.5.4).
+
+**Vérifié en local :** types ; textes des deux formulaires, du menu et des
+pages ; carte QR dessinée et téléchargeable (page d'essai temporaire,
+supprimée) ; page de vérification redirigée vers la connexion sans
+session. Dépôt réel et vérification d'un vrai QR code non testables en
+local (pas de base PostgreSQL) : à contrôler en ligne.
+
+### Mise en ligne du lot L
+
+- [x] GO (28 octobre 2026), commit et push sur `master`.
+- [ ] Contrôle en ligne : inscription test, carte QR affichée et
+      téléchargée, scan du QR code avec un téléphone (administrateur
+      connecté), puis suppression du dossier test.
+- [ ] AzuraCast : station renommée « Radio VFM 105 ».
 
 ---
 

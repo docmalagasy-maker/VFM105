@@ -32,7 +32,10 @@ export async function POST(request: NextRequest) {
     if (creeMaintenant) {
       await envoyerConfirmationPersonne(dossier).catch((err) => console.error("E-mail de confirmation (personne)", err));
     }
-    return NextResponse.json({ dossier: { reference: dossier.reference }, creeMaintenant }, { status: creeMaintenant ? 201 : 200 });
+    return NextResponse.json(
+      { dossier: { reference: dossier.reference, qrJeton: dossier.qrJeton }, creeMaintenant },
+      { status: creeMaintenant ? 201 : 200 }
+    );
   } catch (err) {
     console.error("Erreur création dossier personne", err);
     return NextResponse.json({ erreur: "Tsy lasa ny dosie-nao. Andramo indray azafady." }, { status: 500 });

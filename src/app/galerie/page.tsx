@@ -5,8 +5,8 @@ import { listerPhotos } from "@/lib/galerie";
 import GrilleGalerie from "./GrilleGalerie";
 
 export const metadata: Metadata = {
-  title: "Sary — VFM",
-  description: "Sarin'ny hetsika sy ny asan'ny VFM.",
+  title: "Sary — VFM 105",
+  description: "Sarin'ny hetsika sy ny asan'ny VFM 105.",
 };
 
 export default async function GaleriePage() {
@@ -19,7 +19,7 @@ export default async function GaleriePage() {
       <div className="text-center">
         <h1 className="text-2xl font-bold text-vfm-marine sm:text-3xl">Sary</h1>
         <p className="mt-2 text-sm text-zinc-600 sm:text-base">
-          Sarin&apos;ny hetsika sy ny asan&apos;ny VFM.
+          Sarin&apos;ny hetsika sy ny asan&apos;ny VFM 105.
         </p>
       </div>
 

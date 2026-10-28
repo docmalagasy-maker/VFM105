@@ -20,9 +20,9 @@ export interface MembreBirao {
 }
 
 export const BIRAO: MembreBirao[] = [
-  { anarana: "Fanomezantsoa ANDRIANJANAHARY", andraikitra: "Filoha nasionalin'ny VFM", distrika: "Manandriana" },
-  { anarana: "Pety RAKOTONIAINA", andraikitra: "Filoha lefitra nasionalin'ny VFM", distrika: "Ikalamavony" },
-  { anarana: "Nirina Fenohery Johnny RAKOTOARISOA", andraikitra: "Filoha lefitra nasionalin'ny VFM", distrika: "Ambohidratrimo" },
-  { anarana: "Namiandrazana François AROSY", andraikitra: "Filoha lefitra nasionalin'ny VFM", distrika: "Nosy Be" },
-  { anarana: "Marco TSARADIA", andraikitra: "Sekretera jeneraly nasionalin'ny VFM", distrika: "Ampanihy" },
+  { anarana: "Fanomezantsoa ANDRIANJANAHARY", andraikitra: "Filoha nasionalin'ny VFM 105", distrika: "Manandriana" },
+  { anarana: "Pety RAKOTONIAINA", andraikitra: "Filoha lefitra nasionalin'ny VFM 105", distrika: "Ikalamavony" },
+  { anarana: "Nirina Fenohery Johnny RAKOTOARISOA", andraikitra: "Filoha lefitra nasionalin'ny VFM 105", distrika: "Ambohidratrimo" },
+  { anarana: "Namiandrazana François AROSY", andraikitra: "Filoha lefitra nasionalin'ny VFM 105", distrika: "Nosy Be" },
+  { anarana: "Marco TSARADIA", andraikitra: "Sekretera jeneraly nasionalin'ny VFM 105", distrika: "Ampanihy" },
 ];

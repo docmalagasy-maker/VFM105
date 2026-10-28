@@ -54,7 +54,9 @@ export const dossierInputSchema = z.object({
   }),
   responsables: z
     .array(responsableSchema)
-    .min(1, "Tsy maintsy soratana ny tompon'andraikitra voalohany."),
+    .min(1, "Soraty ny anaran'izay hanatrika ny Tafa sy Dinika.")
+    // Un seul nom : la personne qui assistera aux Tafa sy Dinika
+    .transform((r) => r.slice(0, 1)),
   coordonnees: z.object({
     telephone: z.string().refine(
       (val) => validateTelephoneMadagascar(val).valide,

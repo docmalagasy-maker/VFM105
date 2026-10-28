@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VFM",
-  description: "Fametrahana Dosie ho an'ny fikambanana eo amin'ny VFM — Madagasikara.",
+  title: "VFM 105",
+  description: "Fametrahana Dosie ho an'ny fikambanana eo amin'ny VFM 105 — Madagasikara.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

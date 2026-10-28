@@ -23,7 +23,7 @@ export async function envoyerEmail(destinataire: string, sujet: string, texte: s
   });
   try {
     await transport.sendMail({
-      from: process.env.SMTP_FROM || `VFM <${process.env.SMTP_USER}>`,
+      from: process.env.SMTP_FROM || `VFM 105 <${process.env.SMTP_USER}>`,
       to: destinataire,
       subject: sujet,
       text: texte,

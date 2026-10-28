@@ -4,7 +4,7 @@ import { districtsOccupes } from "@/lib/administrateurs";
 import { isDatabaseConfigured } from "@/lib/db";
 import FormulaireInscription from "./FormulaireInscription";
 
-export const metadata: Metadata = { title: "Demande d'accès administrateur — VFM" };
+export const metadata: Metadata = { title: "Demande d'accès administrateur — VFM 105" };
 
 export default async function InscriptionPage() {
   await connection();

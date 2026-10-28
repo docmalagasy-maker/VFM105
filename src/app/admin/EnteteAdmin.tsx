@@ -47,7 +47,7 @@ export default function EnteteAdmin({
     <>
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-2xl font-semibold text-zinc-900">{titre ?? "Administration VFM"}</p>
+          <p className="text-2xl font-semibold text-zinc-900">{titre ?? "Administration VFM 105"}</p>
           <p className="text-sm text-zinc-500">
             {estSuper
               ? "Super-administrateur — tous les districts"

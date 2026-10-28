@@ -59,4 +59,6 @@ export interface Dossier extends DossierInput {
   smsDate?: string;
   /** E-mail de confirmation au déposant : absent si aucune adresse fournie. */
   emailConfirmation?: "envoye" | "echoue";
+  /** Code secret porté par le QR code d'inscription (Tafa & Dinika). */
+  qrJeton: string;
 }

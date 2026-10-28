@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import CarteQr from "@/components/CarteQr";
 import { obtenirSession } from "@/lib/auth";
 import { obtenirDossierParReference } from "@/lib/repository";
 import { SMS_ACTIF } from "@/lib/sms";
@@ -82,6 +83,21 @@ export default async function DossierAdminPage({
           emailConfirmation={libelleEmailConfirmation(dossier)}
         />
       )}
+
+      <section className="mt-6 rounded-lg border border-zinc-200 bg-white p-4">
+        <h2 className="text-base font-semibold text-zinc-900">QR code Tafa &amp; Dinika</h2>
+        <p className="mb-4 text-sm text-zinc-500">À transmettre au participant s&apos;il n&apos;a pas pu l&apos;enregistrer.</p>
+        <CarteQr
+          infos={{
+            jeton: dossier.qrJeton,
+            reference: dossier.reference,
+            nom: dossier.responsables[0]?.nom ?? "",
+            prenom: dossier.responsables[0]?.prenom ?? "",
+            telephone: dossier.coordonnees.telephone,
+            association: dossier.association.nom,
+          }}
+        />
+      </section>
       </div>
     </div>
   );

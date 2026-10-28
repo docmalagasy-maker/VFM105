@@ -11,7 +11,7 @@ const VERIFICATION_RADIO_MS = 30_000;
 
 /** Pages du menu, dans un ordre fixe. `actif` : la page affichée correspond à ce bouton. */
 const MENUS: { href: string; libelle: string; actif: (chemin: string) => boolean }[] = [
-  { href: "/", libelle: "Dossier", actif: (c) => c === "/" },
+  { href: "/", libelle: "Fisoratana anarana", actif: (c) => c === "/" },
   { href: "/birao", libelle: "Birao", actif: (c) => c === "/birao" },
   { href: "/galerie", libelle: "Sary", actif: (c) => c === "/galerie" },
   { href: "/radio", libelle: "Radio", actif: (c) => c === "/radio" },
@@ -121,7 +121,7 @@ function BoutonRadio({ enCours, enDirect }: { enCours: boolean; enDirect: boolea
       )}
     </>
   );
-  const titre = enDirect ? "Radio VFM — mandeha mivantana" : "Radio VFM";
+  const titre = enDirect ? "Radio VFM 105 — mandeha mivantana" : "Radio VFM 105";
   const base = "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 sm:px-4 transition-colors";
 
   return enCours ? (

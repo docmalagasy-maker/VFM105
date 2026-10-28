@@ -32,6 +32,8 @@ export interface DossierPersonne extends PersonneInput {
   dateDepot: string;
   statut: StatutDossier;
   emailConfirmation?: "envoye" | "echoue";
+  /** Code secret porté par le QR code d'inscription (Tafa & Dinika). */
+  qrJeton: string;
   /** AAAA-MM-JJ — plus demandée depuis le lot K, présente sur les anciens dossiers. */
   dateNaissance?: string;
   /** Plus demandé depuis le lot K, présent sur les anciens dossiers. */
@@ -53,7 +55,7 @@ export const personneInputSchema = z.object({
   fokontanyPcode: z.string().max(20).optional(),
   activite: z.string().trim().min(1, "Soraty ny asanao ankehitriny.").max(200),
   descriptionActivite: z.string().trim().min(1, "Hazavao ny asanao.").max(5000),
-  projet: z.string().trim().min(1, "Hazavao ny tetikasanao manokana.").max(5000),
+  projet: z.string().trim().min(1, "Soraty ny zavatra handrasanao amin'ny Tafa sy Dinika.").max(5000),
   telephone: z
     .string()
     .trim()

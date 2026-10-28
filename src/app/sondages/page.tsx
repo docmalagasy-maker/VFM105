@@ -6,7 +6,7 @@ import { isDatabaseConfigured } from "@/lib/db";
 import { COOKIE_PARTICIPANT, listerSondagesActifs, sondagesDejaRepondus } from "@/lib/sondages";
 
 export const metadata: Metadata = {
-  title: "Manehoa hevitra — VFM",
+  title: "Manehoa hevitra — VFM 105",
   description: "Omeo ny hevitrao momba ireo lohahevitra samihafa.",
 };
 

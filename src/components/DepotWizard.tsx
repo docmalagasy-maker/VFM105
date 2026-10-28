@@ -28,6 +28,8 @@ const ACTIVITES = [
   "Asa sosialy",
   "Fampandrosoana ifotony",
   "Fiofanana",
+  "Fanabeazana",
+  "Fialamboly",
   AUTRE,
 ];
 
@@ -73,6 +75,8 @@ function chargerBrouillon(): FormState {
     void _pieces;
     const brouillon: FormState = { ...ETAT_INITIAL, ...enregistre };
     if (!ACTIVITES.includes(brouillon.activite)) brouillon.activite = ETAT_INITIAL.activite;
+    // Un seul nom désormais (la personne qui assistera aux Tafa sy Dinika)
+    brouillon.responsables = [brouillon.responsables?.[0] ?? { nom: "", prenom: "" }];
     return brouillon;
   } catch {
     return ETAT_INITIAL;
@@ -96,20 +100,8 @@ export default function DepotWizard() {
     window.localStorage.setItem(CLE_LOCALSTORAGE, JSON.stringify(form));
   }, [form]);
 
-  function majResponsable(index: number, champ: keyof Responsable, valeur: string) {
-    setForm((f) => {
-      const responsables = [...f.responsables];
-      responsables[index] = { ...responsables[index], [champ]: valeur };
-      return { ...f, responsables };
-    });
-  }
-
-  function ajouterResponsable() {
-    setForm((f) => ({ ...f, responsables: [...f.responsables, { nom: "", prenom: "" }] }));
-  }
-
-  function retirerResponsable(index: number) {
-    setForm((f) => ({ ...f, responsables: f.responsables.filter((_, i) => i !== index) }));
+  function majResponsable(champ: keyof Responsable, valeur: string) {
+    setForm((f) => ({ ...f, responsables: [{ ...f.responsables[0], [champ]: valeur }] }));
   }
 
   function ajouterAutreCoordonnee() {
@@ -142,7 +134,7 @@ export default function DepotWizard() {
     else if (!form.localite.commune.trim()) problemes.push("Safidio na soraty ny kaominin'ny fikambanana.");
     const principal = form.responsables[0];
     if (!principal?.nom.trim() || !principal?.prenom.trim()) {
-      problemes.push("Soraty ny anarana sy ny fanampin'anaran'ny tompon'andraikitra voalohany.");
+      problemes.push("Soraty ny anarana sy ny fanampin'anaran'izay hanatrika ny Tafa sy Dinika.");
     }
     const membres = Number(form.nombreMembres);
     if (!form.nombreMembres || !Number.isInteger(membres) || membres <= 0) {
@@ -192,7 +184,7 @@ export default function DepotWizard() {
             activite,
             nombreMembres: Number(form.nombreMembres),
           },
-          responsables: form.responsables.filter((r) => r.nom.trim() || r.prenom.trim()),
+          responsables: form.responsables.slice(0, 1).map((r) => ({ nom: r.nom.trim(), prenom: r.prenom.trim() })),
           coordonnees: {
             telephone: form.telephone.trim(),
             email: form.email.trim() || undefined,
@@ -210,7 +202,8 @@ export default function DepotWizard() {
       }
 
       window.localStorage.removeItem(CLE_LOCALSTORAGE);
-      router.push(`/confirmation/${json.dossier.reference}`);
+      // Le code secret dans l'adresse permet d'afficher la carte QR au seul déposant.
+      router.push(`/confirmation/${json.dossier.reference}?c=${encodeURIComponent(json.dossier.qrJeton)}`);
     } catch {
       setErreurEnvoi("Tsy lasa ny antontan-taratasinao. Andramo indray azafady.");
       setEnvoiEnCours(false);
@@ -234,16 +227,9 @@ export default function DepotWizard() {
           <Ligne label="Distrika">{form.district}</Ligne>
           <Ligne label="Kaominina">{form.localite.commune}</Ligne>
           {form.localite.fokontany && <Ligne label="Fokontany">{form.localite.fokontany}</Ligne>}
-          <Ligne label="Tompon'andraikitra voalohany">
+          <Ligne label="Anaran'izay hanatrika ny Tafa sy Dinika">
             {form.responsables[0]?.prenom} {form.responsables[0]?.nom}
           </Ligne>
-          {form.responsables.slice(1).map((r, i) =>
-            r.nom || r.prenom ? (
-              <Ligne key={i} label={`Tompon'andraikitra faha-${i + 2}`}>
-                {r.prenom} {r.nom}
-              </Ligne>
-            ) : null
-          )}
           <Ligne label="Asa">{activite}</Ligne>
           <Ligne label="Isan'ny mpikambana">{form.nombreMembres}</Ligne>
           <Ligne label="Finday">{form.telephone}</Ligne>
@@ -292,11 +278,11 @@ export default function DepotWizard() {
     <PublicShell cardClassName="max-w-5xl">
       <div className="flex flex-col items-center gap-3 text-center">
         <span className="rounded-full bg-vfm-vert/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-vfm-vert-dark">
-          Fametrahana Dosie
+          Fisoratana anarana
         </span>
-        <h1 className="text-2xl font-bold text-vfm-marine sm:text-3xl">VFM</h1>
+        <h1 className="text-2xl font-bold text-vfm-marine sm:text-3xl">VFM 105</h1>
         <p className="max-w-xl text-sm text-zinc-600 sm:text-base">
-          Apetraho ny Dosie-nao eo amin&apos;ny VFM ny antontan-taratasin&apos;ny fikambananao.
+          Fenoina tsara ho mariky ny fisoratana anarana ho an&apos;ny fikambanana misy anao.
           Tsy maintsy fenoina ireo saha misy marika <span className="text-vfm-rouge">*</span>.
         </p>
       </div>
@@ -323,7 +309,7 @@ export default function DepotWizard() {
             <Section
               numero={1}
               titre="Ny fikambanana"
-              sousTitre="Anarana, adiresy ary tompon'andraikitra"
+              sousTitre="Anarana, adiresy ary izay hanatrika ny Tafa sy Dinika"
               icon={<IconPeople className="h-5 w-5" />}
             >
               <Champ label="Anaran'ny fikambanana" obligatoire>
@@ -371,28 +357,22 @@ export default function DepotWizard() {
 
               <div className="flex flex-col gap-2">
                 <span className="text-sm font-medium text-zinc-700">
-                  Tompon&apos;andraikitra <span className="text-vfm-rouge">*</span>
+                  Anaran&apos;izay hanatrika ny Tafa sy Dinika <span className="text-vfm-rouge">*</span>
                 </span>
-                {form.responsables.map((r, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
-                      <input
-                        className="input"
-                        placeholder={i === 0 ? "Fanampin'anarana (voalohany)" : "Fanampin'anarana"}
-                        value={r.prenom}
-                        onChange={(e) => majResponsable(i, "prenom", e.target.value)}
-                      />
-                      <input
-                        className="input"
-                        placeholder={i === 0 ? "Anarana (voalohany)" : "Anarana"}
-                        value={r.nom}
-                        onChange={(e) => majResponsable(i, "nom", e.target.value)}
-                      />
-                    </div>
-                    {i > 0 && <BoutonRetirer onClick={() => retirerResponsable(i)} />}
-                  </div>
-                ))}
-                <BoutonAjouter onClick={ajouterResponsable}>Hanampy tompon&apos;andraikitra</BoutonAjouter>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <input
+                    className="input"
+                    placeholder="Fanampin'anarana"
+                    value={form.responsables[0]?.prenom ?? ""}
+                    onChange={(e) => majResponsable("prenom", e.target.value)}
+                  />
+                  <input
+                    className="input"
+                    placeholder="Anarana"
+                    value={form.responsables[0]?.nom ?? ""}
+                    onChange={(e) => majResponsable("nom", e.target.value)}
+                  />
+                </div>
               </div>
             </Section>
 
@@ -524,7 +504,7 @@ export default function DepotWizard() {
             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-vfm-vert px-6 py-4 text-base font-semibold text-white shadow-lg shadow-vfm-vert/25 transition-all hover:-translate-y-0.5 hover:bg-vfm-vert-dark hover:shadow-xl"
           >
             <IconSend className="h-5 w-5" />
-            Hamarino ny antontan-taratasiko
+            Tsindrio rehefa tsy misy adino na diso
           </button>
 
           <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-zinc-500">
@@ -546,7 +526,7 @@ export function Section({
 }: {
   numero: number;
   titre: string;
-  sousTitre: string;
+  sousTitre?: string;
   icon: React.ReactNode;
   children: React.ReactNode;
 }) {
@@ -561,7 +541,7 @@ export function Section({
         </span>
         <div>
           <h2 className="text-base font-semibold text-vfm-marine sm:text-lg">{titre}</h2>
-          <p className="text-xs text-zinc-500 sm:text-sm">{sousTitre}</p>
+          {sousTitre && <p className="text-xs text-zinc-500 sm:text-sm">{sousTitre}</p>}
         </div>
       </header>
       <div className="flex flex-col gap-4">{children}</div>

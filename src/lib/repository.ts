@@ -33,6 +33,7 @@ function ligneVersDossier(row: Record<string, unknown>): Dossier {
     },
     description: row.description as string,
     pieces: row.pieces as Dossier["pieces"],
+    qrJeton: row.qr_jeton as string,
   };
 }
 
@@ -117,7 +118,15 @@ export async function marquerEmailConfirmation(reference: string, statut: "envoy
 
 export async function obtenirDossierParReference(reference: string): Promise<Dossier | null> {
   const pool = getPool();
+  await verifierSchema();
   const result = await pool.query(`SELECT * FROM dossiers WHERE reference = $1`, [reference]);
+  return result.rows.length > 0 ? ligneVersDossier(result.rows[0]) : null;
+}
+
+/** Dossier d'association correspondant au code d'un QR code d'inscription. */
+export async function obtenirDossierParQrJeton(jeton: string): Promise<Dossier | null> {
+  await verifierSchema();
+  const result = await getPool().query(`SELECT * FROM dossiers WHERE qr_jeton = $1`, [jeton]);
   return result.rows.length > 0 ? ligneVersDossier(result.rows[0]) : null;
 }
 

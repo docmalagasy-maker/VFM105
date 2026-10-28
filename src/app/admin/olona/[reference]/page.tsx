@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import CarteQr from "@/components/CarteQr";
 import { obtenirSession } from "@/lib/auth";
 import { obtenirPersonne } from "@/lib/personnes";
 import EnteteAdmin from "../../EnteteAdmin";
@@ -81,6 +82,14 @@ export default async function PersonneAdminPage({ params }: { params: Promise<{ 
             </div>
           </div>
         )}
+
+        <section className="mt-6 rounded-lg border border-zinc-200 bg-white p-4">
+          <h2 className="text-base font-semibold text-zinc-900">QR code Tafa &amp; Dinika</h2>
+          <p className="mb-4 text-sm text-zinc-500">À transmettre au participant s&apos;il n&apos;a pas pu l&apos;enregistrer.</p>
+          <CarteQr
+            infos={{ jeton: p.qrJeton, reference: p.reference, nom: p.nom, prenom: p.prenom, telephone: p.telephone }}
+          />
+        </section>
       </div>
     </div>
   );

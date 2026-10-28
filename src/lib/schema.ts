@@ -83,6 +83,14 @@ export function verifierSchema(): Promise<unknown> {
        ALTER TABLE dossiers_personnes ADD COLUMN IF NOT EXISTS fokontany TEXT;
        ALTER TABLE dossiers_personnes ADD COLUMN IF NOT EXISTS fokontany_pcode TEXT;
        CREATE INDEX IF NOT EXISTS idx_personnes_district ON dossiers_personnes (district);
+       -- Code secret du QR code d'inscription (Tafa & Dinika) : 32 caractères
+       -- aléatoires, généré par la base pour chaque dossier, y compris les anciens.
+       ALTER TABLE dossiers ADD COLUMN IF NOT EXISTS qr_jeton TEXT NOT NULL
+         DEFAULT replace(gen_random_uuid()::text, '-', '');
+       ALTER TABLE dossiers_personnes ADD COLUMN IF NOT EXISTS qr_jeton TEXT NOT NULL
+         DEFAULT replace(gen_random_uuid()::text, '-', '');
+       CREATE UNIQUE INDEX IF NOT EXISTS idx_dossiers_qr_jeton ON dossiers (qr_jeton);
+       CREATE UNIQUE INDEX IF NOT EXISTS idx_personnes_qr_jeton ON dossiers_personnes (qr_jeton);
        CREATE INDEX IF NOT EXISTS idx_personnes_date_depot ON dossiers_personnes (date_depot);`
     )
     .catch((err) => {

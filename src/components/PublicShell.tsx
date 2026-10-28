@@ -22,7 +22,7 @@ export default function PublicShell({
           <div className="relative aspect-[966/852] w-[clamp(11rem,38vw,16rem)]">
             <Image
               src="/images/logo-vfm-detoure.png"
-              alt="Logo VFM — Vovonan'ny Fihavaozan'i Madagasikara"
+              alt="Logo VFM 105 — Vovonan'ny Fihavaozan'i Madagasikara"
               fill
               sizes="(max-width: 640px) 60vw, 16rem"
               className="object-contain"

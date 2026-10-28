@@ -109,7 +109,7 @@ export async function creerDemande(
   const nomComplet = `${demande.prenom} ${demande.nom}`;
   const emailEnvoye = await envoyerEmail(
     process.env.SUPER_ADMIN_EMAIL || "doc.malagasy@gmail.com",
-    `VFM — Demande d'administrateur pour le district ${demande.district}`,
+    `VFM 105 — Demande d'administrateur pour le district ${demande.district}`,
     `${nomComplet} (${demande.telephone}) demande à devenir administrateur du district ${demande.district}.\n` +
       `Identifiant choisi : ${demande.identifiant}\n\nPour valider ou refuser : ${lien}\n` +
       `(connexion super-administrateur requise)`,

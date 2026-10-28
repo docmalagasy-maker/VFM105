@@ -81,7 +81,7 @@ export default function FormulairePersonne() {
     else if (!form.localite.commune.trim()) p.push("Safidio na soraty ny kaominina misy anao.");
     if (!form.activite.trim()) p.push("Soraty ny asanao ankehitriny.");
     if (!form.descriptionActivite.trim()) p.push("Hazavao ny asanao.");
-    if (!form.projet.trim()) p.push("Hazavao ny tetikasanao manokana.");
+    if (!form.projet.trim()) p.push("Soraty ny zavatra handrasanao amin'ny Tafa sy Dinika.");
     if (!validateTelephoneMadagascar(form.telephone).valide) p.push("Toa diso ny laharana finday.");
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) p.push("Toa diso ny adiresy mailaka.");
     setErreurs(p);
@@ -121,7 +121,8 @@ export default function FormulairePersonne() {
         return;
       }
       window.localStorage.removeItem(CLE_BROUILLON);
-      router.push(`/confirmation/olona/${json.dossier.reference}`);
+      // Le code secret dans l'adresse permet d'afficher la carte QR au seul déposant.
+      router.push(`/confirmation/olona/${json.dossier.reference}?c=${encodeURIComponent(json.dossier.qrJeton)}`);
     } catch {
       setErreurEnvoi("Tsy lasa ny dosie-nao. Andramo indray azafady.");
       setEnvoi(false);
@@ -145,7 +146,7 @@ export default function FormulairePersonne() {
           <Ligne label="Fanazavana momba ny asa">
             <span className="whitespace-pre-wrap">{form.descriptionActivite}</span>
           </Ligne>
-          <Ligne label="Tetikasa manokana">
+          <Ligne label="Ny zavatra handrasanao amin'ny Tafa sy Dinika">
             <span className="whitespace-pre-wrap">{form.projet}</span>
           </Ligne>
           <Ligne label="Finday">{form.telephone}</Ligne>
@@ -181,11 +182,11 @@ export default function FormulairePersonne() {
     <PublicShell cardClassName="max-w-5xl">
       <div className="flex flex-col items-center gap-3 text-center">
         <span className="rounded-full bg-vfm-vert/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-vfm-vert-dark">
-          Fametrahana Dosie — Olona tsirairay
+          Fisoratana anarana
         </span>
-        <h1 className="text-2xl font-bold text-vfm-marine sm:text-3xl">VFM</h1>
+        <h1 className="text-2xl font-bold text-vfm-marine sm:text-3xl">VFM 105</h1>
         <p className="max-w-xl text-sm text-zinc-600 sm:text-base">
-          Apetraho ny Dosie-nao manokana eo amin&apos;ny VFM. Tsy maintsy fenoina ireo saha misy marika{" "}
+          Fenoy tsara ho mariky ny fisoratanao anarana. Tsy maintsy fenoina ireo saha misy marika{" "}
           <span className="text-vfm-rouge">*</span>.
         </p>
       </div>
@@ -288,15 +289,13 @@ export default function FormulairePersonne() {
           <div className="flex flex-col gap-6">
             <Section
               numero={3}
-              titre="Ny tetikasanao manokana"
-              sousTitre="Ny zavatra tianao ho tanterahina"
+              titre="Ny zavatra handrasanao amin'ny Tafa sy Dinika"
               icon={<IconDoc className="h-5 w-5" />}
             >
-              <Champ label="Tetikasa manokana" obligatoire>
+              <Champ label="Soraty eto ambany" obligatoire>
                 <textarea
                   className="input"
                   rows={6}
-                  placeholder="Soraty eto ny tetikasanao, ny tanjonao ary ny filanao..."
                   value={form.projet}
                   onChange={(e) => maj("projet", e.target.value)}
                 />

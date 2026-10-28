@@ -4,8 +4,8 @@ import PublicShell from "@/components/PublicShell";
 import { BIRAO, type MembreBirao } from "@/data/birao";
 
 export const metadata: Metadata = {
-  title: "Birao — VFM",
-  description: "Ireo mpikambana ao amin'ny Birao Nasionaly VFM.",
+  title: "Birao — VFM 105",
+  description: "Ireo mpikambana ao amin'ny Birao Nasionaly VFM 105.",
 };
 
 /** Initiales affichées tant qu'aucune photo n'est fournie. */
@@ -22,7 +22,7 @@ export default function BiraoPage() {
       <div className="text-center">
         <h1 className="text-2xl font-bold text-vfm-marine sm:text-3xl">Birao Nasionaly</h1>
         <p className="mt-2 text-sm text-zinc-600 sm:text-base">
-          Ireo mpikambana ao amin&apos;ny Birao Nasionaly VFM.
+          Ireo mpikambana ao amin&apos;ny Birao Nasionaly VFM 105.
         </p>
       </div>
 
