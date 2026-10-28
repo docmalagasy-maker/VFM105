@@ -43,7 +43,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | L | 28 octobre 2026 | L1 — Menu « Fisoratana anarana » | Mis en ligne (28 octobre 2026) |
 | L | 28 octobre 2026 | L2 — Formulaire associations (un seul nom, 2 activités, nouveaux textes) | Mis en ligne (28 octobre 2026) |
 | L | 28 octobre 2026 | L3 — Formulaire personnes (nouveaux textes) | Mis en ligne (28 octobre 2026) |
-| L | 28 octobre 2026 | L4 — « VFM 105 » et « Radio VFM 105 » (site ; AzuraCast à faire) | Mis en ligne (28 octobre 2026) |
+| L | 28 octobre 2026 | L4 — « VFM 105 » et « Radio VFM 105 » (site et AzuraCast) | Mis en ligne (28 octobre 2026) |
 | L | 28 octobre 2026 | L5 — QR code d'inscription Tafa & Dinika | Mis en ligne (28 octobre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 
@@ -1452,7 +1452,12 @@ local (pas de base PostgreSQL) : à contrôler en ligne.
       déposant.
 - [ ] Scan du QR code VFM-P-2026-0002 avec un téléphone (administrateur
       connecté), puis suppression du dossier test dans l'admin.
-- [ ] AzuraCast : station renommée « Radio VFM 105 ».
+- [x] AzuraCast (28 octobre 2026) : nom de la station « VFM » → « Radio VFM
+      105 » (Station → Paramètres → Profil) et nom de l'instance « Radio
+      VFM » → « Radio VFM 105 » (Administration → Paramètres système).
+      Identifiant court `vfm` et adresses des flux inchangés (le site les
+      utilise). Aucun redémarrage demandé, diffusion non interrompue ;
+      l'API publique `nowplaying` renvoie « Radio VFM 105 ».
 
 ---
 
