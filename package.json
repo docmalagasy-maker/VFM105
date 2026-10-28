@@ -11,13 +11,13 @@
   "dependencies": {
     "d3-geo": "^3.1.1",
     "libphonenumber-js": "^1.13.13",
-    "next": "^16.3.8",
-    "nodemailer": "^10.0.16",
+    "next": "^16.4.2",
+    "nodemailer": "^10.1.4",
     "pg": "^8.23.0",
     "qrcode": "^1.5.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "zod": "^4.6.5"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -29,7 +29,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "^16.3.8",
+    "eslint-config-next": "^16.4.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

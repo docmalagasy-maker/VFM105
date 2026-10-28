@@ -46,6 +46,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | L | 28 octobre 2026 | L4 — « VFM 105 » et « Radio VFM 105 » (site et AzuraCast) | Mis en ligne (28 octobre 2026) |
 | L | 28 octobre 2026 | L5 — QR code d'inscription Tafa & Dinika | Mis en ligne (28 octobre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
+| S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
 ---
 
@@ -1499,3 +1500,38 @@ les 6 onglets, carte, refus sans session (401).
 
 - [ ] GO, commit et push sur `master`.
 - [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
+
+### S2 — Mise à jour de sécurité de Next.js, zod et nodemailer (28 octobre 2026)
+
+**Constat :** `npm audit --omit=dev` (relevé lors du lot L) signalait des
+failles dans des composants utilisés par le site en ligne :
+
+| Composant | Rôle | Version | Gravité | Failles | Corrigé en |
+|---|---|---|---|---|---|
+| Next.js | Moteur du site | 16.3.8 | **Critique** | Exécution de code à distance sans connexion (optimisation d'images SVG, fonctions `use cache`) ; blocage du site (Server Actions) | **16.4.2** |
+| zod | Contrôle des formulaires | 4.6.5 | Élevée | Épuisement de la mémoire avec des envois surdimensionnés | **4.6.7** |
+| nodemailer | Envoi des e-mails | 10.0.16 | Moyenne | Lecture erronée de certaines adresses e-mail (destinataire détourné) | **10.1.4** |
+
+**Choix :** versions correctives publiées depuis plus d'une semaine, sans
+changement de version majeure. `eslint-config-next` aligné en 16.4.2.
+La version Alpine de sharp (image Docker) reste présente dans
+`package-lock.json`.
+
+**Résultat :** `npm audit --omit=dev` → **0 vulnérabilité**.
+
+**Fichiers :** `package.json`, `package-lock.json`.
+
+**Vérifié en local :** types ; build de production Next.js 16.4.2 sans
+avertissement ; site lancé en mode production : pages publiques en 200,
+images de l'affiche et du logo optimisées, image externe refusée (400),
+administration et export refusés sans session (307 / 401), page de
+vérification QR redirigée vers la connexion, formulaire refusé si
+incomplet (400). Pages avec base de données (sondages, dépôt réel) non
+testables en local (pas de PostgreSQL) : à contrôler en ligne.
+
+### Mise en ligne de S2
+
+- [x] GO (28 octobre 2026), commit et push sur `master`.
+- [ ] Contrôles en ligne : pages publiques, sondages, carte QR du dossier
+      test, connexion admin, `npm audit` sur le serveur inutile (image
+      reconstruite depuis `package-lock.json`).
