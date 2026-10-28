@@ -1531,7 +1531,10 @@ testables en local (pas de PostgreSQL) : à contrôler en ligne.
 
 ### Mise en ligne de S2
 
-- [x] GO (28 octobre 2026), commit et push sur `master`.
-- [ ] Contrôles en ligne : pages publiques, sondages, carte QR du dossier
-      test, connexion admin, `npm audit` sur le serveur inutile (image
-      reconstruite depuis `package-lock.json`).
+- [x] GO (28 octobre 2026), commit `91afcc9` et push sur `master`.
+- [x] Contrôles en ligne (https://vfm105.com, nouvelle version détectée
+      après 90 s) : pages publiques en 200, y compris `/sondages` (base de
+      données) et la page du dossier test ; affiche optimisée ; image
+      externe refusée (400) ; admin et export refusés sans session
+      (307 / 401) ; formulaire incomplet refusé (400) ; listes Kaominina
+      chargées dans le formulaire ; aucune erreur dans la console.
