@@ -40,12 +40,15 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Fond beige de l'habillage public (accueil, dépôt, confirmation) */
+/* Fond de l'habillage public (accueil, dépôt, confirmation) : gris taupe à pois
+   décalés, reproduit en CSS d'après l'image fournie (net à toutes les tailles). */
 .bg-vfm-public {
-  background-color: var(--vfm-beige);
+  background-color: #8e857c;
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 255, 255, 0.75), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(230, 218, 195, 0.6), transparent 70%);
+    radial-gradient(circle, #a09b98 3.2px, transparent 3.7px),
+    radial-gradient(circle, #a09b98 3.2px, transparent 3.7px);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
 }
 
 /* Bouton « Radio » pendant la diffusion : mot qui pulse et point LIVE qui clignote,

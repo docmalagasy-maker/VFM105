@@ -31,6 +31,12 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | H | 16 octobre 2026 | H3 — Bouton « Radio » distinctif et indicateur LIVE | Mis en ligne (16 octobre 2026) |
 | H | 16 octobre 2026 | H4 — Menus de l'administration toujours visibles | Mis en ligne (16 octobre 2026) |
 | I | 16 octobre 2026 | I1 — Dossiers de personnes physiques (références VFM-P) | Mis en ligne (16 octobre 2026) |
+| J | 28 octobre 2026 | J1 — Affiche « Tafa & dinika » à l'accueil, deux boutons sous l'affiche | Mis en ligne (28 octobre 2026) |
+| J | 28 octobre 2026 | J2 — Nouveaux textes des boutons d'accueil | Mis en ligne (28 octobre 2026) |
+| J | 28 octobre 2026 | J3 — Fond gris à pois, logo sur médaillon blanc | Mis en ligne (28 octobre 2026) |
+| J | 28 octobre 2026 | J4 — Nouvelle affiche, bandeau « Voafetra » vert à texte blanc | Mis en ligne (28 octobre 2026) |
+| J | 28 octobre 2026 | J5 — « AMBOHIDRATRIMO » sous le logo | Mis en ligne (28 octobre 2026) |
+| J | 28 octobre 2026 | J6 — Domaine vfm105.com | DNS LWS et Coolify à faire |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 
 ---
@@ -1153,6 +1159,96 @@ de l'accueil, formulaire). Types et build de production.
       la connexion sans session, export et statut refusés sans session (401).
 - [ ] Test en ligne : dépôt d'un dossier de personne, consultation dans
       l'onglet Personnes, puis suppression du dossier de test.
+
+---
+
+## Lot J — Accueil (28 octobre 2026)
+
+### J1 — Affiche « Tafa & dinika » à la place de la carte d'accueil
+
+**Avant :** carte blanche « Fametrahana Dosie / VFM » avec texte de
+présentation et bouton « Hametraka antontan-taratasy » qui dévoilait les
+choix Fikambanana / Olona tsirairay.
+
+**Après :** l'affiche « Tafa & dinika — Fanabeazana politika »
+(14 novembre 2026, Ambohidratrimo) remplace la carte : pleine largeur, bord
+à bord sur téléphone ; limitée à la hauteur de l'écran, coins arrondis, sur
+ordinateur. Les deux boutons Fikambanana (`/deposer`) et Olona tsirairay
+(`/deposer/olona`) sont affichés directement sous l'affiche (plus de bouton
+intermédiaire ni de « Hiverina »). Logo et menus inchangés.
+
+**Fichiers :** `public/images/affiche-accueil.png` (nouveau),
+`src/app/page.tsx`, `src/app/ChoixDepot.tsx`, `src/components/PublicShell.tsx`
+(option `sansCarte`).
+
+**Vérifié en local :** affichage téléphone (375 px, sans défilement
+horizontal) et ordinateur, deux boutons visibles.
+
+### J2 — Textes des boutons d'accueil
+
+| Avant | Après |
+|---|---|
+| Iza no ametrahana ny dosie ? | Amin'ny anaran'iza no hisoratanao anarana ? |
+| Fikambanana — Dosien'ny fikambanana iray | Fikambanana — sy ny mombamomba azy |
+| Olona tsirairay — Dosie manokana ho an'ny olona iray | Ny tenako manokana — sy ny mombamomba ahy |
+
+Liens inchangés (`/deposer`, `/deposer/olona`).
+
+**Fichier :** `src/app/ChoixDepot.tsx`.
+
+### J3 — Nouveau fond du site public
+
+**Avant :** fond beige clair avec halos.
+
+**Après :** fond gris taupe (#8e857c) à pois gris clairs décalés, d'après
+l'image `IMG_20261028_104043.jpg`. Reproduit en CSS plutôt qu'en image :
+net à toutes les tailles, rien à télécharger, et sans la signature
+« @theslaytiqedit » présente dans le coin de l'image. S'applique à toutes
+les pages publiques. Le logo est posé sur un médaillon blanc pour que son
+texte gris reste lisible sur le fond gris.
+
+**Fichiers :** `src/app/globals.css`, `src/components/PublicShell.tsx`.
+
+**Vérifié en local :** accueil (téléphone et ordinateur), `/deposer`.
+
+### J4 — Nouvelle affiche, bandeau « Voafetra » vert
+
+**Après :** nouvelle affiche « Fanabeazana ara-politika » (avec pastille
+rouge « Hotronon'ireo manam-pahaizana… »). Le bandeau du bas « Voafetra ny
+toerana… vfm105.com », jaune à texte noir, est redessiné dans l'image :
+pastille verte VFM (#0a9a4a) aux coins arrondis, texte blanc. Le fichier
+change de nom (`affiche-tafa-dinika.png`, l'ancien `affiche-accueil.png`
+est supprimé) pour que navigateurs et serveur d'images ne gardent pas
+l'ancienne affiche en cache.
+
+**Fichiers :** `public/images/affiche-tafa-dinika.png`, `src/app/page.tsx`.
+
+### J5 — « AMBOHIDRATRIMO » sous le logo
+
+Grosses lettres blanches (ombre légère pour la lisibilité sur le fond gris)
+juste sous le médaillon du logo, sur toutes les pages publiques.
+
+**Fichier :** `src/components/PublicShell.tsx`.
+
+**Vérifié en local (J4, J5) :** téléphone 375 px sans défilement
+horizontal, nouvelle affiche bien servie.
+
+### J6 — Domaine `vfm105.com`
+
+Le domaine pointait sur la page de parking LWS. Étapes (détail dans
+`serveur.md`) :
+
+- [ ] LWS → zone DNS `vfm105.com` : enregistrement **A `@` → `31.207.34.137`**
+      (remplace `185.135.132.106`) ; garder le CNAME `www` → `vfm105.com.`.
+- [ ] Coolify → application VFM → *Domains* : ajouter
+      `https://vfm105.com,https://www.vfm105.com`, enregistrer, **Redeploy**.
+- [ ] Contrôle : `https://vfm105.com` et `https://www.vfm105.com` en 200
+      avec certificat valide.
+
+### Mise en ligne du lot J
+
+- [x] GO (28 octobre 2026), commit et push sur `master`.
+- [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
 
 ---
 

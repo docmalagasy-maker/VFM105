@@ -43,6 +43,23 @@ Journal de la migration du site **VFM 105** de Vercel vers un VPS géré par
 `0550.site` lui-même (racine) pointe ailleurs (`216.198.79.1`) : ne pas y
 toucher sans raison.
 
+### Domaine `vfm105.com` (LWS, 28 octobre 2026)
+
+Nouveau domaine du site, mêmes serveurs DNS LWS (`ns17` à `ns20.lwsdns.com`).
+Au 28 octobre 2026, il pointait encore sur la page de parking LWS
+(`185.135.132.106`, `www` en CNAME vers la racine).
+
+| Type | Nom | Valeur | Usage |
+|---|---|---|---|
+| A | `@` (racine) | `31.207.34.137` | Site VFM 105 → https://vfm105.com |
+| CNAME | `www` | `vfm105.com.` | Déjà présent, à conserver → https://www.vfm105.com |
+
+Puis dans Coolify, application VFM → *Domains* : ajouter
+`https://vfm105.com,https://www.vfm105.com` à côté de
+`https://vfm.0550.site` (séparés par des virgules), enregistrer, **Redeploy**.
+Traefik obtient les certificats Let's Encrypt seul une fois le DNS propagé.
+L'ancienne adresse `vfm.0550.site` reste valable.
+
 ---
 
 ## 2. État final du projet VFM 105
