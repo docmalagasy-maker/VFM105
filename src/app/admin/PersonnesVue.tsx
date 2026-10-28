@@ -54,12 +54,12 @@ export default async function PersonnesVue({
               <th className="px-4 py-2">Référence</th>
               <th className="px-4 py-2">Date</th>
               <th className="px-4 py-2">Nom et prénom</th>
-              <th className="px-4 py-2 text-right">Âge</th>
               <th className="px-4 py-2">District</th>
+              <th className="px-4 py-2">Commune</th>
+              <th className="px-4 py-2">Fokontany</th>
               <th className="px-4 py-2">Activité</th>
               <th className="px-4 py-2">Téléphone</th>
               <th className="px-4 py-2">Statut</th>
-              <th className="px-4 py-2">CV</th>
               <th className="px-4 py-2">E-mail</th>
               <th className="sticky right-0 bg-zinc-50 px-4 py-2" />
             </tr>
@@ -76,12 +76,12 @@ export default async function PersonnesVue({
                 <td className="px-4 py-2">
                   {p.prenom} {p.nom}
                 </td>
-                <td className="px-4 py-2 text-right tabular-nums">{age(p.dateNaissance)}</td>
                 <td className="px-4 py-2">{p.district}</td>
+                <td className="px-4 py-2">{p.commune || "—"}</td>
+                <td className="px-4 py-2">{p.fokontany || "—"}</td>
                 <td className="px-4 py-2">{p.activite}</td>
                 <td className="whitespace-nowrap px-4 py-2">{p.telephone}</td>
                 <td className="px-4 py-2">{LIBELLES_STATUT[p.statut] ?? p.statut}</td>
-                <td className="px-4 py-2">{p.cv ? "Oui" : "—"}</td>
                 <td className="px-4 py-2">{libelleEmailPersonne(p)}</td>
                 <td className="sticky right-0 bg-white px-4 py-2 text-right shadow-[-8px_0_8px_-8px_rgba(0,0,0,0.15)]">
                   <div className="flex items-center justify-end gap-2">

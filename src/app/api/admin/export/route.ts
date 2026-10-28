@@ -22,8 +22,11 @@ export async function GET(request: NextRequest) {
     const personnes = await listerPersonnes(undefined, 100000, district);
     contenu = csv(
       [
-        "Référence", "Date de dépôt", "Statut", "Nom", "Prénom", "Date de naissance", "District",
-        "Activité actuelle", "Description de l'activité", "Projet personnel", "Téléphone", "E-mail", "CV",
+        "Référence", "Date de dépôt", "Statut", "Nom", "Prénom", "District",
+        "Commune", "Code commune", "Fokontany",
+        "Activité actuelle", "Description de l'activité", "Projet personnel", "Téléphone", "E-mail",
+        // Plus demandés depuis le lot K : renseignés seulement pour les anciens dossiers
+        "Date de naissance", "CV",
       ],
       personnes.map((p) => [
         p.reference,
@@ -31,13 +34,16 @@ export async function GET(request: NextRequest) {
         LIBELLES_STATUT[p.statut] ?? p.statut,
         p.nom,
         p.prenom,
-        p.dateNaissance.split("-").reverse().join("/"),
         p.district,
+        p.commune,
+        p.communePcode,
+        p.fokontany,
         p.activite,
         p.descriptionActivite,
         p.projet,
         p.telephone,
         p.email,
+        p.dateNaissance ? p.dateNaissance.split("-").reverse().join("/") : "",
         p.cv ? p.cv.nom : "",
       ])
     );

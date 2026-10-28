@@ -37,6 +37,9 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | J | 28 octobre 2026 | J4 — Nouvelle affiche, bandeau « Voafetra » vert à texte blanc | Mis en ligne (28 octobre 2026) |
 | J | 28 octobre 2026 | J5 — « AMBOHIDRATRIMO » sous le logo | Mis en ligne (28 octobre 2026) |
 | J | 28 octobre 2026 | J6 — Domaine vfm105.com | Mis en ligne (28 octobre 2026) |
+| K | 28 octobre 2026 | K1 — Associations : pièces jointes supprimées | Mis en ligne (28 octobre 2026) |
+| K | 28 octobre 2026 | K2 — Personnes : sans date de naissance ni CV, avec commune et fokontany | Mis en ligne (28 octobre 2026) |
+| K | 28 octobre 2026 | K3 — Associations : section « Ny hevitrao » | Mis en ligne (28 octobre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 
 ---
@@ -271,7 +274,7 @@ neutralisée dans l'export.
 
 ### Mise en ligne du lot B
 
-- [ ] GO, commit et push sur `master`.
+- [x] GO (28 octobre 2026), commit et push sur `master`.
 - [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
 - [ ] Test en ligne des trois onglets de `/admin` et d'un export CSV.
 
@@ -374,7 +377,7 @@ lot C (sans légende, noms automatiques).
 
 ### Mise en ligne du lot C
 
-- [ ] GO, commit et push sur `master`.
+- [x] GO (28 octobre 2026), commit et push sur `master`.
 - [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).
 - [ ] Ajouter de vraies photos (dossier `GALERIE` ou admin) et vérifier
       `/galerie` sur téléphone et ordinateur.
@@ -1258,6 +1261,84 @@ puis redéployer.
 
 ---
 
+## Lot K — Formulaires sans pièces jointes, commune et fokontany pour les personnes (28 octobre 2026)
+
+### K1 — Associations : plus de pièces jointes
+
+**Avant :** section 5 « Antontan-taratasy miaraka » pour joindre des
+fichiers (statuts, récépissé, photos…).
+
+**Après :** section supprimée (formulaire et récapitulatif). Tous les autres
+champs sont inchangés. Le serveur ignore toute pièce jointe envoyée
+(ancienne page restée ouverte, brouillon ancien). L'adresse d'envoi de
+fichiers `/api/upload`, ouverte à tous et devenue inutile, est supprimée.
+Les pièces des dossiers déjà déposés restent consultables dans l'admin.
+
+**Fichiers :** `src/components/DepotWizard.tsx`, `src/lib/validation.ts`,
+`src/app/api/upload/route.ts` (supprimé).
+
+### K2 — Personnes : sans date de naissance ni CV, avec commune et fokontany
+
+**Avant :** Anarana, Fanampin'anarana, Daty nahaterahana, Distrika… et
+section 5 « CV ».
+
+**Après :** date de naissance et CV supprimés ; ordre géographique
+**Distrika → Kaominina → Fokontany**, avec les mêmes listes liées que pour
+les associations (référentiel officiel, saisie libre « Hafa » possible).
+Kaominina obligatoire, Fokontany facultatif (comme pour les associations).
+Les autres champs sont inchangés.
+
+**Base de données :** colonnes `commune`, `commune_pcode`, `fokontany`,
+`fokontany_pcode` ajoutées à `dossiers_personnes`, `date_naissance` devient
+facultative. Appliqué automatiquement au démarrage du site (aucune
+manipulation manuelle) ; les anciens dossiers sont conservés tels quels.
+
+**Administration :** liste des personnes avec colonnes Commune et Fokontany
+(colonnes Âge et CV retirées) ; fiche avec Commune et Fokontany, date de
+naissance et CV affichés seulement pour les anciens dossiers qui en ont ;
+export CSV avec Commune, Code commune, Fokontany (Date de naissance et CV
+gardés en fin de fichier pour les anciens dossiers). Recherche aussi par
+commune et fokontany.
+
+**Fichiers :** `src/app/deposer/olona/FormulairePersonne.tsx`,
+`src/lib/personnes-modele.ts`, `src/lib/personnes.ts`, `src/lib/schema.ts`,
+`src/app/admin/PersonnesVue.tsx`, `src/app/admin/olona/[reference]/page.tsx`,
+`src/app/api/admin/export/route.ts`.
+
+**Vérifié en local :** types ; formulaire personne (listes Distrika →
+Kaominina → Fokontany, récapitulatif sans date ni CV) ; formulaire
+association sans section pièces jointes ; refus serveur sans kaominina
+(400, message malgache) ; `/api/upload` en 404. Enregistrement réel non
+testable en local (pas de base PostgreSQL sur le PC) : à contrôler en ligne
+après déploiement.
+
+### K3 — Associations : section « Ny hevitrao »
+
+| Avant | Après |
+|---|---|
+| Titre : Ny tetikasanao | Ny hevitrao |
+| Sous-titre : Hazavao ny filanao na ny fangatahanao | Hazavao ny hevitrao momba ny fanabeazana ara-politika |
+| Champ : Fanazavana momba ny tetikasanao, ny filanao na ny fangatahanao | Soraty eto ambany ny hevitrao |
+| Texte d'exemple dans la zone de saisie | Aucun (zone vide) |
+| Récapitulatif : Ny tetikasa | Ny hevitrao |
+
+Message d'erreur si vide (formulaire et serveur) : « Soraty ny hevitrao
+momba ny fanabeazana ara-politika. » Même champ en base (`description`),
+rien ne change dans l'admin.
+
+**Fichiers :** `src/components/DepotWizard.tsx`, `src/lib/validation.ts`.
+
+**Vérifié en local :** section affichée avec les nouveaux textes, zone de
+saisie vide.
+
+### Mise en ligne du lot K
+
+- [x] GO (28 octobre 2026), commit et push sur `master`.
+- [ ] Contrôle en ligne : dépôt d'un dossier de personne test (commune,
+      fokontany), consultation dans l'admin, puis suppression du dossier test.
+
+---
+
 ## Lot S — Maintenance et sécurité
 
 ### S1 — Mise à jour de sécurité de Next.js et sharp (9 octobre 2026)
@@ -1294,5 +1375,5 @@ les 6 onglets, carte, refus sans session (401).
 
 ### Mise en ligne du lot S
 
-- [ ] GO, commit et push sur `master`.
+- [x] GO (28 octobre 2026), commit et push sur `master`.
 - [ ] Vérifier le déploiement dans Coolify (*Deployments* → **Success**).

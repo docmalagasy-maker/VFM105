@@ -2,38 +2,35 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import ChoixLocalite, { LOCALITE_VIDE, type Localite } from "@/components/ChoixLocalite";
 import { Champ, Ligne, Section } from "@/components/DepotWizard";
-import { IconDoc, IconGear, IconLock, IconMail, IconPaperclip, IconPhone, IconSend, IconUpload } from "@/components/icons";
+import { IconDoc, IconGear, IconLock, IconMail, IconPhone, IconSend } from "@/components/icons";
 import PublicShell from "@/components/PublicShell";
 import { DISTRICTS_PAR_REGION } from "@/lib/districts";
-import { dateNaissanceValide } from "@/lib/personnes-modele";
-import type { PieceJointe } from "@/lib/types";
 import { validateTelephoneMadagascar } from "@/lib/validation";
 
 interface Formulaire {
   nom: string;
   prenom: string;
-  dateNaissance: string;
   district: string;
+  localite: Localite;
   activite: string;
   descriptionActivite: string;
   projet: string;
   telephone: string;
   email: string;
-  cv: PieceJointe | null;
 }
 
 const VIDE: Formulaire = {
   nom: "",
   prenom: "",
-  dateNaissance: "",
   district: "",
+  localite: LOCALITE_VIDE,
   activite: "",
   descriptionActivite: "",
   projet: "",
   telephone: "",
   email: "",
-  cv: null,
 };
 
 // Brouillon séparé de celui des associations (vfm105-brouillon).
@@ -42,16 +39,17 @@ const CLE_BROUILLON = "vfm-brouillon-olona";
 function chargerBrouillon(): Formulaire {
   try {
     const brut = window.localStorage.getItem(CLE_BROUILLON);
-    return brut ? { ...VIDE, ...JSON.parse(brut) } : VIDE;
+    if (!brut) return VIDE;
+    // Les anciens brouillons peuvent encore contenir date de naissance et CV : ignorés.
+    const { nom, prenom, district, localite, activite, descriptionActivite, projet, telephone, email } = {
+      ...VIDE,
+      ...JSON.parse(brut),
+    } as Formulaire;
+    return { nom, prenom, district, localite: { ...LOCALITE_VIDE, ...localite }, activite, descriptionActivite, projet, telephone, email };
   } catch {
     return VIDE;
   }
 }
-
-const dateLisible = (iso: string) => {
-  const [a, m, j] = iso.split("-");
-  return a && m && j ? `${j}/${m}/${a}` : iso;
-};
 
 /** Formulaire des personnes physiques : saisie → famintinana → fandefasana farany. */
 export default function FormulairePersonne() {
@@ -61,7 +59,6 @@ export default function FormulairePersonne() {
   const [form, setForm] = useState<Formulaire>(chargerBrouillon);
   const [erreurs, setErreurs] = useState<string[]>([]);
   const [envoi, setEnvoi] = useState(false);
-  const [envoiCv, setEnvoiCv] = useState(false);
   const [erreurEnvoi, setErreurEnvoi] = useState<string | null>(null);
   const cle = useRef<string | null>(null);
 
@@ -76,29 +73,12 @@ export default function FormulairePersonne() {
 
   const maj = <K extends keyof Formulaire>(champ: K, valeur: Formulaire[K]) => setForm((f) => ({ ...f, [champ]: valeur }));
 
-  async function envoyerCv(fichier: File | undefined) {
-    if (!fichier) return;
-    setEnvoiCv(true);
-    const donnees = new FormData();
-    donnees.append("fichier", fichier);
-    try {
-      const reponse = await fetch("/api/upload", { method: "POST", body: donnees });
-      const json = await reponse.json();
-      if (!reponse.ok) setErreurs([json.erreur ?? `Tsy tafiditra ny rakitra ${fichier.name}.`]);
-      else maj("cv", json.piece);
-    } catch {
-      setErreurs([`Tsy tafiditra ny rakitra ${fichier.name}.`]);
-    } finally {
-      setEnvoiCv(false);
-    }
-  }
-
   function verifier(): boolean {
     const p: string[] = [];
     if (!form.nom.trim()) p.push("Soraty ny anaranao.");
     if (!form.prenom.trim()) p.push("Soraty ny fanampin'anaranao.");
-    if (!dateNaissanceValide(form.dateNaissance)) p.push("Toa diso ny daty nahaterahana.");
     if (!form.district) p.push("Safidio ny distrika misy anao.");
+    else if (!form.localite.commune.trim()) p.push("Safidio na soraty ny kaominina misy anao.");
     if (!form.activite.trim()) p.push("Soraty ny asanao ankehitriny.");
     if (!form.descriptionActivite.trim()) p.push("Hazavao ny asanao.");
     if (!form.projet.trim()) p.push("Hazavao ny tetikasanao manokana.");
@@ -122,14 +102,16 @@ export default function FormulairePersonne() {
           idempotencyKey: cle.current,
           nom: form.nom.trim(),
           prenom: form.prenom.trim(),
-          dateNaissance: form.dateNaissance,
           district: form.district,
+          commune: form.localite.commune.trim(),
+          communePcode: form.localite.communePcode || undefined,
+          fokontany: form.localite.fokontany.trim() || undefined,
+          fokontanyPcode: form.localite.fokontanyPcode || undefined,
           activite: form.activite.trim(),
           descriptionActivite: form.descriptionActivite.trim(),
           projet: form.projet.trim(),
           telephone: form.telephone.trim(),
           email: form.email.trim() || undefined,
-          cv: form.cv ?? undefined,
         }),
       });
       const json = await reponse.json();
@@ -156,8 +138,9 @@ export default function FormulairePersonne() {
         <dl className="mt-6 divide-y divide-vfm-beige-bord rounded-2xl border border-vfm-beige-bord bg-vfm-beige-clair">
           <Ligne label="Anarana">{form.nom}</Ligne>
           <Ligne label="Fanampin'anarana">{form.prenom}</Ligne>
-          <Ligne label="Daty nahaterahana">{dateLisible(form.dateNaissance)}</Ligne>
           <Ligne label="Distrika">{form.district}</Ligne>
+          <Ligne label="Kaominina">{form.localite.commune}</Ligne>
+          {form.localite.fokontany && <Ligne label="Fokontany">{form.localite.fokontany}</Ligne>}
           <Ligne label="Asa ankehitriny">{form.activite}</Ligne>
           <Ligne label="Fanazavana momba ny asa">
             <span className="whitespace-pre-wrap">{form.descriptionActivite}</span>
@@ -167,7 +150,6 @@ export default function FormulairePersonne() {
           </Ligne>
           <Ligne label="Finday">{form.telephone}</Ligne>
           {form.email && <Ligne label="Mailaka">{form.email}</Ligne>}
-          <Ligne label="CV">{form.cv ? form.cv.nom : "Tsy misy"}</Ligne>
         </dl>
 
         {erreurEnvoi && <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{erreurEnvoi}</p>}
@@ -234,7 +216,7 @@ export default function FormulairePersonne() {
             <Section
               numero={1}
               titre="Mombamomba anao"
-              sousTitre="Anarana, daty nahaterahana ary distrika"
+              sousTitre="Anarana, distrika, kaominina ary fokontany"
               icon={
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5" aria-hidden>
                   <circle cx="12" cy="8" r="4" />
@@ -250,18 +232,12 @@ export default function FormulairePersonne() {
                   <input className="input" placeholder="Ohatra : Jean" value={form.prenom} onChange={(e) => maj("prenom", e.target.value)} />
                 </Champ>
               </div>
-              <Champ label="Daty nahaterahana" obligatoire>
-                <input
-                  className="input"
-                  type="date"
-                  min="1900-01-01"
-                  max={new Date().toISOString().slice(0, 10)}
-                  value={form.dateNaissance}
-                  onChange={(e) => maj("dateNaissance", e.target.value)}
-                />
-              </Champ>
               <Champ label="Distrika" obligatoire>
-                <select className="input" value={form.district} onChange={(e) => maj("district", e.target.value)}>
+                <select
+                  className="input"
+                  value={form.district}
+                  onChange={(e) => setForm((f) => ({ ...f, district: e.target.value, localite: LOCALITE_VIDE }))}
+                >
                   <option value="" disabled>
                     Safidio ny distrika
                   </option>
@@ -276,6 +252,11 @@ export default function FormulairePersonne() {
                   ))}
                 </select>
               </Champ>
+              <ChoixLocalite
+                district={form.district}
+                valeur={form.localite}
+                onChange={(modif) => setForm((f) => ({ ...f, localite: { ...f.localite, ...modif } }))}
+              />
             </Section>
 
             <Section
@@ -353,56 +334,13 @@ export default function FormulairePersonne() {
                 </div>
               </Champ>
             </Section>
-
-            <Section
-              numero={5}
-              titre="CV"
-              sousTitre="Ny momba ny fianaranao sy ny traikefanao (tsy voatery)"
-              icon={<IconPaperclip className="h-5 w-5" />}
-            >
-              {form.cv ? (
-                <div className="flex items-center justify-between gap-3 rounded-xl border border-vfm-beige-bord bg-white px-3 py-2 text-sm">
-                  <span className="flex min-w-0 items-center gap-2">
-                    <IconPaperclip className="h-4 w-4 shrink-0 text-vfm-vert" />
-                    <span className="truncate">{form.cv.nom}</span>
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => maj("cv", null)}
-                    className="shrink-0 text-xs font-medium text-zinc-500 hover:text-vfm-rouge"
-                  >
-                    Esory
-                  </button>
-                </div>
-              ) : (
-                <label className="group flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-vfm-beige-bord bg-white px-4 py-7 text-center transition-colors hover:border-vfm-vert hover:bg-vfm-vert/5">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-vfm-vert/10 text-vfm-vert transition-transform group-hover:scale-110">
-                    <IconUpload className="h-6 w-6" />
-                  </span>
-                  <span className="text-sm font-medium text-zinc-700">
-                    {envoiCv ? "Eo am-pampidirana..." : "Tsindrio eto raha hisafidy ny CV-nao"}
-                  </span>
-                  <span className="text-xs text-zinc-500">10 Mo farafahabetsany — PDF, Word, JPEG, PNG, WebP.</span>
-                  <input
-                    type="file"
-                    disabled={envoiCv}
-                    onChange={(e) => {
-                      envoyerCv(e.target.files?.[0]);
-                      e.target.value = "";
-                    }}
-                    className="hidden"
-                  />
-                </label>
-              )}
-            </Section>
           </div>
         </div>
 
         <div className="mx-auto mt-10 max-w-md">
           <button
             type="submit"
-            disabled={envoiCv}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-vfm-vert px-6 py-4 text-base font-semibold text-white shadow-lg shadow-vfm-vert/25 transition-all hover:-translate-y-0.5 hover:bg-vfm-vert-dark hover:shadow-xl disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-vfm-vert px-6 py-4 text-base font-semibold text-white shadow-lg shadow-vfm-vert/25 transition-all hover:-translate-y-0.5 hover:bg-vfm-vert-dark hover:shadow-xl"
           >
             <IconSend className="h-5 w-5" />
             Hamarino ny dosie-ko

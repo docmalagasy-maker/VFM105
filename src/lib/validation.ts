@@ -1,6 +1,7 @@
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { z } from "zod";
 import { TOUS_LES_DISTRICTS } from "@/lib/districts";
+import type { PieceJointe } from "@/lib/types";
 
 // Madagascar : numéros mobiles à 10 chiffres commençant par 032/033/034/037/038,
 // acceptés avec ou sans indicatif +261.
@@ -72,8 +73,9 @@ export const dossierInputSchema = z.object({
   description: z
     .string()
     .trim()
-    .min(1, "Tsy maintsy hazavaina ny tetikasa na ny fangatahana."),
-  pieces: z.array(pieceJointeSchema).default([]),
+    .min(1, "Soraty ny hevitrao momba ny fanabeazana ara-politika."),
+  // Pièces jointes supprimées du formulaire : tout envoi éventuel est ignoré.
+  pieces: z.unknown().transform((): PieceJointe[] => []),
 });
 
 export const MAX_TAILLE_FICHIER = 10 * 1024 * 1024; // 10 Mo

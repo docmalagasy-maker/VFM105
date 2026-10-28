@@ -3,7 +3,7 @@ import { getPool } from "@/lib/db";
 let schemaVerifie: Promise<unknown> | undefined;
 
 /**
- * Applique les migrations 002 à 006 si besoin (idempotent, une fois par
+ * Applique les migrations 002 à 006 (et les colonnes ajoutées depuis) si besoin (idempotent, une fois par
  * démarrage du serveur), pour qu'un déploiement ne casse jamais le site avant
  * une migration manuelle de la base.
  */
@@ -77,6 +77,11 @@ export function verifierSchema(): Promise<unknown> {
          email_confirmation TEXT,
          cree_le TIMESTAMPTZ NOT NULL DEFAULT now()
        );
+       ALTER TABLE dossiers_personnes ALTER COLUMN date_naissance DROP NOT NULL;
+       ALTER TABLE dossiers_personnes ADD COLUMN IF NOT EXISTS commune TEXT;
+       ALTER TABLE dossiers_personnes ADD COLUMN IF NOT EXISTS commune_pcode TEXT;
+       ALTER TABLE dossiers_personnes ADD COLUMN IF NOT EXISTS fokontany TEXT;
+       ALTER TABLE dossiers_personnes ADD COLUMN IF NOT EXISTS fokontany_pcode TEXT;
        CREATE INDEX IF NOT EXISTS idx_personnes_district ON dossiers_personnes (district);
        CREATE INDEX IF NOT EXISTS idx_personnes_date_depot ON dossiers_personnes (date_depot);`
     )

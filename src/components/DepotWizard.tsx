@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { validateTelephoneMadagascar } from "@/lib/validation";
-import type { AutreCoordonnee, PieceJointe, Responsable } from "@/lib/types";
+import type { AutreCoordonnee, Responsable } from "@/lib/types";
 import PublicShell from "@/components/PublicShell";
 import { DISTRICTS_PAR_REGION } from "@/lib/districts";
 import ChoixLocalite, { LOCALITE_VIDE, type Localite } from "@/components/ChoixLocalite";
@@ -12,11 +12,9 @@ import {
   IconGear,
   IconPhone,
   IconDoc,
-  IconPaperclip,
   IconSend,
   IconLock,
   IconMail,
-  IconUpload,
 } from "@/components/icons";
 
 const AUTRE = "Hafa";
@@ -46,7 +44,6 @@ interface FormState {
   email: string;
   autresCoordonnees: AutreCoordonnee[];
   description: string;
-  pieces: PieceJointe[];
 }
 
 const ETAT_INITIAL: FormState = {
@@ -62,7 +59,6 @@ const ETAT_INITIAL: FormState = {
   email: "",
   autresCoordonnees: [],
   description: "",
-  pieces: [],
 };
 
 const CLE_LOCALSTORAGE = "vfm105-brouillon";
@@ -72,7 +68,10 @@ function chargerBrouillon(): FormState {
   try {
     const brut = window.localStorage.getItem(CLE_LOCALSTORAGE);
     if (!brut) return ETAT_INITIAL;
-    const brouillon: FormState = { ...ETAT_INITIAL, ...JSON.parse(brut) };
+    // Les anciens brouillons peuvent encore contenir des pièces jointes : ignorées.
+    const { pieces: _pieces, ...enregistre } = JSON.parse(brut);
+    void _pieces;
+    const brouillon: FormState = { ...ETAT_INITIAL, ...enregistre };
     if (!ACTIVITES.includes(brouillon.activite)) brouillon.activite = ETAT_INITIAL.activite;
     return brouillon;
   } catch {
@@ -135,29 +134,6 @@ export default function DepotWizard() {
     }));
   }
 
-  async function ajouterFichiers(fichiers: FileList | null) {
-    if (!fichiers) return;
-    for (const fichier of Array.from(fichiers)) {
-      const donnees = new FormData();
-      donnees.append("fichier", fichier);
-      try {
-        const reponse = await fetch("/api/upload", { method: "POST", body: donnees });
-        const json = await reponse.json();
-        if (!reponse.ok) {
-          setErreurs((e) => [...e, json.erreur ?? `Tsy tafiditra ny rakitra ${fichier.name}.`]);
-          continue;
-        }
-        setForm((f) => ({ ...f, pieces: [...f.pieces, json.piece] }));
-      } catch {
-        setErreurs((e) => [...e, `Tsy tafiditra ny rakitra ${fichier.name}.`]);
-      }
-    }
-  }
-
-  function retirerPiece(index: number) {
-    setForm((f) => ({ ...f, pieces: f.pieces.filter((_, i) => i !== index) }));
-  }
-
   function valider(): boolean {
     const problemes: string[] = [];
     if (!form.nomAssociation.trim()) problemes.push("Soraty ny anaran'ny fikambanana.");
@@ -179,7 +155,7 @@ export default function DepotWizard() {
       problemes.push("Toa diso ny adiresy mailaka.");
     }
     if (!form.description.trim()) {
-      problemes.push("Hazavao ny tetikasanao, ny filanao na ny fangatahanao.");
+      problemes.push("Soraty ny hevitrao momba ny fanabeazana ara-politika.");
     }
     setErreurs(problemes);
     return problemes.length === 0;
@@ -223,7 +199,6 @@ export default function DepotWizard() {
             autres: form.autresCoordonnees.filter((a) => a.valeur.trim()),
           },
           description: form.description.trim(),
-          pieces: form.pieces,
         }),
       });
 
@@ -281,19 +256,8 @@ export default function DepotWizard() {
                 .join(" · ")}
             </Ligne>
           )}
-          <Ligne label="Ny tetikasa">
+          <Ligne label="Ny hevitrao">
             <span className="whitespace-pre-wrap">{form.description}</span>
-          </Ligne>
-          <Ligne label="Antontan-taratasy miaraka">
-            {form.pieces.length === 0 ? (
-              "Tsy misy"
-            ) : (
-              <ul className="list-inside list-disc">
-                {form.pieces.map((p, i) => (
-                  <li key={i}>{p.nom}</li>
-                ))}
-              </ul>
-            )}
           </Ligne>
         </dl>
 
@@ -538,66 +502,18 @@ export default function DepotWizard() {
 
             <Section
               numero={4}
-              titre="Ny tetikasanao"
-              sousTitre="Hazavao ny filanao na ny fangatahanao"
+              titre="Ny hevitrao"
+              sousTitre="Hazavao ny hevitrao momba ny fanabeazana ara-politika"
               icon={<IconDoc className="h-5 w-5" />}
             >
-              <Champ label="Fanazavana momba ny tetikasanao, ny filanao na ny fangatahanao" obligatoire>
+              <Champ label="Soraty eto ambany ny hevitrao" obligatoire>
                 <textarea
                   className="input"
                   rows={6}
-                  placeholder="Soraty eto ny tetikasanao, ny filanao na izay fanazavana ilaina hafa..."
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                 />
               </Champ>
-            </Section>
-
-            <Section
-              numero={5}
-              titre="Antontan-taratasy miaraka"
-              sousTitre="Sata, tapakila fanamarinana, sary... (tsy voatery)"
-              icon={<IconPaperclip className="h-5 w-5" />}
-            >
-              <label className="group flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-vfm-beige-bord bg-white px-4 py-7 text-center transition-colors hover:border-vfm-vert hover:bg-vfm-vert/5">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-vfm-vert/10 text-vfm-vert transition-transform group-hover:scale-110">
-                  <IconUpload className="h-6 w-6" />
-                </span>
-                <span className="text-sm font-medium text-zinc-700">
-                  Tsindrio eto raha hisafidy rakitra iray na maromaro
-                </span>
-                <span className="text-xs text-zinc-500">
-                  10 Mo farafahabetsany isaky ny rakitra — PDF, Word, JPEG, PNG, WebP.
-                </span>
-                <input
-                  type="file"
-                  multiple
-                  onChange={(e) => ajouterFichiers(e.target.files)}
-                  className="hidden"
-                />
-              </label>
-              {form.pieces.length > 0 && (
-                <ul className="flex flex-col gap-2">
-                  {form.pieces.map((p, i) => (
-                    <li
-                      key={i}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-vfm-beige-bord bg-white px-3 py-2 text-sm"
-                    >
-                      <span className="flex min-w-0 items-center gap-2">
-                        <IconPaperclip className="h-4 w-4 shrink-0 text-vfm-vert" />
-                        <span className="truncate">{p.nom}</span>
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => retirerPiece(i)}
-                        className="shrink-0 text-xs font-medium text-zinc-500 hover:text-vfm-rouge"
-                      >
-                        Esory
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
             </Section>
           </div>
         </div>

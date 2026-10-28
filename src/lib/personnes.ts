@@ -6,7 +6,7 @@ import { supprimerPieceJointe } from "@/lib/stockage";
 import type { StatutDossier } from "@/lib/types";
 
 function ligneVersPersonne(row: Record<string, unknown>): DossierPersonne {
-  const naissance = row.date_naissance as Date | string;
+  const naissance = row.date_naissance as Date | string | null;
   return {
     reference: row.reference as string,
     idempotencyKey: row.idempotency_key as string,
@@ -14,12 +14,19 @@ function ligneVersPersonne(row: Record<string, unknown>): DossierPersonne {
     statut: row.statut as StatutDossier,
     nom: row.nom as string,
     prenom: row.prenom as string,
-    // Colonne DATE : lue sans décalage de fuseau.
+    // Colonne DATE (anciens dossiers uniquement) : lue sans décalage de fuseau.
     dateNaissance:
-      typeof naissance === "string"
-        ? naissance.slice(0, 10)
-        : `${naissance.getFullYear()}-${String(naissance.getMonth() + 1).padStart(2, "0")}-${String(naissance.getDate()).padStart(2, "0")}`,
+      naissance == null
+        ? undefined
+        : typeof naissance === "string"
+          ? naissance.slice(0, 10)
+          : `${naissance.getFullYear()}-${String(naissance.getMonth() + 1).padStart(2, "0")}-${String(naissance.getDate()).padStart(2, "0")}`,
     district: row.district as string,
+    // Les dossiers antérieurs au lot K n'ont ni commune ni fokontany.
+    commune: (row.commune as string) ?? "",
+    communePcode: (row.commune_pcode as string) ?? undefined,
+    fokontany: (row.fokontany as string) ?? undefined,
+    fokontanyPcode: (row.fokontany_pcode as string) ?? undefined,
     activite: row.activite as string,
     descriptionActivite: row.description_activite as string,
     projet: row.projet as string,
@@ -49,9 +56,10 @@ export async function creerPersonne(input: PersonneInput): Promise<{ dossier: Do
   const reference = await genererProchaineReferencePersonne(maintenant.getFullYear());
   const r = await pool.query(
     `INSERT INTO dossiers_personnes (
-       reference, idempotency_key, date_depot, nom, prenom, date_naissance, district,
-       activite, description_activite, projet, telephone, email, cv
-     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+       reference, idempotency_key, date_depot, nom, prenom, district,
+       commune, commune_pcode, fokontany, fokontany_pcode,
+       activite, description_activite, projet, telephone, email
+     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
      ON CONFLICT (idempotency_key) DO NOTHING
      RETURNING *`,
     [
@@ -60,14 +68,16 @@ export async function creerPersonne(input: PersonneInput): Promise<{ dossier: Do
       maintenant.toISOString(),
       input.nom,
       input.prenom,
-      input.dateNaissance,
       input.district,
+      input.commune,
+      input.communePcode || null,
+      input.fokontany || null,
+      input.fokontanyPcode || null,
       input.activite,
       input.descriptionActivite,
       input.projet,
       input.telephone,
       input.email || null,
-      input.cv ? JSON.stringify(input.cv) : null,
     ]
   );
   if (r.rows.length === 0) return { dossier: (await relire())!, creeMaintenant: false };
@@ -89,7 +99,8 @@ export async function listerPersonnes(recherche?: string, limite = 200, district
       WHERE ($2::text IS NULL OR district = $2)
         AND ($3::text IS NULL
           OR reference ILIKE $3 OR nom ILIKE $3 OR prenom ILIKE $3
-          OR district ILIKE $3 OR activite ILIKE $3 OR telephone ILIKE $3)
+          OR district ILIKE $3 OR commune ILIKE $3 OR fokontany ILIKE $3
+          OR activite ILIKE $3 OR telephone ILIKE $3)
       ORDER BY date_depot DESC
       LIMIT $1`,
     [limite, district ?? null, motif]

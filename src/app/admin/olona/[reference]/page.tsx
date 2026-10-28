@@ -33,10 +33,15 @@ export default async function PersonneAdminPage({ params }: { params: Promise<{ 
         <dl className="mt-6 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white">
           <Ligne label="Nom">{p.nom}</Ligne>
           <Ligne label="Prénom">{p.prenom}</Ligne>
-          <Ligne label="Date de naissance">
-            {dateNaissanceFr(p.dateNaissance)} ({age(p.dateNaissance)} ans)
-          </Ligne>
+          {/* Date de naissance et CV : plus demandés, affichés seulement pour les anciens dossiers */}
+          {p.dateNaissance && (
+            <Ligne label="Date de naissance">
+              {dateNaissanceFr(p.dateNaissance)} ({age(p.dateNaissance)} ans)
+            </Ligne>
+          )}
           <Ligne label="District">{p.district}</Ligne>
+          <Ligne label="Commune">{p.commune || "—"}</Ligne>
+          <Ligne label="Fokontany">{p.fokontany || "—"}</Ligne>
           <Ligne label="Activité actuelle">{p.activite}</Ligne>
           <Ligne label="Description de l'activité">
             <span className="whitespace-pre-wrap">{p.descriptionActivite}</span>
@@ -58,15 +63,13 @@ export default async function PersonneAdminPage({ params }: { params: Promise<{ 
               "—"
             )}
           </Ligne>
-          <Ligne label="CV">
-            {p.cv ? (
+          {p.cv && (
+            <Ligne label="CV">
               <a href={`/api/admin/pieces/${p.cv.pathname}`} target="_blank" rel="noopener noreferrer" className="underline">
                 {p.cv.nom}
               </a>
-            ) : (
-              "Non fourni"
-            )}
-          </Ligne>
+            </Ligne>
+          )}
           <Ligne label="E-mail de confirmation">{libelleEmailPersonne(p)}</Ligne>
         </dl>
 
