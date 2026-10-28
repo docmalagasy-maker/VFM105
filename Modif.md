@@ -36,7 +36,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | J | 28 octobre 2026 | J3 — Fond gris à pois, logo sur médaillon blanc | Mis en ligne (28 octobre 2026) |
 | J | 28 octobre 2026 | J4 — Nouvelle affiche, bandeau « Voafetra » vert à texte blanc | Mis en ligne (28 octobre 2026) |
 | J | 28 octobre 2026 | J5 — « AMBOHIDRATRIMO » sous le logo | Mis en ligne (28 octobre 2026) |
-| J | 28 octobre 2026 | J6 — Domaine vfm105.com | DNS LWS et Coolify à faire |
+| J | 28 octobre 2026 | J6 — Domaine vfm105.com | Mis en ligne (28 octobre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 
 ---
@@ -1238,12 +1238,18 @@ horizontal, nouvelle affiche bien servie.
 Le domaine pointait sur la page de parking LWS. Étapes (détail dans
 `serveur.md`) :
 
-- [ ] LWS → zone DNS `vfm105.com` : enregistrement **A `@` → `31.207.34.137`**
-      (remplace `185.135.132.106`) ; garder le CNAME `www` → `vfm105.com.`.
-- [ ] Coolify → application VFM → *Domains* : ajouter
-      `https://vfm105.com,https://www.vfm105.com`, enregistrer, **Redeploy**.
-- [ ] Contrôle : `https://vfm105.com` et `https://www.vfm105.com` en 200
-      avec certificat valide.
+- [x] LWS → zone DNS `vfm105.com` : enregistrement **A `@` → `31.207.34.137`**
+      (remplace `185.135.132.106`) ; CNAME `www` → `vfm105.com.` conservé.
+- [x] Coolify → application VFM → *Domains* : `https://vfm105.com` ajouté
+      (Coolify a ajouté `https://www.vfm105.com` de lui-même), **Redeploy**.
+- [x] Contrôle (28 octobre 2026) : `https://vfm105.com` et
+      `https://www.vfm105.com` en 200, certificat valide, `http://` redirigé
+      vers `https://`. `https://vfm.0550.site` toujours en 200.
+
+**Reste possible :** les liens des e-mails envoyés par le site utilisent
+toujours `https://vfm.0550.site` (variable `SITE_URL` non définie). Pour
+passer à `vfm105.com`, définir `SITE_URL=https://vfm105.com` dans Coolify
+puis redéployer.
 
 ### Mise en ligne du lot J
 

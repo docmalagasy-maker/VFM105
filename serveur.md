@@ -54,11 +54,13 @@ Au 28 octobre 2026, il pointait encore sur la page de parking LWS
 | A | `@` (racine) | `31.207.34.137` | Site VFM 105 → https://vfm105.com |
 | CNAME | `www` | `vfm105.com.` | Déjà présent, à conserver → https://www.vfm105.com |
 
-Puis dans Coolify, application VFM → *Domains* : ajouter
-`https://vfm105.com,https://www.vfm105.com` à côté de
-`https://vfm.0550.site` (séparés par des virgules), enregistrer, **Redeploy**.
-Traefik obtient les certificats Let's Encrypt seul une fois le DNS propagé.
-L'ancienne adresse `vfm.0550.site` reste valable.
+Dans Coolify, application VFM → *Domains* → **Add Domain** → `https` +
+`vfm105.com` → *Save* : Coolify ajoute de lui-même `https://www.vfm105.com`
+(conservé ici, le CNAME `www` existe), puis **Redeploy**. Traefik a obtenu
+les certificats Let's Encrypt dès le déploiement. Mis en service le
+28 octobre 2026 : `https://vfm105.com` et `https://www.vfm105.com` en 200,
+certificat valide, `http://` redirigé vers `https://`. L'ancienne adresse
+`vfm.0550.site` reste valable.
 
 ---
 
@@ -66,7 +68,7 @@ L'ancienne adresse `vfm.0550.site` reste valable.
 
 | Ressource Coolify | Réglages retenus |
 |---|---|
-| **Application** `v-f-m105:master-…` | Build **Dockerfile** (`/Dockerfile`, base `/`), port exposé **3000**, domaine **https://vfm.0550.site**, redirection HTTP → HTTPS activée, déploiement automatique à chaque push sur `master` (webhook GitHub App) |
+| **Application** `v-f-m105:master-…` | Build **Dockerfile** (`/Dockerfile`, base `/`), port exposé **3000**, domaines **https://vfm.0550.site**, **https://vfm105.com** et **https://www.vfm105.com** (28 octobre 2026), redirection HTTP → HTTPS activée, déploiement automatique à chaque push sur `master` (webhook GitHub App) |
 | **Volume persistant** | Nom `…-vfm105-uploads`, monté sur **`/app/data/uploads`** : pièces jointes (`dossiers/`) et photos envoyées depuis l'admin (`galerie/`) |
 | **Base de données** `postgresql-database-…` | Image `postgres:18-alpine`, base `postgres`, utilisateur `postgres`, accès **privé** (réseau Docker interne uniquement), SSL désactivé, script d'initialisation `001_init.sql`. Migrations suivantes (`002` à `005`) appliquées automatiquement par l'application. Tables : `dossiers`, `reference_sequences`, `administrateurs`, `sondages`, `reponses_sondage` |
 | **Sauvegardes** | Quotidiennes, `0 2 * * *` (02:00 UTC = 05:00 Madagascar), timeout 3600 s, stockées dans `/data/coolify/backups/databases/…` sur le VPS |
