@@ -18,7 +18,7 @@ export default async function ConfirmationPage({
   if (!dossier) notFound();
   // Carte QR (nom, téléphone…) seulement avec le code secret reçu à l'envoi du formulaire
   const responsable = dossier.responsables[0];
-  const carte = c && c === dossier.qrJeton;
+  const carte = !!c && c === dossier.qrJeton;
 
   return (
     <PublicShell cardClassName="max-w-xl">
@@ -36,7 +36,8 @@ export default async function ConfirmationPage({
         </p>
         <p className="mt-4 text-sm text-zinc-600">
           {/* Le SMS est désactivé (src/lib/sms.ts) : seul l'e-mail, s'il est parti, est annoncé */}
-          {dossier.emailConfirmation === "envoye" && dossier.coordonnees.email
+          {/* Adresse e-mail seulement pour le déposant (code secret dans l'adresse) */}
+          {carte && dossier.emailConfirmation === "envoye" && dossier.coordonnees.email
             ? `Nalefa tany amin'ny ${dossier.coordonnees.email} ny mailaka fanamarinana misy ity laharana ity.`
             : "Tehirizo ity laharana ity."}
         </p>

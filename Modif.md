@@ -1440,10 +1440,18 @@ local (pas de base PostgreSQL) : à contrôler en ligne.
 
 ### Mise en ligne du lot L
 
-- [x] GO (28 octobre 2026), commit et push sur `master`.
-- [ ] Contrôle en ligne : inscription test, carte QR affichée et
-      téléchargée, scan du QR code avec un téléphone (administrateur
-      connecté), puis suppression du dossier test.
+- [x] GO (28 octobre 2026), commit `e06256c` et push sur `master`.
+- [x] Contrôles en ligne (https://vfm105.com) : pages publiques en 200,
+      « Fisoratana anarana » et « VFM 105 » affichés, colonnes `qr_jeton`
+      créées (page d'un ancien dossier sans erreur). Inscription test
+      **VFM-P-2026-0002** (« Essai TEST-QR ») : carte QR affichée et
+      prête au téléchargement ; sans le bon code, aucune carte.
+- [x] Correctif après contrôle : sans le code secret, la page de
+      remerciement affichait encore le nom (personnes) et l'adresse
+      e-mail (associations), comme avant le lot L ; désormais réservés au
+      déposant.
+- [ ] Scan du QR code VFM-P-2026-0002 avec un téléphone (administrateur
+      connecté), puis suppression du dossier test dans l'admin.
 - [ ] AzuraCast : station renommée « Radio VFM 105 ».
 
 ---
