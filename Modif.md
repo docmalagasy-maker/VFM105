@@ -45,8 +45,8 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | L | 28 octobre 2026 | L3 — Formulaire personnes (nouveaux textes) | Mis en ligne (28 octobre 2026) |
 | L | 28 octobre 2026 | L4 — « VFM 105 » et « Radio VFM 105 » (site et AzuraCast) | Mis en ligne (28 octobre 2026) |
 | L | 28 octobre 2026 | L5 — QR code d'inscription Tafa & Dinika | Mis en ligne (28 octobre 2026) |
-| M | 29 octobre 2026 | M1 — Affiche interactive (logo → Birao, bandeau jaune → inscription, bandeau rouge → programme) | En attente du GO |
-| M | 29 octobre 2026 | M2 — Rubrique admin « Demandes de programme » | En attente du GO |
+| M | 29 octobre 2026 | M1 — Affiche interactive (logo → Birao, bandeau jaune → inscription, bandeau rouge → programme) | Mis en ligne (29 octobre 2026) |
+| M | 29 octobre 2026 | M2 — Rubrique admin « Demandes de programme » | Mis en ligne (29 octobre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1517,9 +1517,15 @@ local (pas de PostgreSQL) : à contrôler en ligne.
 
 ### Mise en ligne du lot M
 
-- [ ] GO, commit et push sur `master`.
-- [ ] Contrôles en ligne : demande test depuis le pop-up, visible dans
-      « Demandes de programme ».
+- [x] GO (29 octobre 2026), commit `473794b` et push sur `master`.
+- [x] Contrôles en ligne (https://vfm105.com, nouvelle version détectée
+      après 120 s) : accueil, `/birao`, `/deposer/olona`, `/sondages` en
+      200 ; nouvelle affiche optimisée servie ; les trois zones présentes
+      (`/birao`, pop-up, `/deposer/olona`) ; adresse invalide refusée
+      (400) ; onglet admin refusé sans session (307).
+- [ ] Demande test depuis le pop-up, puis contrôle dans « Demandes de
+      programme » (super-administrateur connecté). Pas de suppression
+      possible depuis l'admin : utiliser une vraie adresse.
 
 ---
 
