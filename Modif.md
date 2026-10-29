@@ -45,6 +45,8 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | L | 28 octobre 2026 | L3 — Formulaire personnes (nouveaux textes) | Mis en ligne (28 octobre 2026) |
 | L | 28 octobre 2026 | L4 — « VFM 105 » et « Radio VFM 105 » (site et AzuraCast) | Mis en ligne (28 octobre 2026) |
 | L | 28 octobre 2026 | L5 — QR code d'inscription Tafa & Dinika | Mis en ligne (28 octobre 2026) |
+| M | 29 octobre 2026 | M1 — Affiche interactive (logo → Birao, bandeau jaune → inscription, bandeau rouge → programme) | En attente du GO |
+| M | 29 octobre 2026 | M2 — Rubrique admin « Demandes de programme » | En attente du GO |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1459,6 +1461,65 @@ local (pas de base PostgreSQL) : à contrôler en ligne.
       Identifiant court `vfm` et adresses des flux inchangés (le site les
       utilise). Aucun redémarrage demandé, diffusion non interrompue ;
       l'API publique `nowplaying` renvoie « Radio VFM 105 ».
+
+---
+
+## Lot M — Affiche interactive de la conférence (29 octobre 2026)
+
+Demande : `LOCALSEND/NEXT 1/svg.md`, avec le fichier
+`affiche_vfm_interactive.svg`.
+
+### M1 — Affiche à trois zones cliquables
+
+**Avant :** affiche fixe (`affiche-tafa-dinika.png`), sans interaction.
+
+**Après :** nouvelle affiche, image tirée du SVG fourni
+(`affiche-tafa-dinika-interactive.png`, 1121 × 1403, toujours optimisée
+par Next.js). Un calque SVG de même `viewBox`, posé sur l'image, porte
+les zones aux coordonnées du fichier fourni ; elles restent alignées à
+toutes les tailles d'écran. Contour pointillé au survol et au clavier.
+
+| Zone | Action |
+|---|---|
+| Logo VFM | Page « Birao » (`/birao`) |
+| Bandeau jaune du bas | Formulaire d'inscription individuelle (`/deposer/olona`) |
+| Encadré rouge « Fanabeazana olom-pirenena » | Pop-up « Voulez-vous recevoir à l'avance le programme de la conférence ? » |
+
+Pop-up : **Non** ferme la fenêtre (l'accueil reste affiché) ; **Oui**
+affiche un champ e-mail, contrôlé avant l'envoi puis par le serveur
+(`POST /api/programme`). Fermeture aussi par Échap ou clic à côté. Sur
+mobile, la fenêtre s'ouvre en bas de l'écran, boutons pleine largeur.
+Une même adresse n'est enregistrée qu'une fois.
+
+**Base :** table `demandes_programme` (migration
+`007_demandes_programme.sql`, appliquée aussi automatiquement par
+`src/lib/schema.ts`).
+
+### M2 — Rubrique admin « Demandes de programme »
+
+Nouvel onglet (super-administrateur, car ces demandes ne sont rattachées
+à aucun district) : tableau Date de la demande | Adresse e-mail |
+Demande (« Programme demandé »), les plus récentes en tête.
+
+**Fichiers :** `src/app/AfficheInteractive.tsx`, `src/app/page.tsx`,
+`src/app/globals.css`, `src/app/api/programme/route.ts`,
+`src/lib/demandes-programme.ts`, `src/lib/schema.ts`,
+`migrations/007_demandes_programme.sql`, `src/app/admin/EnteteAdmin.tsx`,
+`src/app/admin/page.tsx`, `src/app/admin/DemandesProgrammeVue.tsx`,
+`public/images/affiche-tafa-dinika-interactive.png` (ancienne affiche
+supprimée).
+
+**Vérifié en local :** types et lint ; calque exactement superposé à
+l'image en mobile et en bureau ; logo → `/birao`, bandeau jaune →
+`/deposer/olona` ; pop-up Oui/Non ; adresse invalide refusée (navigateur
+et serveur, 400). Enregistrement réel et onglet admin non testables en
+local (pas de PostgreSQL) : à contrôler en ligne.
+
+### Mise en ligne du lot M
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Contrôles en ligne : demande test depuis le pop-up, visible dans
+      « Demandes de programme ».
 
 ---
 

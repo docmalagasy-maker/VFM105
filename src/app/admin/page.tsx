@@ -9,6 +9,7 @@ import type { Dossier } from "@/lib/types";
 import AdministrateursVue from "./AdministrateursVue";
 import BoutonSupprimer from "./BoutonSupprimer";
 import CarteAdmin from "./CarteAdmin";
+import DemandesProgrammeVue from "./DemandesProgrammeVue";
 import EnteteAdmin, { ongletsVisibles, type Vue } from "./EnteteAdmin";
 import FichesDossiers from "./FichesDossiers";
 import GalerieAdmin from "./GalerieAdmin";
@@ -71,6 +72,7 @@ export default async function AdminPage({
         <GalerieAdmin photos={await listerPhotos()} auteur={estSuper ? "super" : session.id} />
       )}
       {vue === "sondages" && <SondagesVue estSuper={estSuper} district={district} />}
+      {vue === "programme" && estSuper && <DemandesProgrammeVue />}
       {vue === "admins" && estSuper && <AdministrateursVue administrateurs={await listerAdministrateurs()} />}
     </div>
   );

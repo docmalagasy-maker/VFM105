@@ -2,7 +2,16 @@ import Link from "next/link";
 import type { Session } from "@/lib/auth";
 import BoutonDeconnexion from "./BoutonDeconnexion";
 
-export type Vue = "liste" | "fiches" | "personnes" | "stats" | "carte" | "galerie" | "sondages" | "admins";
+export type Vue =
+  | "liste"
+  | "fiches"
+  | "personnes"
+  | "stats"
+  | "carte"
+  | "galerie"
+  | "sondages"
+  | "programme"
+  | "admins";
 
 /** Rubriques de l'administration, dans un ordre fixe. */
 export const ONGLETS: { vue: Vue; libelle: string; superSeulement?: boolean }[] = [
@@ -13,6 +22,7 @@ export const ONGLETS: { vue: Vue; libelle: string; superSeulement?: boolean }[] 
   { vue: "carte", libelle: "Carte" },
   { vue: "galerie", libelle: "Galerie photos" },
   { vue: "sondages", libelle: "Sondages" },
+  { vue: "programme", libelle: "Demandes de programme", superSeulement: true },
   { vue: "admins", libelle: "Administrateurs", superSeulement: true },
 ];
 

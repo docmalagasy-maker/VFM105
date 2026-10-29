@@ -3,7 +3,7 @@ import { getPool } from "@/lib/db";
 let schemaVerifie: Promise<unknown> | undefined;
 
 /**
- * Applique les migrations 002 à 006 (et les colonnes ajoutées depuis) si besoin (idempotent, une fois par
+ * Applique les migrations 002 à 007 (et les colonnes ajoutées depuis) si besoin (idempotent, une fois par
  * démarrage du serveur), pour qu'un déploiement ne casse jamais le site avant
  * une migration manuelle de la base.
  */
@@ -91,7 +91,13 @@ export function verifierSchema(): Promise<unknown> {
          DEFAULT replace(gen_random_uuid()::text, '-', '');
        CREATE UNIQUE INDEX IF NOT EXISTS idx_dossiers_qr_jeton ON dossiers (qr_jeton);
        CREATE UNIQUE INDEX IF NOT EXISTS idx_personnes_qr_jeton ON dossiers_personnes (qr_jeton);
-       CREATE INDEX IF NOT EXISTS idx_personnes_date_depot ON dossiers_personnes (date_depot);`
+       CREATE INDEX IF NOT EXISTS idx_personnes_date_depot ON dossiers_personnes (date_depot);
+       CREATE TABLE IF NOT EXISTS demandes_programme (
+         id SERIAL PRIMARY KEY,
+         email TEXT NOT NULL,
+         cree_le TIMESTAMPTZ NOT NULL DEFAULT now()
+       );
+       CREATE UNIQUE INDEX IF NOT EXISTS idx_demandes_programme_email ON demandes_programme (lower(email));`
     )
     .catch((err) => {
       schemaVerifie = undefined;

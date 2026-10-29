@@ -83,6 +83,27 @@ body {
 }
 
 @layer components {
+  /* Zones cliquables de l'affiche de l'accueil (src/app/AfficheInteractive.tsx) */
+  .zone-affiche rect {
+    fill: transparent;
+    stroke: transparent;
+    stroke-width: 3;
+    pointer-events: all;
+    cursor: pointer;
+    transition: fill 0.15s ease, stroke 0.15s ease;
+  }
+
+  .zone-affiche:hover rect,
+  .zone-affiche:focus-visible rect {
+    fill: #ffffff26;
+    stroke: #ffffff;
+    stroke-dasharray: 9 5;
+  }
+
+  .zone-affiche:focus {
+    outline: none;
+  }
+
   .input {
     width: 100%;
     border-radius: 0.75rem;
