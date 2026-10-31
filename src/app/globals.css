@@ -62,7 +62,7 @@ body {
   /* Personnage de l'affiche : agrandissement très léger depuis le bas du buste,
      le calque recouvre toujours le personnage de l'affiche dessous. */
   .affiche-personnage {
-    transform-origin: 73% 78%;
+    transform-origin: 72% 78%;
     animation: affiche-respiration 4.5s ease-in-out infinite;
   }
 }

@@ -55,6 +55,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | N | 31 octobre 2026 | N6 — Affiche de l'accueil sans fond à pois | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N7 — Voile marron sur le fond vidéo | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N8 — Personnage de l'affiche légèrement animé (sans sourire) | Mis en ligne (31 octobre 2026) |
+| N | 31 octobre 2026 | N9 — Nouvelle affiche à fond transparent | Prêt, en attente de GO |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1728,6 +1729,37 @@ horizontal.
       en 200 ; accueil avec calque `affiche-personnage.png`, animation
       `affiche-respiration` présente dans la feuille de style, voile marron
       sur la vidéo.
+
+### N9 — Nouvelle affiche à fond transparent
+
+**Avant :** affiche sur fond beige uni (N6), cadre arrondi avec ombre.
+
+**Après :** affiche fournie `file_0000000052ac820b8788c651b793c118.png`
+(1121 × 1403, fond transparent, textes détourés de blanc) : le fond
+animé du site se voit autour des textes et du personnage. Cadre arrondi
+et ombre retirés (ils dessinaient un rectangle autour d'une image
+transparente).
+
+Zones cliquables recalées sur la nouvelle mise en page (mesurées dans
+l'image) : logo → `/birao`, bandeau rouge « Fanabeazana olom-pirenena »
+→ pop-up du programme, bandeau jaune « Voafetra… » → `/deposer/olona`.
+
+Personnage animé (N8) redécoupé dans la nouvelle affiche ; le bord de
+l'épaule contre le titre est adouci sur 25 px et le bas sur 15 px au-dessus
+du bandeau vert, pour que le mouvement ne marque aucune coupure.
+
+**Fichiers :** `public/images/affiche-tafa-dinika-transparente.png`,
+`public/images/affiche-personnage-transparente.png`
+(`affiche-tafa-dinika-unie.png` et `affiche-personnage.png` supprimés),
+`src/app/AfficheInteractive.tsx`, `src/app/globals.css`.
+
+**Vérifié en local :** affiche et calque chargés, trois zones colorées
+pour contrôle et exactement posées sur le logo et les deux bandeaux.
+
+### Mise en ligne de N9
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Contrôles en ligne.
 
 ---
 

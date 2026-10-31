@@ -26,18 +26,18 @@ export default function AfficheInteractive() {
   return (
     <div className="relative w-full sm:w-fit">
       <Image
-        src="/images/affiche-tafa-dinika-unie.png"
+        src="/images/affiche-tafa-dinika-transparente.png"
         alt="Tafa & dinika — Fanabeazana olom-pirenena, 14 Novambra 2026, Tranom-pokonolona Ambohidratrimo"
         width={LARGEUR}
         height={HAUTEUR}
         sizes={`(max-width: 640px) 100vw, min(100vw, calc(100dvh * ${LARGEUR} / ${HAUTEUR}))`}
-        className="block h-auto w-full sm:w-auto sm:max-h-[100dvh] sm:max-w-full sm:rounded-3xl sm:shadow-[0_20px_50px_-20px_rgba(20,43,71,0.35)]"
+        className="block h-auto w-full sm:w-auto sm:max-h-[100dvh] sm:max-w-full"
         priority
       />
       {/* Personnage détouré, même repère que l'affiche : léger mouvement de respiration */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden sm:rounded-3xl">
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <Image
-          src="/images/affiche-personnage.png"
+          src="/images/affiche-personnage-transparente.png"
           alt=""
           width={LARGEUR}
           height={HAUTEUR}
@@ -53,7 +53,7 @@ export default function AfficheInteractive() {
       >
         <Link href="/birao" aria-label="Birao — membres du bureau" className="zone-affiche">
           <title>Birao</title>
-          <rect x={35} y={36} width={319} height={268} rx={12} />
+          <rect x={25} y={18} width={366} height={304} rx={12} />
         </Link>
         <a
           href="#programme"
@@ -66,11 +66,11 @@ export default function AfficheInteractive() {
           }}
         >
           <title>Programme de la conférence</title>
-          <rect x={60} y={587} width={454} height={128} rx={3} />
+          <rect x={40} y={612} width={519} height={141} rx={3} />
         </a>
         <Link href="/deposer/olona" aria-label="Inscription individuelle" className="zone-affiche">
           <title>Fisoratana anarana</title>
-          <rect x={38} y={1288} width={1030} height={50} rx={25} />
+          <rect x={37} y={1307} width={1049} height={54} rx={27} />
         </Link>
       </svg>
 
