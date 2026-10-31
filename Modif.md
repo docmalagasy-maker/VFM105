@@ -1678,8 +1678,12 @@ le cache, ancienne affiche supprimée.
 
 ### Mise en ligne de N5 et N6
 
-- [x] GO (31 octobre 2026), commit et push sur `master`.
-- [ ] Contrôles en ligne.
+- [x] GO (31 octobre 2026), commit `d49b9d1` et push sur `master`.
+- [x] Contrôles en ligne (https://vfm105.com, nouvelle version détectée
+      après 60 s) : `/`, `/deposer`, `/deposer/olona`, `/birao`, `/radio`
+      en 200 ; accueil avec `fond-vfm-voile.mp4` et
+      `affiche-tafa-dinika-unie.png` ; ancienne affiche et vidéo grille
+      en 404.
 
 ---
 
