@@ -40,15 +40,14 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Fond de l'habillage public (accueil, dépôt, confirmation) : gris taupe à pois
-   décalés, reproduit en CSS d'après l'image fournie (net à toutes les tailles). */
+/* Fond de l'habillage public (accueil, dépôt, confirmation) : animation vidéo
+   (PublicShell). Cette image, première vue de la vidéo, s'affiche le temps
+   qu'elle charge ou si le navigateur ne peut pas la lire. */
 .bg-vfm-public {
-  background-color: #8e857c;
-  background-image:
-    radial-gradient(circle, #a09b98 3.2px, transparent 3.7px),
-    radial-gradient(circle, #a09b98 3.2px, transparent 3.7px);
-  background-size: 32px 32px;
-  background-position: 0 0, 16px 16px;
+  background-color: #d9bfa0;
+  background-image: url("/videos/fond-vfm.jpg");
+  background-size: cover;
+  background-position: center;
 }
 
 /* Bouton « Radio » pendant la diffusion : mot qui pulse et point LIVE qui clignote,

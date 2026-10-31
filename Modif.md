@@ -47,6 +47,9 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | L | 28 octobre 2026 | L5 — QR code d'inscription Tafa & Dinika | Mis en ligne (28 octobre 2026) |
 | M | 29 octobre 2026 | M1 — Affiche interactive (logo → Birao, bandeau jaune → inscription, bandeau rouge → programme) | Mis en ligne (29 octobre 2026) |
 | M | 29 octobre 2026 | M2 — Rubrique admin « Demandes de programme » | Mis en ligne (29 octobre 2026) |
+| N | 31 octobre 2026 | N1 — QR code : « Fanabeazana olom-pirenena » | Prêt, en attente de GO |
+| N | 31 octobre 2026 | N2 — Confirmation : « Hovaiko ny mombamomba ahy », « Tsindrio eto raha hanohy » | Prêt, en attente de GO |
+| N | 31 octobre 2026 | N3 — Animation vidéo en arrière-plan des pages publiques | Prêt, en attente de GO |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1526,6 +1529,70 @@ local (pas de PostgreSQL) : à contrôler en ligne.
 - [ ] Demande test depuis le pop-up, puis contrôle dans « Demandes de
       programme » (super-administrateur connecté). Pas de suppression
       possible depuis l'admin : utiliser une vraie adresse.
+
+---
+
+## Lot N — Textes d'inscription et fond animé (31 octobre 2026)
+
+Demande : `LOCALSEND/NEXT 1/animation.md`.
+
+### N1 — Image du QR code d'inscription
+
+Sous « TAFA & DINIKA » : « FANABEAZANA ARA-POLITIKA » devient
+« FANABEAZANA OLOM-PIRENENA » (en majuscules, comme le reste de la carte).
+Une seule fonction dessine la carte pour les associations et les
+personnes. Le reste de la carte est inchangé.
+
+**Fichier :** `src/components/CarteQr.tsx`.
+
+### N2 — Dernière étape de l'inscription
+
+| Avant | Après |
+|---|---|
+| Hanova ny mombamomba | Hovaiko ny mombamomba ahy |
+| Handefa farany ny dosie-ko (personnes) | Tsindrio eto raha hanohy |
+| Handefa farany ny antontan-taratasiko (associations) | Tsindrio eto raha hanohy |
+
+Appliqué aux deux formulaires. Design, couleurs et fonctionnement des
+boutons inchangés (« Eo am-pandefasana... » pendant l'envoi).
+
+**Fichiers :** `src/app/deposer/olona/FormulairePersonne.tsx`,
+`src/components/DepotWizard.tsx`.
+
+### N3 — Animation vidéo en arrière-plan
+
+**Avant :** fond gris taupe à pois (J3).
+
+**Après :** animation fournie (`lv_0_20261031072527.mp4`, texture de vieux
+film beige, 10 s) en fond de toutes les pages publiques (accueil,
+formulaires, confirmations, Birao, Sary, Radio, Manehoa hevitra) :
+lecture automatique, sans son, en boucle, fixe derrière le contenu
+(clics, menus et formulaires non gênés), recadrée pour couvrir tout
+l'écran sur téléphone, tablette et ordinateur. L'administration garde son
+fond.
+
+Optimisation : vidéo réencodée de 10,1 Mo à 0,78 Mo (son retiré, 24 images/s,
+démarrage rapide), bande du haut recadrée pour retirer le logo CapCut.
+Une image fixe (première vue de la vidéo, 9 Ko) s'affiche pendant le
+chargement ou si la vidéo ne peut pas être lue.
+
+Lisibilité : ombre de « AMBOHIDRATRIMO » renforcée (texte blanc sur fond
+désormais clair) ; logo, menus et formulaires restent sur leurs fonds
+blancs.
+
+**Fichiers :** `public/videos/fond-vfm.mp4`, `public/videos/fond-vfm.jpg`,
+`src/components/PublicShell.tsx`, `src/app/globals.css`.
+
+**Vérifié en local :** types ; accueil et `/deposer/olona` en ordinateur et
+téléphone 375 px (vidéo lue, muette, en boucle, sans défilement
+horizontal, derrière le contenu). Carte QR et étape finale non affichées
+en local (pas de PostgreSQL) : simples remplacements de texte, à contrôler
+en ligne.
+
+### Mise en ligne du lot N
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Contrôles en ligne : fond animé, nouvelle étape finale, carte QR.
 
 ---
 

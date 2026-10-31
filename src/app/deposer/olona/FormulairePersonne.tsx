@@ -162,7 +162,7 @@ export default function FormulairePersonne() {
             disabled={envoi}
             className="flex-1 rounded-2xl border border-vfm-beige-bord px-4 py-3.5 text-sm font-medium text-zinc-700 hover:bg-vfm-beige-clair disabled:opacity-50"
           >
-            Hanova ny mombamomba
+            Hovaiko ny mombamomba ahy
           </button>
           <button
             type="button"
@@ -171,7 +171,7 @@ export default function FormulairePersonne() {
             className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-vfm-vert px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-vfm-vert/25 hover:bg-vfm-vert-dark disabled:opacity-50"
           >
             <IconSend className="h-4 w-4" />
-            {envoi ? "Eo am-pandefasana..." : "Handefa farany ny dosie-ko"}
+            {envoi ? "Eo am-pandefasana..." : "Tsindrio eto raha hanohy"}
           </button>
         </div>
       </PublicShell>

@@ -148,7 +148,7 @@ async function dessinerCarte(infos: InfosCarteQr): Promise<string> {
   ctx.font = "800 104px Arial, Helvetica, sans-serif";
   ctx.fillText("TAFA & DINIKA", centre, 320);
   ctx.font = "700 40px Arial, Helvetica, sans-serif";
-  ctx.fillText("FANABEAZANA ARA-POLITIKA", centre, 378);
+  ctx.fillText("FANABEAZANA OLOM-PIRENENA", centre, 378);
   ctx.font = "400 32px Arial, Helvetica, sans-serif";
   ctx.fillText("14 Novambra 2026 · Tranom-pokonolona Ambohidratrimo", centre, 432);
 

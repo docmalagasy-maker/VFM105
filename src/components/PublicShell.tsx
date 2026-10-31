@@ -13,11 +13,27 @@ export default function PublicShell({
   sansCarte?: boolean;
 }) {
   return (
-    <div className="relative min-h-dvh w-full bg-vfm-public">
+    <div className="relative isolate min-h-dvh w-full">
+      {/* Animation de fond : fixe derrière tout le contenu, muette, en boucle */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-vfm-public">
+        <video
+          className="h-full w-full object-cover"
+          src="/videos/fond-vfm.mp4"
+          poster="/videos/fond-vfm.jpg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+          tabIndex={-1}
+        />
+      </div>
+
       <div className="vfm-lisere h-1.5 w-full" />
 
       <div className="flex min-h-dvh w-full flex-col items-center px-4 pb-12 pt-6 sm:px-6 sm:pt-8">
-        {/* Médaillon blanc : le texte gris du logo reste lisible sur le fond gris à pois */}
+        {/* Médaillon blanc : le texte gris du logo reste lisible sur le fond animé */}
         <div className="rounded-3xl bg-white/95 px-5 py-3 shadow-[0_12px_30px_-15px_rgba(20,43,71,0.45)]">
           <div className="relative aspect-[966/852] w-[clamp(11rem,38vw,16rem)]">
             <Image
@@ -30,7 +46,7 @@ export default function PublicShell({
             />
           </div>
         </div>
-        <p className="mb-6 mt-3 text-center text-3xl font-extrabold uppercase tracking-wide text-white [text-shadow:0_2px_8px_rgba(12,28,48,0.55)] sm:mb-8 sm:text-5xl">
+        <p className="mb-6 mt-3 text-center text-3xl font-extrabold uppercase tracking-wide text-white [text-shadow:0_0_2px_rgba(12,28,48,0.9),0_2px_10px_rgba(12,28,48,0.75)] sm:mb-8 sm:text-5xl">
           Ambohidratrimo
         </p>
 
