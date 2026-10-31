@@ -53,8 +53,8 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | N | 31 octobre 2026 | N4 — Nouvelle vidéo de fond : grille noire et bleue | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N5 — Vidéo de fond claire : voile de tissu | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N6 — Affiche de l'accueil sans fond à pois | Mis en ligne (31 octobre 2026) |
-| N | 31 octobre 2026 | N7 — Voile marron sur le fond vidéo | Prêt, en attente de GO |
-| N | 31 octobre 2026 | N8 — Personnage de l'affiche légèrement animé | Prêt, en attente de GO |
+| N | 31 octobre 2026 | N7 — Voile marron sur le fond vidéo | Mis en ligne (31 octobre 2026) |
+| N | 31 octobre 2026 | N8 — Personnage de l'affiche légèrement animé (sans sourire) | Mis en ligne (31 octobre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1722,8 +1722,12 @@ horizontal.
 
 ### Mise en ligne de N7 et N8
 
-- [ ] GO, commit et push sur `master`.
-- [ ] Contrôles en ligne.
+- [x] GO (31 octobre 2026), commit `cb4da8e` et push sur `master`.
+- [x] Contrôles en ligne (https://vfm105.com, nouvelle version détectée
+      après 60 s) : `/`, `/deposer`, `/deposer/olona`, `/birao`, `/radio`
+      en 200 ; accueil avec calque `affiche-personnage.png`, animation
+      `affiche-respiration` présente dans la feuille de style, voile marron
+      sur la vidéo.
 
 ---
 
