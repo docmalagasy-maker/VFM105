@@ -18,8 +18,8 @@ export default function PublicShell({
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-vfm-public">
         <video
           className="h-full w-full object-cover"
-          src="/videos/fond-vfm.mp4"
-          poster="/videos/fond-vfm.jpg"
+          src="/videos/fond-vfm-grille.mp4"
+          poster="/videos/fond-vfm-grille.jpg"
           autoPlay
           muted
           loop

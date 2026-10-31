@@ -44,8 +44,8 @@ body {
    (PublicShell). Cette image, première vue de la vidéo, s'affiche le temps
    qu'elle charge ou si le navigateur ne peut pas la lire. */
 .bg-vfm-public {
-  background-color: #d9bfa0;
-  background-image: url("/videos/fond-vfm.jpg");
+  background-color: #05060f;
+  background-image: url("/videos/fond-vfm-grille.jpg");
   background-size: cover;
   background-position: center;
 }

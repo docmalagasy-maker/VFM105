@@ -50,6 +50,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | N | 31 octobre 2026 | N1 — QR code : « Fanabeazana olom-pirenena » | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N2 — Confirmation : « Hovaiko ny mombamomba ahy », « Tsindrio eto raha hanohy » | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N3 — Animation vidéo en arrière-plan des pages publiques | Mis en ligne (31 octobre 2026) |
+| N | 31 octobre 2026 | N4 — Nouvelle vidéo de fond : grille noire et bleue | Mis en ligne (31 octobre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1598,6 +1599,32 @@ en ligne.
       `video/mp4`) et appelée par l'accueil ; nouveaux textes présents
       dans le code servi, anciens textes absents.
 - [ ] Inscription test complète (étape finale et carte QR à l'écran).
+
+### N4 — Nouvelle vidéo de fond (grille)
+
+**Avant :** texture de vieux film beige (N3).
+
+**Après :** grille blanche sur fond noir dégradé vers le bleu en bas, d'après
+`Backgrounds for edits video _ … Grid background 9 16 _ Astatic
+background(MP4).mp4`. Seules les 20 premières secondes (la grille) sont
+gardées : la suite de la vidéo source est une promo de chaîne
+(pictogrammes, personnage). Même comportement que N3 (automatique, muette,
+en boucle, derrière le contenu, toutes pages publiques).
+
+Optimisation : 2,4 Mo, 38 s, avec son devient 1,1 Mo, 19,9 s, sans son,
+24 images/s, démarrage rapide. Nouveau nom de fichier pour que les
+navigateurs ne gardent pas l'ancienne vidéo en cache ; ancienne vidéo et
+ancienne image supprimées. Couleur d'attente sombre (#05060f) assortie.
+« AMBOHIDRATRIMO » en blanc redevient très lisible sur ce fond sombre.
+
+**Fichiers :** `public/videos/fond-vfm-grille.mp4`,
+`public/videos/fond-vfm-grille.jpg` (`fond-vfm.mp4` et `fond-vfm.jpg`
+supprimés), `src/components/PublicShell.tsx`, `src/app/globals.css`.
+
+**Vérifié en local :** accueil, vidéo lue en boucle et muette, sans
+défilement horizontal.
+
+**Mise en ligne :** GO immédiat demandé (31 octobre 2026).
 
 ---
 
