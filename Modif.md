@@ -57,6 +57,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | N | 31 octobre 2026 | N8 — Personnage de l'affiche légèrement animé (sans sourire) | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N9 — Nouvelle affiche à fond transparent | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N10 — Affiche sans logo ni contours blancs | Mis en ligne (31 octobre 2026) |
+| O | 31 octobre 2026 | O1 — Inscriptions limitées à 200, places restantes dès 180, « COMPLET », suivi admin | Prêt, en attente de GO |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1796,6 +1797,69 @@ défilement horizontal.
       après 70 s) : `/`, `/deposer`, `/deposer/olona`, `/birao`, `/radio`
       en 200 ; accueil avec les deux nouvelles images et deux zones
       cliquables recalées ; anciennes images en 404.
+
+---
+
+## Lot O — Limite de 200 inscriptions (31 octobre 2026)
+
+Demande : `LOCALSEND/NEXT 1/200.md`.
+
+### O1 — Inscriptions limitées à 200 participants
+
+**Comptage :** dossiers d'associations + dossiers de personnes, hors
+dossiers refusés (statut « Refusé ») ; un dossier supprimé ou refusé
+libère sa place. Une association compte pour un participant (un seul nom
+par formulaire depuis L2). Comptage en temps réel dans la base.
+
+**Limite stricte côté serveur :** chaque nouvelle inscription passe par un
+verrou PostgreSQL (`pg_advisory_xact_lock`) qui recompte avant
+l'enregistrement : deux envois simultanés ne peuvent pas prendre la même
+dernière place. Au-delà, refus (409) avec le message « Feno ny toerana :
+efa misy 200 ireo voasoratra anarana… », affiché par les deux
+formulaires. Refus avant de consommer un numéro de référence. Un nouvel
+essai d'un envoi déjà enregistré (même clé) renvoie toujours son dossier.
+
+**Accueil :**
+- moins de 180 inscrits : rien ne change ;
+- dès 180 : macaron au-dessus des deux boutons, « 20 places restantes »
+  … « 1 place restante » ;
+- à 200 : macaron « COMPLET », bandeau rouge « COMPLET » en travers des
+  deux boutons, boutons désactivés (plus de lien).
+Relecture automatique toutes les 30 s et au retour sur l'onglet.
+
+**Formulaires (`/deposer`, `/deposer/olona`, y compris par lien direct ou
+bandeau jaune de l'affiche) :** à 200, page « COMPLET » avec le message et
+un bouton de retour à l'accueil, à la place du formulaire.
+
+**Administration :** encadré « Inscriptions Tafa & Dinika » en haut de
+toutes les vues : inscrits / 200, places restantes, taux de remplissage
+et barre de progression (verte, orange dès 180, rouge à 200), relu toutes
+les 30 s.
+
+**Nouvelle adresse publique :** `GET /api/inscriptions` (nombres
+seulement, aucune donnée personnelle).
+
+**Fichiers :** `src/lib/inscriptions.ts`, `src/lib/inscriptions-regles.ts`,
+`src/lib/useEtatInscriptions.ts`, `src/app/api/inscriptions/route.ts`,
+`src/lib/repository.ts`, `src/lib/personnes.ts`,
+`src/app/api/dossiers/route.ts`, `src/app/api/personnes/route.ts`,
+`src/app/page.tsx`, `src/app/ChoixDepot.tsx`,
+`src/components/InscriptionsCompletes.tsx`, `src/app/deposer/page.tsx`,
+`src/app/deposer/olona/page.tsx`, `src/app/admin/page.tsx`,
+`src/app/admin/SuiviInscriptions.tsx`.
+
+**Vérifié en local (base PGlite temporaire) :** types et lint ; 179
+inscrits : pas de macaron ; 185 : « 15 places restantes » ; 199 : « 1 place
+restante » ; 200e inscription acceptée (201), 201e refusée (409) ; 200 :
+« COMPLET », bandeau, boutons désactivés, `/deposer` et `/deposer/olona`
+fermés ; admin : 200 / 200, 0 place, 100 %. Envois simultanés non
+testables avec PGlite (une seule connexion réelle) : le verrou repose sur
+PostgreSQL du serveur.
+
+### Mise en ligne du lot O
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Contrôles en ligne : `/api/inscriptions`, accueil, encadré admin.
 
 ---
 

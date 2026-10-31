@@ -1,8 +1,17 @@
+import { connection } from "next/server";
 import PublicShell from "@/components/PublicShell";
+import { etatInscriptions } from "@/lib/inscriptions";
 import AfficheInteractive from "./AfficheInteractive";
 import ChoixDepot from "./ChoixDepot";
 
-export default function Accueil() {
+export default async function Accueil() {
+  // Nombre d'inscrits lu à chaque visite (places restantes, « COMPLET »)
+  await connection();
+  const etat = await etatInscriptions().catch((err) => {
+    console.error("État des inscriptions (accueil)", err);
+    return null;
+  });
+
   return (
     <PublicShell sansCarte>
       {/* Affiche en pleine largeur sur mobile, limitée à la hauteur de l'écran sur grand écran */}
@@ -10,7 +19,7 @@ export default function Accueil() {
         <AfficheInteractive />
       </div>
       <div className="w-full max-w-md">
-        <ChoixDepot />
+        <ChoixDepot etatInitial={etat} />
       </div>
     </PublicShell>
   );

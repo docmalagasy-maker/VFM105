@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { listerAdministrateurs } from "@/lib/administrateurs";
 import { districtAutorise, obtenirSession } from "@/lib/auth";
 import { listerPhotos } from "@/lib/galerie";
+import { etatInscriptions } from "@/lib/inscriptions";
 import { listerDossiers } from "@/lib/repository";
 import { SMS_ACTIF } from "@/lib/sms";
 import type { Dossier } from "@/lib/types";
@@ -17,6 +18,7 @@ import PersonnesVue from "./PersonnesVue";
 import { libelleEmailConfirmation, LIBELLES_SMS, LIBELLES_STATUT } from "./libelles";
 import SondagesVue from "./SondagesVue";
 import StatistiquesVue from "./StatistiquesVue";
+import SuiviInscriptions from "./SuiviInscriptions";
 
 export default async function AdminPage({
   searchParams,
@@ -37,6 +39,7 @@ export default async function AdminPage({
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
       <EnteteAdmin session={session} vue={vue} q={q} />
+      <SuiviInscriptions etatInitial={await etatInscriptions().catch(() => null)} />
 
       {avecRecherche && (
         <form className="mt-4" method="get">

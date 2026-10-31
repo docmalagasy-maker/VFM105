@@ -1,4 +1,5 @@
 import { getPool } from "@/lib/db";
+import { avecPlaceDisponible, etatInscriptions, InscriptionsCompletes } from "@/lib/inscriptions";
 import type { DossierPersonne, PersonneInput } from "@/lib/personnes-modele";
 import { genererProchaineReferencePersonne } from "@/lib/reference";
 import { verifierSchema } from "@/lib/schema";
@@ -53,9 +54,13 @@ export async function creerPersonne(input: PersonneInput): Promise<{ dossier: Do
   const existant = await relire();
   if (existant) return { dossier: existant, creeMaintenant: false };
 
+  // Refus avant de consommer un numéro de référence quand c'est déjà complet
+  if ((await etatInscriptions())?.complet) throw new InscriptionsCompletes();
+
   const maintenant = new Date();
   const reference = await genererProchaineReferencePersonne(maintenant.getFullYear());
-  const r = await pool.query(
+  // Refusé (InscriptionsCompletes) si les 200 places sont déjà prises
+  const r = await avecPlaceDisponible((client) => client.query(
     `INSERT INTO dossiers_personnes (
        reference, idempotency_key, date_depot, nom, prenom, district,
        commune, commune_pcode, fokontany, fokontany_pcode,
@@ -80,7 +85,7 @@ export async function creerPersonne(input: PersonneInput): Promise<{ dossier: Do
       input.telephone,
       input.email || null,
     ]
-  );
+  ));
   if (r.rows.length === 0) return { dossier: (await relire())!, creeMaintenant: false };
   return { dossier: ligneVersPersonne(r.rows[0]), creeMaintenant: true };
 }

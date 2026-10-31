@@ -4,6 +4,7 @@ import { envoyerConfirmationDepot } from "@/lib/confirmation";
 import { rattacherAuReferentiel } from "@/lib/referentiel";
 import { creerDossier } from "@/lib/repository";
 import { isDatabaseConfigured } from "@/lib/db";
+import { InscriptionsCompletes } from "@/lib/inscriptions";
 
 export async function POST(request: NextRequest) {
   if (!isDatabaseConfigured()) {
@@ -43,6 +44,9 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json({ dossier, creeMaintenant }, { status: creeMaintenant ? 201 : 200 });
   } catch (err) {
+    if (err instanceof InscriptionsCompletes) {
+      return NextResponse.json({ erreur: err.message, complet: true }, { status: 409 });
+    }
     console.error("Erreur création dossier", err);
     return NextResponse.json(
       { erreur: "Tsy lasa ny antontan-taratasinao. Andramo indray azafady." },

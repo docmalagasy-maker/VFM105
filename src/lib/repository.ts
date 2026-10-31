@@ -1,4 +1,5 @@
 import { getPool } from "@/lib/db";
+import { avecPlaceDisponible, etatInscriptions, InscriptionsCompletes } from "@/lib/inscriptions";
 import { verifierSchema } from "@/lib/schema";
 import { genererProchaineReference } from "@/lib/reference";
 import { statutSmsInitial } from "@/lib/sms";
@@ -57,10 +58,14 @@ export async function creerDossier(input: DossierInput): Promise<{
     return { dossier: ligneVersDossier(existant.rows[0]), creeMaintenant: false };
   }
 
+  // Refus avant de consommer un numéro de référence quand c'est déjà complet
+  if ((await etatInscriptions())?.complet) throw new InscriptionsCompletes();
+
   const maintenant = new Date();
   const reference = await genererProchaineReference(maintenant.getFullYear());
 
-  const result = await pool.query(
+  // Refusé (InscriptionsCompletes) si les 200 places sont déjà prises
+  const result = await avecPlaceDisponible((client) => client.query(
     `INSERT INTO dossiers (
        reference, idempotency_key, date_depot, statut, statut_sms,
        association_nom, association_adresse, association_district, association_commune,
@@ -91,7 +96,7 @@ export async function creerDossier(input: DossierInput): Promise<{
       JSON.stringify(input.pieces),
       statutSmsInitial(),
     ]
-  );
+  ));
 
   // Course concurrente sur la même idempotencyKey : quelqu'un d'autre a gagné entre-temps.
   if (result.rows.length === 0) {

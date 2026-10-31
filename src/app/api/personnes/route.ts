@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { envoyerConfirmationPersonne } from "@/lib/confirmation-personne";
 import { isDatabaseConfigured } from "@/lib/db";
+import { InscriptionsCompletes } from "@/lib/inscriptions";
 import { creerPersonne } from "@/lib/personnes";
 import { personneInputSchema } from "@/lib/personnes-modele";
 import { validateTelephoneMadagascar } from "@/lib/validation";
@@ -37,6 +38,9 @@ export async function POST(request: NextRequest) {
       { status: creeMaintenant ? 201 : 200 }
     );
   } catch (err) {
+    if (err instanceof InscriptionsCompletes) {
+      return NextResponse.json({ erreur: err.message, complet: true }, { status: 409 });
+    }
     console.error("Erreur création dossier personne", err);
     return NextResponse.json({ erreur: "Tsy lasa ny dosie-nao. Andramo indray azafady." }, { status: 500 });
   }
