@@ -14,9 +14,8 @@ const emailSchema = z.string().trim().max(254).email();
 type Etape = "question" | "email" | "envoi" | "merci";
 
 /**
- * Affiche de l'accueil avec trois zones cliquables, alignées sur l'image à
+ * Affiche de l'accueil avec deux zones cliquables, alignées sur l'image à
  * toutes les tailles (calque SVG de même viewBox, posé par-dessus) :
- * - logo VFM → page Birao ;
  * - bandeau rouge → pop-up de demande du programme de la conférence ;
  * - bandeau jaune → formulaire d'inscription individuelle.
  */
@@ -26,7 +25,7 @@ export default function AfficheInteractive() {
   return (
     <div className="relative w-full sm:w-fit">
       <Image
-        src="/images/affiche-tafa-dinika-transparente.png"
+        src="/images/affiche-tafa-dinika-sans-logo.png"
         alt="Tafa & dinika — Fanabeazana olom-pirenena, 14 Novambra 2026, Tranom-pokonolona Ambohidratrimo"
         width={LARGEUR}
         height={HAUTEUR}
@@ -37,7 +36,7 @@ export default function AfficheInteractive() {
       {/* Personnage détouré, même repère que l'affiche : léger mouvement de respiration */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <Image
-          src="/images/affiche-personnage-transparente.png"
+          src="/images/affiche-personnage-sans-logo.png"
           alt=""
           width={LARGEUR}
           height={HAUTEUR}
@@ -51,10 +50,6 @@ export default function AfficheInteractive() {
         className="absolute inset-0 h-full w-full"
         aria-label="Zones cliquables de l'affiche"
       >
-        <Link href="/birao" aria-label="Birao — membres du bureau" className="zone-affiche">
-          <title>Birao</title>
-          <rect x={25} y={18} width={366} height={304} rx={12} />
-        </Link>
         <a
           href="#programme"
           role="button"
@@ -66,11 +61,11 @@ export default function AfficheInteractive() {
           }}
         >
           <title>Programme de la conférence</title>
-          <rect x={40} y={612} width={519} height={141} rx={3} />
+          <rect x={38} y={624} width={516} height={142} rx={3} />
         </a>
         <Link href="/deposer/olona" aria-label="Inscription individuelle" className="zone-affiche">
           <title>Fisoratana anarana</title>
-          <rect x={37} y={1307} width={1049} height={54} rx={27} />
+          <rect x={35} y={1299} width={1052} height={56} rx={28} />
         </Link>
       </svg>
 

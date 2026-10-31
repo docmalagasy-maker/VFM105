@@ -56,6 +56,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | N | 31 octobre 2026 | N7 — Voile marron sur le fond vidéo | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N8 — Personnage de l'affiche légèrement animé (sans sourire) | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N9 — Nouvelle affiche à fond transparent | Mis en ligne (31 octobre 2026) |
+| N | 31 octobre 2026 | N10 — Affiche sans logo ni contours blancs | Prêt, en attente de GO |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1763,6 +1764,35 @@ pour contrôle et exactement posées sur le logo et les deux bandeaux.
       après 70 s) : `/`, `/deposer`, `/deposer/olona`, `/birao`, `/radio`
       en 200 ; accueil avec les deux nouvelles images et les zones
       recalées ; anciennes images en 404.
+
+### N10 — Affiche sans logo ni contours blancs
+
+**Avant :** affiche transparente avec logo VFM en haut à gauche et textes
+détourés de blanc (N9).
+
+**Après :** affiche fournie `file_00000000346c81faace7f74e82f4650f.png`
+(1121 × 1403, fond transparent) : plus de logo, textes sans contour
+blanc, lisibles sur le fond clair du site.
+
+Zones cliquables : la zone du logo (→ `/birao`) est retirée puisque le
+logo n'y est plus (Birao reste dans le menu). Bandeau rouge → pop-up du
+programme et bandeau jaune → `/deposer/olona`, recalés sur la nouvelle
+image. Personnage animé redécoupé (mêmes bords adoucis que N9).
+
+**Fichiers :** `public/images/affiche-tafa-dinika-sans-logo.png`,
+`public/images/affiche-personnage-sans-logo.png`
+(`affiche-tafa-dinika-transparente.png` et
+`affiche-personnage-transparente.png` supprimés),
+`src/app/AfficheInteractive.tsx`, `src/app/globals.css`.
+
+**Vérifié en local :** types et lint ; images chargées ; deux zones
+colorées pour contrôle, exactement posées sur les bandeaux ; pas de
+défilement horizontal.
+
+### Mise en ligne de N10
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Contrôles en ligne.
 
 ---
 
