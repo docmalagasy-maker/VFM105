@@ -47,9 +47,9 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | L | 28 octobre 2026 | L5 — QR code d'inscription Tafa & Dinika | Mis en ligne (28 octobre 2026) |
 | M | 29 octobre 2026 | M1 — Affiche interactive (logo → Birao, bandeau jaune → inscription, bandeau rouge → programme) | Mis en ligne (29 octobre 2026) |
 | M | 29 octobre 2026 | M2 — Rubrique admin « Demandes de programme » | Mis en ligne (29 octobre 2026) |
-| N | 31 octobre 2026 | N1 — QR code : « Fanabeazana olom-pirenena » | Prêt, en attente de GO |
-| N | 31 octobre 2026 | N2 — Confirmation : « Hovaiko ny mombamomba ahy », « Tsindrio eto raha hanohy » | Prêt, en attente de GO |
-| N | 31 octobre 2026 | N3 — Animation vidéo en arrière-plan des pages publiques | Prêt, en attente de GO |
+| N | 31 octobre 2026 | N1 — QR code : « Fanabeazana olom-pirenena » | Mis en ligne (31 octobre 2026) |
+| N | 31 octobre 2026 | N2 — Confirmation : « Hovaiko ny mombamomba ahy », « Tsindrio eto raha hanohy » | Mis en ligne (31 octobre 2026) |
+| N | 31 octobre 2026 | N3 — Animation vidéo en arrière-plan des pages publiques | Mis en ligne (31 octobre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1591,8 +1591,13 @@ en ligne.
 
 ### Mise en ligne du lot N
 
-- [ ] GO, commit et push sur `master`.
-- [ ] Contrôles en ligne : fond animé, nouvelle étape finale, carte QR.
+- [x] GO (31 octobre 2026), commit `470fe0b` et push sur `master`.
+- [x] Contrôles en ligne (https://vfm105.com, nouvelle version détectée
+      après 130 s) : `/`, `/deposer`, `/deposer/olona`, `/birao`,
+      `/sondages`, `/radio` en 200 ; vidéo de fond servie (0,78 Mo,
+      `video/mp4`) et appelée par l'accueil ; nouveaux textes présents
+      dans le code servi, anciens textes absents.
+- [ ] Inscription test complète (étape finale et carte QR à l'écran).
 
 ---
 
