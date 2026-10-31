@@ -57,7 +57,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | N | 31 octobre 2026 | N8 — Personnage de l'affiche légèrement animé (sans sourire) | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N9 — Nouvelle affiche à fond transparent | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N10 — Affiche sans logo ni contours blancs | Mis en ligne (31 octobre 2026) |
-| O | 31 octobre 2026 | O1 — Inscriptions limitées à 200, places restantes dès 180, « COMPLET », suivi admin | Prêt, en attente de GO |
+| O | 31 octobre 2026 | O1 — Inscriptions limitées à 200, places restantes dès 180, « COMPLET », suivi admin | Mis en ligne (31 octobre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1858,8 +1858,14 @@ PostgreSQL du serveur.
 
 ### Mise en ligne du lot O
 
-- [ ] GO, commit et push sur `master`.
-- [ ] Contrôles en ligne : `/api/inscriptions`, accueil, encadré admin.
+- [x] GO (31 octobre 2026), commit `32f2aa4` et push sur `master`.
+- [x] Contrôles en ligne (https://vfm105.com, nouvelle version détectée
+      après 70 s) : `/api/inscriptions` → 4 inscrits, 196 places
+      restantes, 2 % ; accueil sans macaron (moins de 180) ; `/deposer`
+      et `/deposer/olona` ouverts ; `/birao`, `/radio` en 200 ; `/admin`
+      redirige vers la connexion (307).
+- [ ] Encadré « Inscriptions Tafa & Dinika » à contrôler dans l'admin
+      (connexion requise).
 
 ---
 
