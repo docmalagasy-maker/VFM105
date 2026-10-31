@@ -53,6 +53,8 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | N | 31 octobre 2026 | N4 — Nouvelle vidéo de fond : grille noire et bleue | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N5 — Vidéo de fond claire : voile de tissu | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N6 — Affiche de l'accueil sans fond à pois | Mis en ligne (31 octobre 2026) |
+| N | 31 octobre 2026 | N7 — Voile marron sur le fond vidéo | Prêt, en attente de GO |
+| N | 31 octobre 2026 | N8 — Personnage de l'affiche légèrement animé | Prêt, en attente de GO |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1684,6 +1686,44 @@ le cache, ancienne affiche supprimée.
       en 200 ; accueil avec `fond-vfm-voile.mp4` et
       `affiche-tafa-dinika-unie.png` ; ancienne affiche et vidéo grille
       en 404.
+
+### N7 — Voile marron sur le fond vidéo
+
+Couche marron (#6b4226) transparente à 85 % (opacité 15 %) posée sur la
+vidéo du voile de tissu : le fond prend une teinte marron claire, le
+mouvement de la vidéo reste visible.
+
+**Fichier :** `src/components/PublicShell.tsx`.
+
+### N8 — Personnage de l'affiche légèrement animé
+
+**Demande :** léger mouvement et sourire, sans le faire parler, sans
+exagération.
+
+**Fait :** le personnage est détouré dans un calque transparent de même
+taille que l'affiche (`affiche-personnage.png`, découpe sur le fond beige
+uni), posé par-dessus. Il « respire » : agrandissement de 1,2 % depuis le
+bas du buste, aller-retour en 4,5 s. Le calque couvrant toujours le
+personnage dessous, aucun double contour. Animation coupée si le
+visiteur a demandé à réduire les animations. Zones cliquables inchangées
+(au-dessus du calque).
+
+**Non fait — sourire :** modifier l'expression du visage d'une personne
+réelle demande un outil de génération d'image que le projet n'a pas, et
+une retouche à la main donnerait un visage artificiel. Solution
+proposée : fournir une photo où il sourit, à mettre à la place.
+
+**Fichiers :** `public/images/affiche-personnage.png`,
+`src/app/AfficheInteractive.tsx`, `src/app/globals.css`.
+
+**Vérifié en local :** calque aligné au pixel sur l'affiche, animation
+active, contours propres, voile marron appliqué, pas de défilement
+horizontal.
+
+### Mise en ligne de N7 et N8
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Contrôles en ligne.
 
 ---
 

@@ -28,6 +28,8 @@ export default function PublicShell({
           disablePictureInPicture
           tabIndex={-1}
         />
+        {/* Voile marron transparent à 85 % (opacité 15 %) posé sur la vidéo */}
+        <div className="absolute inset-0 bg-[#6b4226]/15" />
       </div>
 
       <div className="vfm-lisere h-1.5 w-full" />

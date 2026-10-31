@@ -34,6 +34,18 @@ export default function AfficheInteractive() {
         className="block h-auto w-full sm:w-auto sm:max-h-[100dvh] sm:max-w-full sm:rounded-3xl sm:shadow-[0_20px_50px_-20px_rgba(20,43,71,0.35)]"
         priority
       />
+      {/* Personnage détouré, même repère que l'affiche : léger mouvement de respiration */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden sm:rounded-3xl">
+        <Image
+          src="/images/affiche-personnage.png"
+          alt=""
+          width={LARGEUR}
+          height={HAUTEUR}
+          sizes={`(max-width: 640px) 100vw, min(100vw, calc(100dvh * ${LARGEUR} / ${HAUTEUR}))`}
+          className="affiche-personnage h-full w-full"
+          priority
+        />
+      </div>
       <svg
         viewBox={`0 0 ${LARGEUR} ${HAUTEUR}`}
         className="absolute inset-0 h-full w-full"

@@ -59,6 +59,17 @@ body {
   .radio-point {
     animation: radio-point 1.2s ease-in-out infinite;
   }
+  /* Personnage de l'affiche : agrandissement très léger depuis le bas du buste,
+     le calque recouvre toujours le personnage de l'affiche dessous. */
+  .affiche-personnage {
+    transform-origin: 73% 78%;
+    animation: affiche-respiration 4.5s ease-in-out infinite;
+  }
+}
+
+@keyframes affiche-respiration {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.012); }
 }
 
 @keyframes radio-pulse {
