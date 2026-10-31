@@ -1624,7 +1624,13 @@ supprimés), `src/components/PublicShell.tsx`, `src/app/globals.css`.
 **Vérifié en local :** accueil, vidéo lue en boucle et muette, sans
 défilement horizontal.
 
-**Mise en ligne :** GO immédiat demandé (31 octobre 2026).
+**Mise en ligne :**
+
+- [x] GO immédiat (31 octobre 2026), commit `79a5913` et push sur `master`.
+- [x] Contrôles en ligne (https://vfm105.com, nouvelle version détectée
+      après 50 s) : `/`, `/deposer`, `/deposer/olona`, `/birao`, `/radio`
+      en 200 ; nouvelle vidéo servie (1,1 Mo, `video/mp4`) et appelée par
+      l'accueil ; ancienne vidéo en 404.
 
 ---
 
