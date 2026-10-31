@@ -56,7 +56,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | N | 31 octobre 2026 | N7 — Voile marron sur le fond vidéo | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N8 — Personnage de l'affiche légèrement animé (sans sourire) | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N9 — Nouvelle affiche à fond transparent | Mis en ligne (31 octobre 2026) |
-| N | 31 octobre 2026 | N10 — Affiche sans logo ni contours blancs | Prêt, en attente de GO |
+| N | 31 octobre 2026 | N10 — Affiche sans logo ni contours blancs | Mis en ligne (31 octobre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1791,8 +1791,11 @@ défilement horizontal.
 
 ### Mise en ligne de N10
 
-- [ ] GO, commit et push sur `master`.
-- [ ] Contrôles en ligne.
+- [x] GO (31 octobre 2026), commit `a420b3b` et push sur `master`.
+- [x] Contrôles en ligne (https://vfm105.com, nouvelle version détectée
+      après 70 s) : `/`, `/deposer`, `/deposer/olona`, `/birao`, `/radio`
+      en 200 ; accueil avec les deux nouvelles images et deux zones
+      cliquables recalées ; anciennes images en 404.
 
 ---
 
