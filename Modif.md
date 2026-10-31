@@ -51,6 +51,8 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | N | 31 octobre 2026 | N2 — Confirmation : « Hovaiko ny mombamomba ahy », « Tsindrio eto raha hanohy » | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N3 — Animation vidéo en arrière-plan des pages publiques | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N4 — Nouvelle vidéo de fond : grille noire et bleue | Mis en ligne (31 octobre 2026) |
+| N | 31 octobre 2026 | N5 — Vidéo de fond claire : voile de tissu | Mis en ligne (31 octobre 2026) |
+| N | 31 octobre 2026 | N6 — Affiche de l'accueil sans fond à pois | Mis en ligne (31 octobre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1631,6 +1633,53 @@ défilement horizontal.
       après 50 s) : `/`, `/deposer`, `/deposer/olona`, `/birao`, `/radio`
       en 200 ; nouvelle vidéo servie (1,1 Mo, `video/mp4`) et appelée par
       l'accueil ; ancienne vidéo en 404.
+
+### N5 — Vidéo de fond claire (voile de tissu)
+
+**Avant :** grille noire et bleue (N4), jugée trop sombre.
+
+**Après :** voile de tissu clair, beige et blanc, qui ondule doucement,
+d'après `_(MP4).mp4` (12 s, vidéo entière gardée, sans logo ni
+générique). Même comportement que N3 (automatique, muette, en boucle,
+derrière le contenu, toutes pages publiques).
+
+Optimisation : 0,76 Mo avec son devient 0,78 Mo sans son, 24 images/s,
+démarrage rapide. Nouveau nom de fichier contre le cache ; vidéo et image de la
+grille supprimées. Couleur d'attente claire (#e8e1d6) assortie.
+« AMBOHIDRATRIMO » garde l'ombre renforcée de N3, lisible sur ce fond
+clair.
+
+**Fichiers :** `public/videos/fond-vfm-voile.mp4`,
+`public/videos/fond-vfm-voile.jpg` (`fond-vfm-grille.*` supprimés),
+`src/components/PublicShell.tsx`, `src/app/globals.css`.
+
+**Vérifié en local :** accueil, vidéo lue en boucle et muette, sans
+défilement horizontal.
+
+**Mise en ligne :** avec N6 (même commit, voir ci-dessous).
+
+### N6 — Affiche de l'accueil sans fond à pois
+
+**Avant :** fond beige à pois blancs derrière le texte et la photo.
+
+**Après :** fond beige uni. Les pois sont effacés directement dans l'image :
+détection des petites taches claires sur le beige, puis des positions de
+leur motif régulier (pour ceux collés au texte ou au maillot), remplacées
+par le beige voisin. Textes, logo, photo, bandeaux et zones cliquables
+inchangés (mêmes dimensions 1121 × 1403). Nouveau nom de fichier contre
+le cache, ancienne affiche supprimée.
+
+**Fichiers :** `public/images/affiche-tafa-dinika-unie.png`
+(`affiche-tafa-dinika-interactive.png` supprimé),
+`src/app/AfficheInteractive.tsx`.
+
+**Vérifié en local :** comparaisons zoomées avant/après (oreille, texte,
+épaule, logo) sans retouche visible ; affiche servie sur l'accueil.
+
+### Mise en ligne de N5 et N6
+
+- [x] GO (31 octobre 2026), commit et push sur `master`.
+- [ ] Contrôles en ligne.
 
 ---
 

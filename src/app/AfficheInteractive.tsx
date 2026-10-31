@@ -26,7 +26,7 @@ export default function AfficheInteractive() {
   return (
     <div className="relative w-full sm:w-fit">
       <Image
-        src="/images/affiche-tafa-dinika-interactive.png"
+        src="/images/affiche-tafa-dinika-unie.png"
         alt="Tafa & dinika — Fanabeazana olom-pirenena, 14 Novambra 2026, Tranom-pokonolona Ambohidratrimo"
         width={LARGEUR}
         height={HAUTEUR}
