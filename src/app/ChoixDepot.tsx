@@ -24,7 +24,8 @@ export default function ChoixDepot({ etatInitial }: { etatInitial: EtatInscripti
 
   return (
     <div className="mt-6 flex w-full flex-col gap-3" role="group" aria-label="Karazana dosie">
-      <p className="text-center text-base font-semibold text-vfm-marine-dark">
+      {/* Halo clair : lisible sur le paysage du fond animé */}
+      <p className="text-center text-base font-semibold text-vfm-marine-dark [text-shadow:0_0_3px_#fff,0_0_6px_#fff,0_0_10px_rgba(255,255,255,0.8)]">
         Amin&apos;ny anaran&apos;iza no hisoratanao anarana&nbsp;?
       </p>
 

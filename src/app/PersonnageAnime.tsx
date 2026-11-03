@@ -7,21 +7,23 @@ import { useEffect, useRef, useState } from "react";
  * Vidéo de Johnny Rakotoarisoa détourée, placée derrière l'affiche (les
  * textes, le macaron et le bandeau restent devant).
  *
- * Un MP4 n'a pas de transparence : chaque image de `johnny-detoure.mp4`
+ * Un MP4 n'a pas de transparence : chaque image de `johnny5-detoure.mp4`
  * contient les couleurs en haut et le masque (gris) en bas ; un petit shader
  * WebGL les recombine. Lecture aller-retour encodée dans la vidéo, donc sans
- * saut à la reprise. Image fixe du personnage tant que la vidéo n'est pas
- * prête, et à la place de la vidéo si WebGL ou la lecture automatique sont
- * indisponibles, ou si le visiteur a demandé moins d'animations.
+ * saut à la reprise. Image fixe (première image de la vidéo) tant que la
+ * vidéo n'est pas prête, et à sa place si WebGL ou la lecture automatique
+ * sont indisponibles, ou si le visiteur a demandé moins d'animations.
  */
 
-const VIDEO = "/videos/johnny-detoure-large.mp4";
+const VIDEO = "/videos/johnny5-detoure.mp4";
+const IMAGE_FIXE = "/images/johnny5-fixe.webp";
 
 /**
  * Position de la vidéo dans le repère de l'affiche (1121 × 1403). Elle
- * dépasse à droite (jusqu'à 1200) : le bras sort du cadre de l'affiche.
+ * dépasse à droite (jusqu'à 1281) : le bras droit sort du cadre de
+ * l'affiche ; bras et mains sont entiers dans la vidéo, sans coupure.
  */
-const CADRE = { gauche: 448, haut: 15, largeur: 752, hauteur: 1072 };
+const CADRE = { gauche: 439, haut: 25, largeur: 842, hauteur: 1127 };
 const AFFICHE = { largeur: 1121, hauteur: 1403 };
 
 const SOMMETS = `
@@ -38,8 +40,7 @@ uniform sampler2D video;
 varying vec2 uv;
 void main() {
   vec3 couleur = texture2D(video, vec2(uv.x, uv.y * 0.5)).rgb;
-  // Fondu sur le bord droit : le bras qui sort de la vidéo d'origine ne s'arrête pas net
-  float alpha = texture2D(video, vec2(uv.x, 0.5 + uv.y * 0.5)).r * smoothstep(1.0, 0.95, uv.x);
+  float alpha = texture2D(video, vec2(uv.x, 0.5 + uv.y * 0.5)).r;
   gl_FragColor = vec4(couleur * alpha, alpha);
 }`;
 
@@ -47,7 +48,7 @@ function pourcent(valeur: number, total: number) {
   return `${(valeur / total) * 100}%`;
 }
 
-export default function PersonnageAnime({ sizes }: { sizes: string }) {
+export default function PersonnageAnime() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [videoPrete, setVideoPrete] = useState(false);
 
@@ -134,26 +135,29 @@ export default function PersonnageAnime({ sizes }: { sizes: string }) {
   }, []);
 
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0">
+    <div
+      aria-hidden
+      className="pointer-events-none absolute"
+      style={{
+        left: pourcent(CADRE.gauche, AFFICHE.largeur),
+        top: pourcent(CADRE.haut, AFFICHE.hauteur),
+        width: pourcent(CADRE.largeur, AFFICHE.largeur),
+        height: pourcent(CADRE.hauteur, AFFICHE.hauteur),
+      }}
+    >
       {/* Image fixe : avant le chargement de la vidéo, ou si elle ne peut pas être lue */}
       <Image
-        src="/images/affiche-personnage-sans-logo.png"
+        src={IMAGE_FIXE}
         alt=""
-        width={AFFICHE.largeur}
-        height={AFFICHE.hauteur}
-        sizes={sizes}
+        width={366}
+        height={490}
+        sizes="(max-width: 640px) 75vw, 40vw"
         className={`absolute inset-0 h-full w-full transition-opacity duration-500 ${videoPrete ? "opacity-0" : "opacity-100"}`}
         priority
       />
       <canvas
         ref={canvasRef}
-        className={`absolute transition-opacity duration-500 ${videoPrete ? "opacity-100" : "opacity-0"}`}
-        style={{
-          left: pourcent(CADRE.gauche, AFFICHE.largeur),
-          top: pourcent(CADRE.haut, AFFICHE.hauteur),
-          width: pourcent(CADRE.largeur, AFFICHE.largeur),
-          height: pourcent(CADRE.hauteur, AFFICHE.hauteur),
-        }}
+        className={`absolute inset-0 h-full w-full transition-opacity duration-500 ${videoPrete ? "opacity-100" : "opacity-0"}`}
       />
     </div>
   );

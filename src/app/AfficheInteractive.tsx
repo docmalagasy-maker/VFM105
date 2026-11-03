@@ -27,7 +27,7 @@ export default function AfficheInteractive() {
   return (
     <div className="relative isolate w-full sm:w-fit">
       {/* Johnny en vidéo, derrière l'affiche : textes, macaron et bandeau restent devant */}
-      <PersonnageAnime sizes={TAILLES} />
+      <PersonnageAnime />
       <Image
         src="/images/affiche-tafa-dinika-sans-personnage.png"
         alt="Tafa & dinika — Fanabeazana olom-pirenena, 14 Novambra 2026, Tranom-pokonolona Ambohidratrimo"

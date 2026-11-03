@@ -61,7 +61,8 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | P | 3 novembre 2026 | P1 — Menu public en boutons « balayage » | Mis en ligne (3 novembre 2026) |
 | P | 3 novembre 2026 | P2 — Personnage de l'affiche remplacé par la vidéo Johnny1 | Mis en ligne (3 novembre 2026) |
 | P | 3 novembre 2026 | P3 — Fond du site : paysage (johnny3), halo clair sur l'affiche | Mis en ligne (3 novembre 2026) |
-| P | 3 novembre 2026 | P4 — Bras de Johnny qui dépasse du cadre de l'affiche | Mis en ligne (3 novembre 2026) |
+| P | 3 novembre 2026 | P4 — Bras de Johnny qui dépasse du cadre de l'affiche | Mis en ligne (3 novembre 2026), mains coupées : remplacé par P5 |
+| P | 3 novembre 2026 | P5 — Vidéo Johnny5 (bras entiers), halo sur la question d'accueil | Prêt, en attente de GO |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -2026,6 +2027,46 @@ horizontal.
 
 - [x] Avec P3 : commit `baab48b` ; `johnny-detoure-large.mp4` servie,
       habillage public avec `overflow-x-clip` en ligne.
+
+**Constat après mise en ligne :** mains coupées. Ce n'était pas le site :
+dans `Johnny1.mp4`, les bras sortent du cadre de la vidéo d'origine (à
+gauche sur 88 images sur 125, à droite sur 65). Remplacé par P5.
+
+### P5 — Nouvelle vidéo de Johnny (Johnny5), bras entiers
+
+Demande : utiliser `LOCALSEND/NEXT 2/Johnny5.mp4` (464 × 832, 5 s, sans
+son, fond noir) : Johnny plus petit dans le cadre, souriant, mains jointes,
+léger mouvement ; bras et mains toujours entiers (jamais au bord de la
+vidéo).
+
+**Après :** même principe que P2 (détourage, couleurs + masque, WebGL,
+aller-retour, derrière l'affiche). Cadrage : haut du corps sur l'affiche,
+taille ×2,3, de x 439 à 1281 : le bras droit sort du bord droit de
+l'affiche, entier, sans coupure ni fondu ; le bas du corps reste derrière
+le bandeau vert. Vidéo recadrée à la zone utile : 0,66 Mo.
+Image de secours (pendant le chargement, sans WebGL, ou animations
+réduites) : première image de la vidéo, détourée (`johnny5-fixe.webp`,
+20 Ko), à la place de l'ancien personnage fixe.
+
+**Lisibilité :** halo clair sur la question « Amin'ny anaran'iza no
+hisoratanao anarana ? » au-dessus des boutons, peu lisible sur le
+paysage (P3).
+
+**Fichiers :** `public/videos/johnny5-detoure.mp4`,
+`public/images/johnny5-fixe.webp` (`johnny-detoure-large.mp4` et
+`affiche-personnage-sans-logo.png` supprimés),
+`src/app/PersonnageAnime.tsx`, `src/app/AfficheInteractive.tsx`,
+`src/app/ChoixDepot.tsx`.
+
+**Vérifié en local :** types et lint ; écran 1280 × 800 : bras et mains
+entiers, bras droit au-delà du bord de l'affiche, montre visible ;
+téléphone 375 px : vidéo lue, aucun défilement horizontal, question
+lisible.
+
+### Mise en ligne de P5
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Contrôles en ligne.
 
 ---
 
