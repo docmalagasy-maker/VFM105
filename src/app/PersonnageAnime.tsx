@@ -15,10 +15,13 @@ import { useEffect, useRef, useState } from "react";
  * indisponibles, ou si le visiteur a demandé moins d'animations.
  */
 
-const VIDEO = "/videos/johnny-detoure.mp4";
+const VIDEO = "/videos/johnny-detoure-large.mp4";
 
-/** Position de la vidéo dans le repère de l'affiche (1121 × 1403). */
-const CADRE = { gauche: 448, haut: 15, largeur: 674, hauteur: 1072 };
+/**
+ * Position de la vidéo dans le repère de l'affiche (1121 × 1403). Elle
+ * dépasse à droite (jusqu'à 1200) : le bras sort du cadre de l'affiche.
+ */
+const CADRE = { gauche: 448, haut: 15, largeur: 752, hauteur: 1072 };
 const AFFICHE = { largeur: 1121, hauteur: 1403 };
 
 const SOMMETS = `
@@ -35,7 +38,8 @@ uniform sampler2D video;
 varying vec2 uv;
 void main() {
   vec3 couleur = texture2D(video, vec2(uv.x, uv.y * 0.5)).rgb;
-  float alpha = texture2D(video, vec2(uv.x, 0.5 + uv.y * 0.5)).r;
+  // Fondu sur le bord droit : le bras qui sort de la vidéo d'origine ne s'arrête pas net
+  float alpha = texture2D(video, vec2(uv.x, 0.5 + uv.y * 0.5)).r * smoothstep(1.0, 0.95, uv.x);
   gl_FragColor = vec4(couleur * alpha, alpha);
 }`;
 
@@ -130,7 +134,7 @@ export default function PersonnageAnime({ sizes }: { sizes: string }) {
   }, []);
 
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden className="pointer-events-none absolute inset-0">
       {/* Image fixe : avant le chargement de la vidéo, ou si elle ne peut pas être lue */}
       <Image
         src="/images/affiche-personnage-sans-logo.png"

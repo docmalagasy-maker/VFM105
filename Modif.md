@@ -60,6 +60,8 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | O | 31 octobre 2026 | O1 — Inscriptions limitées à 200, places restantes dès 180, « COMPLET », suivi admin | Mis en ligne (31 octobre 2026) |
 | P | 3 novembre 2026 | P1 — Menu public en boutons « balayage » | Mis en ligne (3 novembre 2026) |
 | P | 3 novembre 2026 | P2 — Personnage de l'affiche remplacé par la vidéo Johnny1 | Mis en ligne (3 novembre 2026) |
+| P | 3 novembre 2026 | P3 — Fond du site : paysage (johnny3), halo clair sur l'affiche | Prêt, en attente de GO |
+| P | 3 novembre 2026 | P4 — Bras de Johnny qui dépasse du cadre de l'affiche | Prêt, en attente de GO |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1957,6 +1959,68 @@ horizontal) ; textes, nom et macaron devant ; zones cliquables actives.
       servie (0,95 Mo, `video/mp4`) ; nouvelle affiche et image de secours
       servies, ancienne affiche en 404 ; vidéo lue et détourée sur
       l'accueil (navigateur intégré).
+
+### P3 — Fond du site : paysage
+
+Demande : fond du site remplacé par `LOCALSEND/NEXT 2/johnny3.mp4`
+(travelling sur des collines et des rizières, 832 × 464, 5 s, sans son).
+
+**Avant :** voile de tissu clair (N5), voile marron à 15 % (N7).
+
+**Après :** paysage en fond de toutes les pages publiques, même
+comportement (automatique, muet, en boucle, derrière le contenu, recadré à
+la taille de l'écran) ; voile marron à 15 % conservé par-dessus.
+Lecture aller-retour encodée dans la vidéo (10 s) : le travelling repart
+en sens inverse au lieu de sauter au début.
+
+Optimisation : 2,3 Mo devient 1,0 Mo (son retiré, démarrage rapide).
+Image d'attente : première vue du paysage. Vidéo et image du voile de
+tissu supprimées.
+
+**Lisibilité de l'affiche (accueil) :** l'affiche transparente laissait
+ses textes foncés (« 14 Novambra 2026 », horaires, lieu) sur les arbres
+du paysage. Halo blanc léger autour de tous les éléments de l'affiche :
+textes nets, nom « Johnny Rakotoarisoa » toujours lisible.
+
+**Fichiers :** `public/videos/fond-vfm-paysage.mp4`,
+`public/videos/fond-vfm-paysage.jpg` (`fond-vfm-voile.*` supprimés),
+`src/components/PublicShell.tsx`, `src/app/globals.css`,
+`src/app/AfficheInteractive.tsx`.
+
+**Vérifié en local :** types et lint ; vidéo lue, muette, en boucle sur
+`/birao` et l'accueil, sans défilement horizontal ; textes de l'affiche
+lisibles avec le halo.
+
+### Mise en ligne de P3
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Contrôles en ligne.
+
+### P4 — Bras de Johnny hors du cadre de l'affiche
+
+**Avant :** vidéo de Johnny coupée au bord droit de l'affiche.
+
+**Après :** vidéo reprise sur toute sa largeur (464 px au lieu de 416) et
+placée jusqu'à 7 % au-delà du bord droit : l'épaule et le bras sortent de
+l'affiche, comme superposés au fond du site. Sur les gestes où l'avant-bras
+touche le bord de la vidéo d'origine, fondu sur les derniers 5 % pour
+éviter une coupure nette. Le bas reste derrière le bandeau vert.
+
+Sur téléphone, l'affiche occupant toute la largeur, le dépassement sort de
+l'écran ; la page ne défile pas pour autant de côté
+(`overflow-x: clip` sur l'habillage public).
+
+**Fichiers :** `public/videos/johnny-detoure-large.mp4`
+(`johnny-detoure.mp4` supprimée), `src/app/PersonnageAnime.tsx`,
+`src/components/PublicShell.tsx`.
+
+**Vérifié en local :** types et lint ; écran 1280 × 800 : épaule et bras
+au-delà du bord droit de l'affiche ; téléphone 375 px : aucun défilement
+horizontal.
+
+### Mise en ligne de P4
+
+Avec P3 (même GO attendu).
 
 ---
 

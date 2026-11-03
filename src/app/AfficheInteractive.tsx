@@ -34,7 +34,8 @@ export default function AfficheInteractive() {
         width={LARGEUR}
         height={HAUTEUR}
         sizes={TAILLES}
-        className="relative block h-auto w-full sm:w-auto sm:max-h-[100dvh] sm:max-w-full"
+        // Halo clair : textes lisibles sur le paysage du fond animé
+        className="relative block h-auto w-full [filter:drop-shadow(0_0_1px_#fff)_drop-shadow(0_0_3px_#fff)_drop-shadow(0_0_8px_rgba(255,255,255,0.7))] sm:w-auto sm:max-h-[100dvh] sm:max-w-full"
         priority
       />
       <svg

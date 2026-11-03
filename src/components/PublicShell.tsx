@@ -13,13 +13,14 @@ export default function PublicShell({
   sansCarte?: boolean;
 }) {
   return (
-    <div className="relative isolate min-h-dvh w-full">
+    // overflow-x-clip : ce qui dépasse sur les côtés (bras de Johnny sur l'affiche) ne crée pas de défilement horizontal
+    <div className="relative isolate min-h-dvh w-full overflow-x-clip">
       {/* Animation de fond : fixe derrière tout le contenu, muette, en boucle */}
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-vfm-public">
         <video
           className="h-full w-full object-cover"
-          src="/videos/fond-vfm-voile.mp4"
-          poster="/videos/fond-vfm-voile.jpg"
+          src="/videos/fond-vfm-paysage.mp4"
+          poster="/videos/fond-vfm-paysage.jpg"
           autoPlay
           muted
           loop
