@@ -59,7 +59,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | N | 31 octobre 2026 | N10 — Affiche sans logo ni contours blancs | Mis en ligne (31 octobre 2026) |
 | O | 31 octobre 2026 | O1 — Inscriptions limitées à 200, places restantes dès 180, « COMPLET », suivi admin | Mis en ligne (31 octobre 2026) |
 | P | 3 novembre 2026 | P1 — Menu public en boutons « balayage » | Mis en ligne (3 novembre 2026) |
-| P | 3 novembre 2026 | P2 — Personnage de l'affiche remplacé par la vidéo Johnny1 | Prêt, en attente de GO |
+| P | 3 novembre 2026 | P2 — Personnage de l'affiche remplacé par la vidéo Johnny1 | Mis en ligne (3 novembre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1951,8 +1951,12 @@ horizontal) ; textes, nom et macaron devant ; zones cliquables actives.
 
 ### Mise en ligne de P2
 
-- [ ] GO, commit et push sur `master`.
-- [ ] Contrôles en ligne.
+- [x] GO (3 novembre 2026), commit `e8cdda6` et push sur `master`.
+- [x] Contrôles en ligne (https://vfm105.com) : `/`, `/deposer`,
+      `/deposer/olona`, `/birao`, `/radio` en 200 ; `johnny-detoure.mp4`
+      servie (0,95 Mo, `video/mp4`) ; nouvelle affiche et image de secours
+      servies, ancienne affiche en 404 ; vidéo lue et détourée sur
+      l'accueil (navigateur intégré).
 
 ---
 
