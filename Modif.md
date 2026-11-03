@@ -59,6 +59,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | N | 31 octobre 2026 | N10 — Affiche sans logo ni contours blancs | Mis en ligne (31 octobre 2026) |
 | O | 31 octobre 2026 | O1 — Inscriptions limitées à 200, places restantes dès 180, « COMPLET », suivi admin | Mis en ligne (31 octobre 2026) |
 | P | 3 novembre 2026 | P1 — Menu public en boutons « balayage » | Mis en ligne (3 novembre 2026) |
+| P | 3 novembre 2026 | P2 — Personnage de l'affiche remplacé par la vidéo Johnny1 | Prêt, en attente de GO |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1908,6 +1909,50 @@ vert visible) et survol (vert, texte noir) sur `/birao`.
       `/galerie`, `/radio`, `/sondages` en 200 ; menu de `/birao` avec 4
       boutons « balayage » (Birao grisé, Radio inchangé) ; règle de survol
       présente dans la feuille de style.
+
+### P2 — Personnage de l'affiche en vidéo
+
+Demande : remplacer le personnage de l'affiche de l'accueil par
+`LOCALSEND/NEXT 2/Johnny1.mp4` (Johnny Rakotoarisoa sur fond noir,
+464 × 832, 5 s, sans son).
+
+**Avant :** personnage fixe découpé dans l'affiche, léger mouvement de
+« respiration » (N8).
+
+**Après :** Johnny en vidéo à la place du personnage, même taille et même
+position. La vidéo passe derrière l'affiche : titres, nom « Johnny
+Rakotoarisoa / Solombavambahoaka », macaron rouge et bandeau vert restent
+devant, ses mains passent derrière les textes quand il fait des gestes.
+
+**Technique :**
+- fond noir retiré image par image (noir relié aux bords, lisière
+  adoucie) ; un MP4 ne gérant pas la transparence, chaque image contient
+  les couleurs en haut et le masque en bas, recombinés dans le navigateur
+  (WebGL) — fonctionne aussi sur iPhone ;
+- lecture aller-retour encodée dans la vidéo (10 s), donc aucun saut à la
+  reprise ; muette, en boucle, en pause quand l'affiche n'est plus à
+  l'écran ;
+- vidéo recadrée à la zone visible : 0,95 Mo (`johnny-detoure.mp4`) ;
+- image fixe de l'ancien personnage affichée pendant le chargement, et à
+  la place de la vidéo si WebGL ou la lecture automatique sont
+  indisponibles, ou si le visiteur a demandé moins d'animations ;
+- animation « respiration » (N8) retirée.
+
+**Fichiers :** `public/videos/johnny-detoure.mp4`,
+`public/images/affiche-tafa-dinika-sans-personnage.png`
+(`affiche-tafa-dinika-sans-logo.png` supprimé ;
+`affiche-personnage-sans-logo.png` gardé comme image de secours),
+`src/app/PersonnageAnime.tsx`, `src/app/AfficheInteractive.tsx`,
+`src/app/globals.css`.
+
+**Vérifié en local :** types et lint ; vidéo détourée sans liseré noir,
+alignée sur l'affiche (ordinateur et téléphone 375 px, sans défilement
+horizontal) ; textes, nom et macaron devant ; zones cliquables actives.
+
+### Mise en ligne de P2
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Contrôles en ligne.
 
 ---
 

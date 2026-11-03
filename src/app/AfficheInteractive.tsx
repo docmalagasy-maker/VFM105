@@ -4,10 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
+import PersonnageAnime from "./PersonnageAnime";
 
 /** Dimensions de l'affiche : le calque des zones cliquables reprend le même repère. */
 const LARGEUR = 1121;
 const HAUTEUR = 1403;
+const TAILLES = `(max-width: 640px) 100vw, min(100vw, calc(100dvh * ${LARGEUR} / ${HAUTEUR}))`;
 
 const emailSchema = z.string().trim().max(254).email();
 
@@ -23,28 +25,18 @@ export default function AfficheInteractive() {
   const [ouvert, setOuvert] = useState(false);
 
   return (
-    <div className="relative w-full sm:w-fit">
+    <div className="relative isolate w-full sm:w-fit">
+      {/* Johnny en vidéo, derrière l'affiche : textes, macaron et bandeau restent devant */}
+      <PersonnageAnime sizes={TAILLES} />
       <Image
-        src="/images/affiche-tafa-dinika-sans-logo.png"
+        src="/images/affiche-tafa-dinika-sans-personnage.png"
         alt="Tafa & dinika — Fanabeazana olom-pirenena, 14 Novambra 2026, Tranom-pokonolona Ambohidratrimo"
         width={LARGEUR}
         height={HAUTEUR}
-        sizes={`(max-width: 640px) 100vw, min(100vw, calc(100dvh * ${LARGEUR} / ${HAUTEUR}))`}
-        className="block h-auto w-full sm:w-auto sm:max-h-[100dvh] sm:max-w-full"
+        sizes={TAILLES}
+        className="relative block h-auto w-full sm:w-auto sm:max-h-[100dvh] sm:max-w-full"
         priority
       />
-      {/* Personnage détouré, même repère que l'affiche : léger mouvement de respiration */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <Image
-          src="/images/affiche-personnage-sans-logo.png"
-          alt=""
-          width={LARGEUR}
-          height={HAUTEUR}
-          sizes={`(max-width: 640px) 100vw, min(100vw, calc(100dvh * ${LARGEUR} / ${HAUTEUR}))`}
-          className="affiche-personnage h-full w-full"
-          priority
-        />
-      </div>
       <svg
         viewBox={`0 0 ${LARGEUR} ${HAUTEUR}`}
         className="absolute inset-0 h-full w-full"
