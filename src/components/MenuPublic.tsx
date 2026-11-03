@@ -73,8 +73,8 @@ export default function MenuPublic() {
               {m.libelle}
             </span>
           ) : (
-            <Link key={m.href} href={m.href} className={`${BOUTON} text-vfm-marine hover:bg-vfm-beige`}>
-              {m.libelle}
+            <Link key={m.href} href={m.href} className={`${BOUTON} bouton-balayage`}>
+              <span>{m.libelle}</span>
             </Link>
           );
         })}
@@ -82,9 +82,9 @@ export default function MenuPublic() {
           type="button"
           onClick={() => setContactOuvert((o) => !o)}
           aria-expanded={contactOuvert}
-          className={`${BOUTON} ${contactOuvert ? "bg-vfm-marine text-white" : "text-vfm-marine hover:bg-vfm-beige"}`}
+          className={`${BOUTON} ${contactOuvert ? "bg-vfm-marine text-white" : "bouton-balayage"}`}
         >
-          Resaho izahay
+          <span>Resaho izahay</span>
         </button>
       </nav>
 

@@ -58,6 +58,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | N | 31 octobre 2026 | N9 — Nouvelle affiche à fond transparent | Mis en ligne (31 octobre 2026) |
 | N | 31 octobre 2026 | N10 — Affiche sans logo ni contours blancs | Mis en ligne (31 octobre 2026) |
 | O | 31 octobre 2026 | O1 — Inscriptions limitées à 200, places restantes dès 180, « COMPLET », suivi admin | Mis en ligne (31 octobre 2026) |
+| P | 3 novembre 2026 | P1 — Menu public en boutons « balayage » | Prêt, en attente de GO |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -1864,8 +1865,45 @@ PostgreSQL du serveur.
       restantes, 2 % ; accueil sans macaron (moins de 180) ; `/deposer`
       et `/deposer/olona` ouverts ; `/birao`, `/radio` en 200 ; `/admin`
       redirige vers la connexion (307).
-- [ ] Encadré « Inscriptions Tafa & Dinika » à contrôler dans l'admin
-      (connexion requise).
+- [x] Encadré « Inscriptions Tafa & Dinika » contrôlé dans l'admin
+      (super-administrateur) : 0 / 200, 200 places, 0 %, cohérent avec les
+      listes vides.
+
+---
+
+## Lot P — Menu public (3 novembre 2026)
+
+### P1 — Boutons « balayage » dans le menu
+
+Demande : `/bouton sur le menu de vfm105.com` (style sauvegardé, d'après
+Uiverse.io, BHARGAVPATEL1244).
+
+**Avant :** boutons texte bleu marine, fond beige au survol.
+
+**Après :** « Fisoratana anarana », « Birao », « Sary », « Manehoa hevitra »
+et « Resaho izahay » sont des pilules noires à texte blanc gras ; au
+survol (ou au clavier), le calque noir incliné glisse vers la droite et
+découvre un fond vert (#66ff66), le texte devient noir.
+
+**Inchangés :** bouton « Radio » (fond marine, pastille LIVE, H3), page en
+cours grisée et inactive (H1), « Resaho izahay » ouvert (fond marine),
+taille et disposition du menu (pas d'agrandissement à 17 px, pour garder
+le menu sur une ou deux lignes).
+
+**Adaptations du code d'origine :** style limité à la classe
+`.bouton-balayage` (les autres boutons du site ne changent pas), calque
+élargi pour couvrir les coins des petites pilules, contour visible à la
+navigation au clavier, `::after` inutile retiré.
+
+**Fichiers :** `src/app/globals.css`, `src/components/MenuPublic.tsx`.
+
+**Vérifié en local :** types et lint ; repos (pilules noires, aucun coin
+vert visible) et survol (vert, texte noir) sur `/birao`.
+
+### Mise en ligne du lot P
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Contrôles en ligne.
 
 ---
 

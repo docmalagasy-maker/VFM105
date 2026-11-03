@@ -93,6 +93,47 @@ body {
 }
 
 @layer components {
+  /* Bouton « balayage » (d'après Uiverse.io, BHARGAVPATEL1244) : pilule verte
+     recouverte d'un calque noir incliné qui glisse vers la droite au survol ;
+     le texte, dans un <span>, passe du blanc au noir. Menu public. */
+  .bouton-balayage {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: #66ff66;
+    color: ghostwhite;
+    font-weight: 700;
+    letter-spacing: 0.05rem;
+  }
+  .bouton-balayage > span {
+    position: relative;
+    z-index: 1;
+    transition: color 0.4s;
+  }
+  .bouton-balayage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* plus large que le bouton pour couvrir les coins malgré l'inclinaison */
+    left: -1.25rem;
+    width: calc(100% + 2.5rem);
+    background: #000;
+    transform: skew(30deg);
+    transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+  }
+  .bouton-balayage:hover > span,
+  .bouton-balayage:focus-visible > span {
+    color: #000;
+  }
+  .bouton-balayage:hover::before,
+  .bouton-balayage:focus-visible::before {
+    transform: translate3d(100%, 0, 0);
+  }
+  .bouton-balayage:focus-visible {
+    outline: 3px solid #000;
+    outline-offset: 2px;
+  }
+
   /* Zones cliquables de l'affiche de l'accueil (src/app/AfficheInteractive.tsx) */
   .zone-affiche rect {
     fill: transparent;
