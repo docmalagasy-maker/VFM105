@@ -62,7 +62,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | P | 3 novembre 2026 | P2 — Personnage de l'affiche remplacé par la vidéo Johnny1 | Mis en ligne (3 novembre 2026) |
 | P | 3 novembre 2026 | P3 — Fond du site : paysage (johnny3), halo clair sur l'affiche | Mis en ligne (3 novembre 2026) |
 | P | 3 novembre 2026 | P4 — Bras de Johnny qui dépasse du cadre de l'affiche | Mis en ligne (3 novembre 2026), mains coupées : remplacé par P5 |
-| P | 3 novembre 2026 | P5 — Vidéo Johnny5 (bras entiers), halo sur la question d'accueil | Prêt, en attente de GO |
+| P | 3 novembre 2026 | P5 — Vidéo Johnny5 (bras entiers), halo sur la question d'accueil | Mis en ligne (3 novembre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -2065,8 +2065,12 @@ lisible.
 
 ### Mise en ligne de P5
 
-- [ ] GO, commit et push sur `master`.
-- [ ] Contrôles en ligne.
+- [x] GO (3 novembre 2026), commit `adf0126` et push sur `master`.
+- [x] Contrôles en ligne (https://vfm105.com, nouvelle version détectée
+      après 80 s) : `/`, `/deposer`, `/deposer/olona`, `/birao`, `/radio`
+      en 200 ; `johnny5-detoure.mp4` et `johnny5-fixe.webp` servis,
+      anciens fichiers en 404 ; écran 1280 × 800 : vidéo lue, bras entiers,
+      bras droit hors de l'affiche ; halo de la question présent.
 
 ---
 
