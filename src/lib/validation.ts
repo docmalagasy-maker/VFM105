@@ -34,23 +34,45 @@ export const pieceJointeSchema = z.object({
   type: z.string().min(1),
 });
 
+/** Champ texte facultatif (lot Q) : absent ou vide devient "". */
+const texteFacultatif = (max: number) => z.string().trim().max(max).optional().transform((v) => v ?? "");
+
+/** Téléphone facultatif (lot Q), mais contrôlé s'il est rempli. */
+export const telephoneFacultatif = z
+  .string()
+  .trim()
+  .optional()
+  .transform((v) => v ?? "")
+  .refine((v) => v === "" || validateTelephoneMadagascar(v).valide, "Toa diso ny laharana finday.");
+
+/** District facultatif (lot Q), mais pris dans la liste officielle s'il est choisi. */
+export const districtFacultatif = (message: string) =>
+  z
+    .string()
+    .optional()
+    .transform((v) => v ?? "")
+    .refine((v) => v === "" || TOUS_LES_DISTRICTS.includes(v), message);
+
+// Lot Q : seuls le nom et le prénom (de la personne qui assistera aux Tafa sy
+// Dinika) restent obligatoires ; les autres champs sont contrôlés s'ils sont remplis.
 export const dossierInputSchema = z.object({
   idempotencyKey: z.string().uuid(),
   association: z.object({
-    nom: z.string().trim().min(1, "Tsy maintsy soratana ny anaran'ny fikambanana."),
-    adresse: z.string().trim().min(1, "Tsy maintsy soratana ny adiresin'ny fikambanana."),
-    district: z
-      .string()
-      .refine((val) => TOUS_LES_DISTRICTS.includes(val), "Safidio ny distrikan'ny fikambanana."),
-    commune: z.string().trim().min(1, "Safidio na soraty ny kaominin'ny fikambanana.").max(120),
+    nom: texteFacultatif(300),
+    adresse: texteFacultatif(1000),
+    district: districtFacultatif("Safidio ny distrikan'ny fikambanana."),
+    commune: texteFacultatif(120),
     communePcode: z.string().max(20).optional(),
     fokontany: z.string().trim().max(120).optional(),
     fokontanyPcode: z.string().max(20).optional(),
-    activite: z.string().trim().min(1, "Tsy maintsy soratana ny asan'ny fikambanana."),
+    activite: texteFacultatif(200),
     nombreMembres: z
       .number()
       .int("Isa feno no atao amin'ny isan'ny mpikambana.")
-      .positive("Tsy maintsy mihoatra ny aotra ny isan'ny mpikambana."),
+      .positive("Tsy maintsy mihoatra ny aotra ny isan'ny mpikambana.")
+      .nullable()
+      .optional()
+      .transform((v) => v ?? null),
   }),
   responsables: z
     .array(responsableSchema)
@@ -58,10 +80,7 @@ export const dossierInputSchema = z.object({
     // Un seul nom : la personne qui assistera aux Tafa sy Dinika
     .transform((r) => r.slice(0, 1)),
   coordonnees: z.object({
-    telephone: z.string().refine(
-      (val) => validateTelephoneMadagascar(val).valide,
-      "Toa diso ny laharana finday."
-    ),
+    telephone: telephoneFacultatif,
     email: z
       .string()
       .trim()
@@ -72,12 +91,11 @@ export const dossierInputSchema = z.object({
       .array(z.object({ type: z.string(), valeur: z.string() }))
       .optional(),
   }),
-  description: z
-    .string()
-    .trim()
-    .min(1, "Soraty ny hevitrao momba ny fanabeazana ara-politika."),
+  description: texteFacultatif(5000),
   // Pièces jointes supprimées du formulaire : tout envoi éventuel est ignoré.
-  pieces: z.unknown().transform((): PieceJointe[] => []),
+  // `.optional()` : le formulaire n'envoie plus ce champ ; sans lui, zod 4
+  // refusait le dossier (« expected nonoptional »).
+  pieces: z.unknown().optional().transform((): PieceJointe[] => []),
 });
 
 export const MAX_TAILLE_FICHIER = 10 * 1024 * 1024; // 10 Mo

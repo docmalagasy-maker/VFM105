@@ -127,29 +127,25 @@ export default function DepotWizard() {
   }
 
   function valider(): boolean {
+    // Lot Q : seuls le nom et le prénom sont obligatoires ; les autres champs
+    // ne sont contrôlés que s'ils sont remplis.
     const problemes: string[] = [];
-    if (!form.nomAssociation.trim()) problemes.push("Soraty ny anaran'ny fikambanana.");
-    if (!form.adresseAssociation.trim()) problemes.push("Soraty ny adiresin'ny fikambanana.");
-    if (!form.district) problemes.push("Safidio ny distrikan'ny fikambanana.");
-    else if (!form.localite.commune.trim()) problemes.push("Safidio na soraty ny kaominin'ny fikambanana.");
     const principal = form.responsables[0];
     if (!principal?.nom.trim() || !principal?.prenom.trim()) {
       problemes.push("Soraty ny anarana sy ny fanampin'anaran'izay hanatrika ny Tafa sy Dinika.");
     }
     const membres = Number(form.nombreMembres);
-    if (!form.nombreMembres || !Number.isInteger(membres) || membres <= 0) {
+    if (form.nombreMembres.trim() && (!Number.isInteger(membres) || membres <= 0)) {
       problemes.push("Isa feno mihoatra ny aotra no atao amin'ny isan'ny mpikambana.");
     }
-    if (!validateTelephoneMadagascar(form.telephone).valide) {
+    if (form.telephone.trim() && !validateTelephoneMadagascar(form.telephone).valide) {
       problemes.push("Toa diso ny laharana finday.");
     }
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       problemes.push("Toa diso ny adiresy mailaka.");
     }
-    if (!form.description.trim()) {
-      problemes.push("Soraty ny hevitrao momba ny fanabeazana ara-politika.");
-    }
     setErreurs(problemes);
+    if (problemes.length) window.scrollTo({ top: 0, behavior: "smooth" });
     return problemes.length === 0;
   }
 
@@ -182,7 +178,7 @@ export default function DepotWizard() {
             fokontany: form.localite.fokontany.trim() || undefined,
             fokontanyPcode: form.localite.fokontanyPcode || undefined,
             activite,
-            nombreMembres: Number(form.nombreMembres),
+            nombreMembres: form.nombreMembres.trim() ? Number(form.nombreMembres) : null,
           },
           responsables: form.responsables.slice(0, 1).map((r) => ({ nom: r.nom.trim(), prenom: r.prenom.trim() })),
           coordonnees: {
@@ -222,17 +218,18 @@ export default function DepotWizard() {
         </p>
 
         <dl className="mt-6 divide-y divide-vfm-beige-bord rounded-2xl border border-vfm-beige-bord bg-vfm-beige-clair">
-          <Ligne label="Fikambanana">{form.nomAssociation}</Ligne>
-          <Ligne label="Adiresy">{form.adresseAssociation}</Ligne>
-          <Ligne label="Distrika">{form.district}</Ligne>
-          <Ligne label="Kaominina">{form.localite.commune}</Ligne>
+          {/* Lot Q : les champs facultatifs laissés vides ne sont pas affichés */}
+          {form.nomAssociation.trim() && <Ligne label="Fikambanana">{form.nomAssociation}</Ligne>}
+          {form.adresseAssociation.trim() && <Ligne label="Adiresy">{form.adresseAssociation}</Ligne>}
+          {form.district && <Ligne label="Distrika">{form.district}</Ligne>}
+          {form.localite.commune.trim() && <Ligne label="Kaominina">{form.localite.commune}</Ligne>}
           {form.localite.fokontany && <Ligne label="Fokontany">{form.localite.fokontany}</Ligne>}
           <Ligne label="Anaran'izay hanatrika ny Tafa sy Dinika">
             {form.responsables[0]?.prenom} {form.responsables[0]?.nom}
           </Ligne>
-          <Ligne label="Asa">{activite}</Ligne>
-          <Ligne label="Isan'ny mpikambana">{form.nombreMembres}</Ligne>
-          <Ligne label="Finday">{form.telephone}</Ligne>
+          {activite.trim() && <Ligne label="Asa">{activite}</Ligne>}
+          {form.nombreMembres.trim() && <Ligne label="Isan'ny mpikambana">{form.nombreMembres}</Ligne>}
+          {form.telephone.trim() && <Ligne label="Finday">{form.telephone}</Ligne>}
           {form.email && <Ligne label="Mailaka">{form.email}</Ligne>}
           {form.autresCoordonnees.filter((a) => a.valeur).length > 0 && (
             <Ligne label="Fifandraisana hafa">
@@ -242,9 +239,11 @@ export default function DepotWizard() {
                 .join(" · ")}
             </Ligne>
           )}
-          <Ligne label="Ny hevitrao">
-            <span className="whitespace-pre-wrap">{form.description}</span>
-          </Ligne>
+          {form.description.trim() && (
+            <Ligne label="Ny hevitrao">
+              <span className="whitespace-pre-wrap">{form.description}</span>
+            </Ligne>
+          )}
         </dl>
 
         {erreurEnvoi && (
@@ -312,7 +311,7 @@ export default function DepotWizard() {
               sousTitre="Anarana, adiresy ary izay hanatrika ny Tafa sy Dinika"
               icon={<IconPeople className="h-5 w-5" />}
             >
-              <Champ label="Anaran'ny fikambanana" obligatoire>
+              <Champ label="Anaran'ny fikambanana">
                 <input
                   className="input"
                   placeholder="Ohatra : Tanora ho an'ny Fampandrosoana"
@@ -320,7 +319,7 @@ export default function DepotWizard() {
                   onChange={(e) => setForm((f) => ({ ...f, nomAssociation: e.target.value }))}
                 />
               </Champ>
-              <Champ label="Adiresin'ny fikambanana" obligatoire>
+              <Champ label="Adiresin'ny fikambanana">
                 <textarea
                   className="input"
                   rows={2}
@@ -329,7 +328,7 @@ export default function DepotWizard() {
                   onChange={(e) => setForm((f) => ({ ...f, adresseAssociation: e.target.value }))}
                 />
               </Champ>
-              <Champ label="Distrika" obligatoire>
+              <Champ label="Distrika">
                 <select
                   className="input"
                   value={form.district}
@@ -382,7 +381,7 @@ export default function DepotWizard() {
               sousTitre="Sehatra iasan'ny fikambanana"
               icon={<IconGear className="h-5 w-5" />}
             >
-              <Champ label="Asan'ny fikambanana" obligatoire>
+              <Champ label="Asan'ny fikambanana">
                 <select
                   className="input"
                   value={form.activite}
@@ -404,7 +403,7 @@ export default function DepotWizard() {
                 )}
               </Champ>
 
-              <Champ label="Isan'ny mpikambana" obligatoire>
+              <Champ label="Isan'ny mpikambana">
                 <input
                   className="input"
                   type="number"
@@ -425,7 +424,7 @@ export default function DepotWizard() {
               sousTitre="Raha manome mailaka ianao dia handray mailaka fanamarinana"
               icon={<IconPhone className="h-5 w-5" />}
             >
-              <Champ label="Laharana finday" obligatoire>
+              <Champ label="Laharana finday">
                 <div className="relative">
                   <IconPhone className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-vfm-vert" />
                   <input
@@ -486,7 +485,7 @@ export default function DepotWizard() {
               sousTitre="Hazavao ny hevitrao momba ny fanabeazana ara-politika"
               icon={<IconDoc className="h-5 w-5" />}
             >
-              <Champ label="Soraty eto ambany ny hevitrao" obligatoire>
+              <Champ label="Soraty eto ambany ny hevitrao">
                 <textarea
                   className="input"
                   rows={6}

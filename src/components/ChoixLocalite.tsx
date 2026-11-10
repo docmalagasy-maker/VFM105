@@ -73,7 +73,7 @@ export default function ChoixLocalite({
 
   return (
     <>
-      <Champ label="Kaominina" obligatoire>
+      <Champ label="Kaominina">
         {!communeManuelle && (
           <select
             className="input"

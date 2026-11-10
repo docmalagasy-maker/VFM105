@@ -62,6 +62,24 @@ les certificats Let's Encrypt dès le déploiement. Mis en service le
 certificat valide, `http://` redirigé vers `https://`. L'ancienne adresse
 `vfm.0550.site` reste valable.
 
+### Domaine `radomilijaona.online` (LWS, 4 novembre 2026)
+
+Site de campagne statique de Rado Milijaona (CSM 2026). Projet Coolify
+distinct **Rado Milijaona** → environnement **production** → application
+`radomilijaona:main-…`, dépôt privé `docmalagasy-maker/radomilijaona`
+(branche `main`, code local `D:\PROJETS\RADO\site-rado`), build
+**Dockerfile** (nginx), port **80**, déploiement automatique à chaque push.
+
+| Type | Nom | Valeur | TTL | Usage |
+|---|---|---|---|---|
+| A | `@` (racine) | `31.207.34.137` | 15 min | https://radomilijaona.online (remplace la page de parking LWS `213.255.195.58`) |
+| CNAME | `www` | `@` | 15 min | Déjà présent, conservé → https://www.radomilijaona.online |
+
+Les enregistrements mail LWS (`mail`, `imap`, `pop`, `smtp`, MX, SPF,
+DKIM, DMARC) n'ont pas été modifiés. Voir la difficulté n° 17 (§4) : le
+fournisseur d'accès malgache a continué de servir la page de parking
+pendant plusieurs heures.
+
 ---
 
 ## 2. État final du projet VFM 105
@@ -375,6 +393,7 @@ for c in $(docker ps -q); do v=$(docker exec $c php -r 'echo PHP_VERSION;' 2>/de
 | 13 | **E-mail non reçu** après une demande d'accès administrateur | `SMTP_PASSWORD` absent du conteneur : variable non encore ajoutée, ou ajoutée **après** le dernier déploiement | Ajouter la variable dans la section Production, puis **Deploy** ; vérifier sa présence dans le conteneur (§6). Refaire une demande : l'e-mail n'est envoyé qu'à la création d'une demande |
 | 14 | Connexion SSL refusée vers `mail.0550.site` | Le serveur mail LWS présente un certificat au nom de `*.lwspanel.com` | Utiliser le nom réel du serveur : **`mail77.lwspanel.com`** (indiqué aussi dans LWS → *Paramètres de configuration mail*) |
 | 15 | Terminal Coolify : la commande tapée ne fait rien | La page affiche encore « Finding available servers and containers… » | Attendre l'invite `root@vps125329:~#` avant de taper |
+| 17 | **Nouveau site invisible depuis Madagascar** (page « Félicitations » de LWS, « Non sécurisé ») alors que `dns.google` donne déjà l'IP du VPS, même sur mobile (radomilijaona.online, 4 novembre 2026) | Domaine **déjà existant** (parking LWS, TTL 6 h) consulté juste avant le changement d'IP : le fournisseur d'accès a gardé l'ancienne réponse en cache. Il **intercepte tout le DNS sur le port 53** (une requête vers `8.8.8.8` reçoit la réponse de son cache, même TTL) | Attendre la fin du TTL (6 h au plus), ou passer par un DNS chiffré (Chrome : *DNS sécurisé* ; Android : *DNS privé* `dns.google`). **Prévention** : pour un domaine qui existe déjà, baisser le TTL de `@` et `www` à 15 min **plusieurs heures avant** de changer l'IP, et ne pas ouvrir le domaine juste avant le changement. Vérifier depuis le PC avec `curl --resolve domaine:443:31.207.34.137 https://domaine/` |
 | 16 | Aucune demande d'accès en base alors qu'un test a été fait | Demande supprimée depuis l'onglet Administrateurs (la suppression l'efface), ou formulaire refusé (mot de passe < 10 caractères, identifiant avec espaces ou accents) | Refaire la demande et vérifier le message vert de confirmation |
 
 ---
@@ -534,6 +553,10 @@ CMD ["node", "server.js"]
 
 ### 7.3 Domaine (LWS)
 
+0. **Domaine déjà existant** (racine d'un domaine neuf en parking LWS,
+   ou ancienne adresse) : baisser d'abord le TTL de `@` et `www` à
+   **15 minutes**, attendre l'ancien TTL (souvent 6 h), puis changer l'IP
+   (difficulté n° 17, §4). Inutile pour un sous-domaine nouveau.
 1. Zone DNS → `A  <sous-domaine>  31.207.34.137`.
 2. Vérifier avec `dns.google` (souvent en quelques minutes).
 3. Coolify → *Domains* → *Add Domain* (`https`) → supprimer l'entrée

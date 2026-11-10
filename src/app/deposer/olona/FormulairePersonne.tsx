@@ -77,12 +77,9 @@ export default function FormulairePersonne() {
     const p: string[] = [];
     if (!form.nom.trim()) p.push("Soraty ny anaranao.");
     if (!form.prenom.trim()) p.push("Soraty ny fanampin'anaranao.");
-    if (!form.district) p.push("Safidio ny distrika misy anao.");
-    else if (!form.localite.commune.trim()) p.push("Safidio na soraty ny kaominina misy anao.");
-    if (!form.activite.trim()) p.push("Soraty ny asanao ankehitriny.");
-    if (!form.descriptionActivite.trim()) p.push("Hazavao ny asanao.");
-    if (!form.projet.trim()) p.push("Soraty ny zavatra handrasanao amin'ny Tafa sy Dinika.");
-    if (!validateTelephoneMadagascar(form.telephone).valide) p.push("Toa diso ny laharana finday.");
+    // Lot Q : seuls le nom et le prénom sont obligatoires ; les autres champs
+    // ne sont contrôlés que s'ils sont remplis.
+    if (form.telephone.trim() && !validateTelephoneMadagascar(form.telephone).valide) p.push("Toa diso ny laharana finday.");
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) p.push("Toa diso ny adiresy mailaka.");
     setErreurs(p);
     if (p.length) window.scrollTo({ top: 0, behavior: "smooth" });
@@ -139,17 +136,22 @@ export default function FormulairePersonne() {
         <dl className="mt-6 divide-y divide-vfm-beige-bord rounded-2xl border border-vfm-beige-bord bg-vfm-beige-clair">
           <Ligne label="Anarana">{form.nom}</Ligne>
           <Ligne label="Fanampin'anarana">{form.prenom}</Ligne>
-          <Ligne label="Distrika">{form.district}</Ligne>
-          <Ligne label="Kaominina">{form.localite.commune}</Ligne>
+          {/* Lot Q : les champs facultatifs laissés vides ne sont pas affichés */}
+          {form.district && <Ligne label="Distrika">{form.district}</Ligne>}
+          {form.localite.commune.trim() && <Ligne label="Kaominina">{form.localite.commune}</Ligne>}
           {form.localite.fokontany && <Ligne label="Fokontany">{form.localite.fokontany}</Ligne>}
-          <Ligne label="Asa ankehitriny">{form.activite}</Ligne>
-          <Ligne label="Fanazavana momba ny asa">
-            <span className="whitespace-pre-wrap">{form.descriptionActivite}</span>
-          </Ligne>
-          <Ligne label="Ny zavatra handrasanao amin'ny Tafa sy Dinika">
-            <span className="whitespace-pre-wrap">{form.projet}</span>
-          </Ligne>
-          <Ligne label="Finday">{form.telephone}</Ligne>
+          {form.activite.trim() && <Ligne label="Asa ankehitriny">{form.activite}</Ligne>}
+          {form.descriptionActivite.trim() && (
+            <Ligne label="Fanazavana momba ny asa">
+              <span className="whitespace-pre-wrap">{form.descriptionActivite}</span>
+            </Ligne>
+          )}
+          {form.projet.trim() && (
+            <Ligne label="Ny zavatra handrasanao amin'ny Tafa sy Dinika">
+              <span className="whitespace-pre-wrap">{form.projet}</span>
+            </Ligne>
+          )}
+          {form.telephone.trim() && <Ligne label="Finday">{form.telephone}</Ligne>}
           {form.email && <Ligne label="Mailaka">{form.email}</Ligne>}
         </dl>
 
@@ -233,7 +235,7 @@ export default function FormulairePersonne() {
                   <input className="input" placeholder="Ohatra : Jean" value={form.prenom} onChange={(e) => maj("prenom", e.target.value)} />
                 </Champ>
               </div>
-              <Champ label="Distrika" obligatoire>
+              <Champ label="Distrika">
                 <select
                   className="input"
                   value={form.district}
@@ -266,7 +268,7 @@ export default function FormulairePersonne() {
               sousTitre="Ny asa ataonao amin'izao fotoana izao"
               icon={<IconGear className="h-5 w-5" />}
             >
-              <Champ label="Asa ankehitriny" obligatoire>
+              <Champ label="Asa ankehitriny">
                 <input
                   className="input"
                   placeholder="Ohatra : Mpamboly, mpampianatra, mpianatra..."
@@ -274,7 +276,7 @@ export default function FormulairePersonne() {
                   onChange={(e) => maj("activite", e.target.value)}
                 />
               </Champ>
-              <Champ label="Fanazavana momba ny asanao" obligatoire>
+              <Champ label="Fanazavana momba ny asanao">
                 <textarea
                   className="input"
                   rows={4}
@@ -292,7 +294,7 @@ export default function FormulairePersonne() {
               titre="Ny zavatra handrasanao amin'ny Tafa sy Dinika"
               icon={<IconDoc className="h-5 w-5" />}
             >
-              <Champ label="Soraty eto ambany" obligatoire>
+              <Champ label="Soraty eto ambany">
                 <textarea
                   className="input"
                   rows={6}
@@ -308,7 +310,7 @@ export default function FormulairePersonne() {
               sousTitre="Raha manome mailaka ianao dia handray mailaka fanamarinana"
               icon={<IconPhone className="h-5 w-5" />}
             >
-              <Champ label="Laharana finday" obligatoire>
+              <Champ label="Laharana finday">
                 <div className="relative">
                   <IconPhone className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-vfm-vert" />
                   <input

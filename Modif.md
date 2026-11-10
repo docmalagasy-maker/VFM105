@@ -63,6 +63,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | P | 3 novembre 2026 | P3 — Fond du site : paysage (johnny3), halo clair sur l'affiche | Mis en ligne (3 novembre 2026) |
 | P | 3 novembre 2026 | P4 — Bras de Johnny qui dépasse du cadre de l'affiche | Mis en ligne (3 novembre 2026), mains coupées : remplacé par P5 |
 | P | 3 novembre 2026 | P5 — Vidéo Johnny5 (bras entiers), halo sur la question d'accueil | Mis en ligne (3 novembre 2026) |
+| Q | 10 novembre 2026 | Q1 — Formulaires d'inscription : seuls le nom et le prénom restent obligatoires | En attente du GO |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -2071,6 +2072,63 @@ lisible.
       en 200 ; `johnny5-detoure.mp4` et `johnny5-fixe.webp` servis,
       anciens fichiers en 404 ; écran 1280 × 800 : vidéo lue, bras entiers,
       bras droit hors de l'affiche ; halo de la question présent.
+
+---
+
+## Lot Q — Formulaires d'inscription allégés (10 novembre 2026)
+
+### Q1 — Seuls le nom et le prénom sont obligatoires
+
+**Avant :** association : nom, adresse, district, kaominina, nom et prénom
+de la personne qui assistera aux Tafa sy Dinika, activité, nombre de
+membres, téléphone et avis obligatoires. Personne : nom, prénom, district,
+kaominina, activité, description de l'activité, attentes et téléphone
+obligatoires.
+
+**Après :** dans les deux formulaires (`/deposer`, `/deposer/olona`), seuls
+le **nom** et le **prénom** restent obligatoires (pour une association :
+ceux de la personne qui assistera aux Tafa sy Dinika). Astérisque rouge
+uniquement sur ces deux champs. Un champ facultatif rempli reste contrôlé :
+téléphone malgache valide, adresse e-mail valide, nombre de membres entier
+positif, district pris dans la liste. Les champs laissés vides
+n'apparaissent pas dans le récapitulatif (famintinana).
+
+**Côté serveur :** mêmes règles (`/api/dossiers`, `/api/personnes`). Champs
+texte vides enregistrés vides ; district et kaominina vides enregistrés
+sans valeur pour les associations ; nombre de membres sans valeur
+(colonne `association_nombre_membres` rendue facultative au démarrage du
+site, aucune manipulation manuelle).
+
+**Effets :** un dossier sans district n'est visible que du
+super-administrateur (les administrateurs de district ne voient que leur
+district). Remerciement sans district : « Misaotra anao ny VFM 105 ».
+Statistiques : dossiers sans district comptés en « non renseigné » ;
+nombre de membres non renseigné compté 0.
+
+**Correctif lié :** le champ `pieces` (pièces jointes supprimées au lot K)
+était encore attendu par le contrôle du serveur ; le formulaire ne
+l'envoyant plus, zod 4 refusait le dossier d'association
+(« expected nonoptional »). Il est désormais facultatif. Les inscriptions
+d'associations depuis le 28 octobre 2026 étaient donc probablement
+refusées : à vérifier en ligne après déploiement.
+
+**Fichiers :** `src/lib/validation.ts`, `src/lib/personnes-modele.ts`,
+`src/lib/types.ts`, `src/lib/repository.ts`, `src/lib/schema.ts`,
+`src/components/DepotWizard.tsx`, `src/components/ChoixLocalite.tsx`,
+`src/app/deposer/olona/FormulairePersonne.tsx`.
+
+**Vérifié en local :** types ; 11 cas de contrôle serveur (noms seuls
+acceptés, champs vides acceptés, sans nom ou sans prénom refusé, district
+inconnu, 0 membre et e-mail invalide refusés) ; formulaires vides → seul
+le message du nom et du prénom ; nom et prénom seuls → récapitulatif
+affiché (association et personne). Enregistrement réel non testable en
+local (pas de PostgreSQL) : à contrôler en ligne.
+
+### Mise en ligne du lot Q
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Contrôle en ligne : inscription test d'une association et d'une
+      personne avec nom et prénom seuls, puis suppression dans l'admin.
 
 ---
 

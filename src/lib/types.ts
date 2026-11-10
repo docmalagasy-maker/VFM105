@@ -39,7 +39,8 @@ export interface DossierInput {
     fokontany?: string;
     fokontanyPcode?: string;
     activite: string;
-    nombreMembres: number;
+    /** Facultatif depuis le lot Q : null si non renseigné. */
+    nombreMembres: number | null;
   };
   responsables: Responsable[];
   coordonnees: {

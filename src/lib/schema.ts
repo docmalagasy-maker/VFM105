@@ -78,6 +78,8 @@ export function verifierSchema(): Promise<unknown> {
          cree_le TIMESTAMPTZ NOT NULL DEFAULT now()
        );
        ALTER TABLE dossiers_personnes ALTER COLUMN date_naissance DROP NOT NULL;
+       -- Lot Q : nombre de membres facultatif (les champs texte vides sont enregistrés à '')
+       ALTER TABLE dossiers ALTER COLUMN association_nombre_membres DROP NOT NULL;
        ALTER TABLE dossiers_personnes ADD COLUMN IF NOT EXISTS commune TEXT;
        ALTER TABLE dossiers_personnes ADD COLUMN IF NOT EXISTS commune_pcode TEXT;
        ALTER TABLE dossiers_personnes ADD COLUMN IF NOT EXISTS fokontany TEXT;
