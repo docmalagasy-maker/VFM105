@@ -63,7 +63,7 @@ comportement avant/après, fichiers touchés, vérifications, mise en ligne.
 | P | 3 novembre 2026 | P3 — Fond du site : paysage (johnny3), halo clair sur l'affiche | Mis en ligne (3 novembre 2026) |
 | P | 3 novembre 2026 | P4 — Bras de Johnny qui dépasse du cadre de l'affiche | Mis en ligne (3 novembre 2026), mains coupées : remplacé par P5 |
 | P | 3 novembre 2026 | P5 — Vidéo Johnny5 (bras entiers), halo sur la question d'accueil | Mis en ligne (3 novembre 2026) |
-| Q | 10 novembre 2026 | Q1 — Formulaires d'inscription : seuls le nom et le prénom restent obligatoires | En attente du GO |
+| Q | 10 novembre 2026 | Q1 — Formulaires d'inscription : seuls le nom et le prénom restent obligatoires | Mis en ligne (10 novembre 2026) |
 | S | 9 octobre 2026 | S1 — Mise à jour de sécurité (Next.js 16.3.8, sharp 0.35.5) | Mis en ligne (15 octobre 2026) |
 | S | 28 octobre 2026 | S2 — Mise à jour de sécurité (Next.js 16.4.2, zod 4.6.7, nodemailer 10.1.4) | Mis en ligne (28 octobre 2026) |
 
@@ -2109,8 +2109,9 @@ nombre de membres non renseigné compté 0.
 était encore attendu par le contrôle du serveur ; le formulaire ne
 l'envoyant plus, zod 4 refusait le dossier d'association
 (« expected nonoptional »). Il est désormais facultatif. Les inscriptions
-d'associations depuis le 28 octobre 2026 étaient donc probablement
-refusées : à vérifier en ligne après déploiement.
+d'associations depuis le 28 octobre 2026 étaient donc refusées : confirmé
+en ligne, la dernière référence d'association était `VFM-2026-0002`
+(9 octobre) alors que les personnes atteignaient `VFM-P-2026-0019`.
 
 **Fichiers :** `src/lib/validation.ts`, `src/lib/personnes-modele.ts`,
 `src/lib/types.ts`, `src/lib/repository.ts`, `src/lib/schema.ts`,
@@ -2126,9 +2127,15 @@ local (pas de PostgreSQL) : à contrôler en ligne.
 
 ### Mise en ligne du lot Q
 
-- [ ] GO, commit et push sur `master`.
-- [ ] Contrôle en ligne : inscription test d'une association et d'une
-      personne avec nom et prénom seuls, puis suppression dans l'admin.
+- [x] GO (10 novembre 2026), commit `db28885` et push sur `master`.
+- [x] Contrôles en ligne (https://vfm105.com, nouvelle version détectée
+      après 120 s) : `/`, `/deposer`, `/deposer/olona`, `/birao`, `/radio`,
+      `/sondages` en 200 ; inscriptions test avec nom et prénom seuls
+      acceptées (201) : association **VFM-2026-0003** et personne
+      **VFM-P-2026-0020** (« TEST-Q Essai »), pages de remerciement en 200
+      (« Misaotra anao ny VFM 105 ») ; personne sans prénom refusée (400) ;
+      compteur 15 → 17 inscrits.
+- [ ] Supprimer les deux dossiers test dans l'admin (super-administrateur).
 
 ---
 
