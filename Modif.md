@@ -2186,10 +2186,13 @@ testable en local (pas de PostgreSQL) : à contrôler en ligne.
 
 ### Mise en ligne du lot R
 
-- [ ] GO, commit et push sur `master`.
-- [ ] Contrôle en ligne : compteur inchangé (18) avant import.
-- [ ] Import depuis la session super-administrateur ; compteur attendu
-      18 + 43 = **61**.
+- [x] GO (11 novembre 2026), commit `368e0bb` et push sur `master`.
+- [x] Contrôle en ligne : nouvelle version détectée après ~200 s, compteur
+      inchangé (18) avant import.
+- [x] Import depuis la session super-administrateur : 26 inscriptions
+      créées, **VFM-P-2026-0023** à **VFM-P-2026-0048**, 43 participants ;
+      compteur **61 / 200** (60 participants personnes + 1 association).
+      Nouvel envoi d'une ligne déjà importée : rien créé, compteur 61.
 
 ---
 
