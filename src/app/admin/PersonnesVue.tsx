@@ -36,7 +36,9 @@ export default async function PersonnesVue({
     <div className="mt-6 flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-zinc-500">
-          {personnes.length} dossier(s) de personne{district && ` — district ${district}`}
+          {personnes.length} dossier(s) de personne
+          {" "}({personnes.reduce((s, p) => s + p.nombreParticipants, 0)} participant(s))
+          {district && ` — district ${district}`}
           {personnes.length === 200 && " (200 plus récents affichés)"}
         </p>
         <a
@@ -54,6 +56,8 @@ export default async function PersonnesVue({
               <th className="px-4 py-2">Référence</th>
               <th className="px-4 py-2">Date</th>
               <th className="px-4 py-2">Nom et prénom</th>
+              <th className="px-4 py-2">Participants</th>
+              <th className="px-4 py-2">Association</th>
               <th className="px-4 py-2">District</th>
               <th className="px-4 py-2">Commune</th>
               <th className="px-4 py-2">Fokontany</th>
@@ -76,11 +80,13 @@ export default async function PersonnesVue({
                 <td className="px-4 py-2">
                   {p.prenom} {p.nom}
                 </td>
-                <td className="px-4 py-2">{p.district}</td>
+                <td className="px-4 py-2 text-center">{p.nombreParticipants}</td>
+                <td className="px-4 py-2">{p.association || "—"}</td>
+                <td className="px-4 py-2">{p.district || "—"}</td>
                 <td className="px-4 py-2">{p.commune || "—"}</td>
                 <td className="px-4 py-2">{p.fokontany || "—"}</td>
-                <td className="px-4 py-2">{p.activite}</td>
-                <td className="whitespace-nowrap px-4 py-2">{p.telephone}</td>
+                <td className="px-4 py-2">{p.activite || "—"}</td>
+                <td className="whitespace-nowrap px-4 py-2">{p.telephone || "—"}</td>
                 <td className="px-4 py-2">{LIBELLES_STATUT[p.statut] ?? p.statut}</td>
                 <td className="px-4 py-2">{libelleEmailPersonne(p)}</td>
                 <td className="sticky right-0 bg-white px-4 py-2 text-right shadow-[-8px_0_8px_-8px_rgba(0,0,0,0.15)]">
@@ -98,7 +104,7 @@ export default async function PersonnesVue({
             ))}
             {personnes.length === 0 && (
               <tr>
-                <td colSpan={11} className="px-4 py-8 text-center text-zinc-500">
+                <td colSpan={13}className="px-4 py-8 text-center text-zinc-500">
                   Aucun dossier de personne trouvé.
                 </td>
               </tr>

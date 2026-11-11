@@ -1,6 +1,14 @@
 import { getPool } from "@/lib/db";
-import { avecPlaceDisponible, etatInscriptions, InscriptionsCompletes } from "@/lib/inscriptions";
-import type { DossierPersonne, PersonneInput } from "@/lib/personnes-modele";
+import {
+  avecPlaceDisponible,
+  compterParticipants,
+  etatInscriptions,
+  InscriptionsCompletes,
+  sousVerrouInscriptions,
+} from "@/lib/inscriptions";
+import { LIMITE_INSCRITS } from "@/lib/inscriptions-regles";
+import type { DossierPersonne, ImportPersonnes, PersonneInput } from "@/lib/personnes-modele";
+import { validateTelephoneMadagascar } from "@/lib/validation";
 import { genererProchaineReferencePersonne } from "@/lib/reference";
 import { verifierSchema } from "@/lib/schema";
 import { supprimerPieceJointe } from "@/lib/stockage";
@@ -36,7 +44,65 @@ function ligneVersPersonne(row: Record<string, unknown>): DossierPersonne {
     cv: (row.cv as DossierPersonne["cv"]) ?? undefined,
     emailConfirmation: (row.email_confirmation as DossierPersonne["emailConfirmation"]) ?? undefined,
     qrJeton: row.qr_jeton as string,
+    nombreParticipants: Number(row.nombre_participants ?? 1),
+    association: (row.association as string) ?? undefined,
+    source: (row.source as string) ?? undefined,
   };
+}
+
+/**
+ * Import d'une liste papier par le super-administrateur (lot R). Tout ou rien,
+ * sous le verrou des inscriptions : refusé si les places manquent. Une ligne
+ * dont la clé a déjà été importée est ignorée (jamais comptée deux fois).
+ */
+export async function importerPersonnes(
+  donnees: ImportPersonnes
+): Promise<{ crees: DossierPersonne[]; dejaImportees: string[]; participantsAjoutes: number; totalApres: number }> {
+  await verifierSchema();
+  return sousVerrouInscriptions(async (client) => {
+    const cles = donnees.lignes.map((l) => l.idempotencyKey);
+    const deja = await client.query<{ idempotency_key: string; reference: string }>(
+      `SELECT idempotency_key, reference FROM dossiers_personnes WHERE idempotency_key = ANY($1::uuid[])`,
+      [cles]
+    );
+    const clesDeja = new Set(deja.rows.map((r) => r.idempotency_key));
+    const nouvelles = donnees.lignes.filter((l) => !clesDeja.has(l.idempotencyKey));
+    const participantsAjoutes = nouvelles.reduce((s, l) => s + l.nombreParticipants, 0);
+    const avant = await compterParticipants(client);
+    if (avant + participantsAjoutes > LIMITE_INSCRITS) throw new InscriptionsCompletes();
+
+    const maintenant = new Date();
+    const annee = maintenant.getFullYear();
+    const crees: DossierPersonne[] = [];
+    for (const l of nouvelles) {
+      const seq = await client.query<{ dernier_numero: number }>(
+        `INSERT INTO reference_sequences_personnes (annee, dernier_numero)
+         VALUES ($1, 1)
+         ON CONFLICT (annee)
+         DO UPDATE SET dernier_numero = reference_sequences_personnes.dernier_numero + 1
+         RETURNING dernier_numero`,
+        [annee]
+      );
+      const reference = `VFM-P-${annee}-${String(seq.rows[0].dernier_numero).padStart(4, "0")}`;
+      const telephone = l.telephone ? (validateTelephoneMadagascar(l.telephone).formate ?? l.telephone) : "";
+      const r = await client.query(
+        `INSERT INTO dossiers_personnes (
+           reference, idempotency_key, date_depot, nom, prenom, district, commune,
+           activite, description_activite, projet, telephone,
+           nombre_participants, association, source
+         ) VALUES ($1,$2,$3,$4,$5,'','','','','',$6,$7,$8,$9)
+         RETURNING *`,
+        [reference, l.idempotencyKey, maintenant.toISOString(), l.nom, l.prenom, telephone, l.nombreParticipants, l.association ?? null, donnees.source]
+      );
+      crees.push(ligneVersPersonne(r.rows[0]));
+    }
+    return {
+      crees,
+      dejaImportees: deja.rows.map((r) => r.reference),
+      participantsAjoutes,
+      totalApres: avant + participantsAjoutes,
+    };
+  });
 }
 
 /**
@@ -113,7 +179,7 @@ export async function listerPersonnes(recherche?: string, limite = 200, district
         AND ($3::text IS NULL
           OR reference ILIKE $3 OR nom ILIKE $3 OR prenom ILIKE $3
           OR district ILIKE $3 OR commune ILIKE $3 OR fokontany ILIKE $3
-          OR activite ILIKE $3 OR telephone ILIKE $3)
+          OR activite ILIKE $3 OR telephone ILIKE $3 OR association ILIKE $3)
       ORDER BY date_depot DESC
       LIMIT $1`,
     [limite, district ?? null, motif]

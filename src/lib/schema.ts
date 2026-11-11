@@ -99,7 +99,14 @@ export function verifierSchema(): Promise<unknown> {
          email TEXT NOT NULL,
          cree_le TIMESTAMPTZ NOT NULL DEFAULT now()
        );
-       CREATE UNIQUE INDEX IF NOT EXISTS idx_demandes_programme_email ON demandes_programme (lower(email));`
+       CREATE UNIQUE INDEX IF NOT EXISTS idx_demandes_programme_email ON demandes_programme (lower(email));
+       -- Lot R : une inscription peut représenter plusieurs participants
+       -- (inscription collective d'une association, liste papier). 1 par défaut,
+       -- donc les inscriptions existantes ne changent pas.
+       ALTER TABLE dossiers ADD COLUMN IF NOT EXISTS nombre_participants INTEGER NOT NULL DEFAULT 1;
+       ALTER TABLE dossiers_personnes ADD COLUMN IF NOT EXISTS nombre_participants INTEGER NOT NULL DEFAULT 1;
+       ALTER TABLE dossiers_personnes ADD COLUMN IF NOT EXISTS association TEXT;
+       ALTER TABLE dossiers_personnes ADD COLUMN IF NOT EXISTS source TEXT;`
     )
     .catch((err) => {
       schemaVerifie = undefined;

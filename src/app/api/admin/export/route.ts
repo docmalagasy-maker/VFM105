@@ -22,7 +22,8 @@ export async function GET(request: NextRequest) {
     const personnes = await listerPersonnes(undefined, 100000, district);
     contenu = csv(
       [
-        "Référence", "Date de dépôt", "Statut", "Nom", "Prénom", "District",
+        "Référence", "Date de dépôt", "Statut", "Nom", "Prénom",
+        "Nombre de participants", "Association", "Origine", "District",
         "Commune", "Code commune", "Fokontany",
         "Activité actuelle", "Description de l'activité", "Projet personnel", "Téléphone", "E-mail",
         // Plus demandés depuis le lot K : renseignés seulement pour les anciens dossiers
@@ -34,6 +35,9 @@ export async function GET(request: NextRequest) {
         LIBELLES_STATUT[p.statut] ?? p.statut,
         p.nom,
         p.prenom,
+        p.nombreParticipants,
+        p.association,
+        p.source === "liste_papier" ? "Liste papier" : "Formulaire",
         p.district,
         p.commune,
         p.communePcode,

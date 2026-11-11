@@ -2139,6 +2139,60 @@ local (pas de PostgreSQL) : à contrôler en ligne.
 
 ---
 
+## Lot R — Inscriptions collectives et liste papier (11 novembre 2026)
+
+### R1 — Nombre de participants par inscription, import de la liste papier
+
+**Avant :** chaque inscription (association ou personne) comptait pour
+**1** participant ; aucun moyen d'enregistrer une inscription papier
+représentant plusieurs personnes.
+
+**Après :**
+- Colonne `nombre_participants` (1 par défaut) sur `dossiers` et
+  `dossiers_personnes`, plus `association` et `source` sur
+  `dossiers_personnes` (ajoutées au démarrage du site, aucune manipulation
+  manuelle). Les inscriptions existantes restent à 1.
+- Compteur des inscrits (accueil, formulaires, admin) = **somme des
+  participants**, toujours limité à 200.
+- Import réservé au super-administrateur : `POST /api/admin/personnes/import`
+  (liste de lignes nom, prénom, association, nombre, téléphone). Tout ou
+  rien sous le verrou des inscriptions, refusé s'il manque des places ;
+  une clé fixe par ligne : relancer le même import ne crée rien de plus.
+  Aucun e-mail envoyé. Champs absents de la liste (district, activité,
+  projet…) laissés vides.
+- Admin « Personnes » : colonnes **Participants** et **Association**, total
+  des participants ; fiche : nombre, association, origine « Liste papier » ;
+  export CSV : nombre, association, origine. Recherche aussi sur l'association.
+
+**Données :** liste « 📝 Word - Liste.docx » (DocScan) → 26 inscriptions,
+43 participants, fichier `MARKDOWN/import-liste-papier-2026-11-11.json`.
+Doublon possible « RANVOARISOA Niriana » / `VFM-P-2026-0019` « Nirina
+Ranivoarison » : personne différente selon le responsable (11/11/2026).
+Aucun téléphone de la liste déjà présent en base.
+
+**Remarque :** inscriptions sans district visibles du seul
+super-administrateur. Doublons déjà en base, non modifiés :
+`VFM-P-2026-0009`/`0018` (Léa MANJAKAVELO), `0010`/`0011` (Juda Robinson
+Andriambololona), `0016`/`0017` (Soloniaina voahirana Randrianarisoa).
+
+**Fichiers :** `src/lib/schema.ts`, `src/lib/inscriptions.ts`,
+`src/lib/personnes.ts`, `src/lib/personnes-modele.ts`,
+`src/app/api/admin/personnes/import/route.ts`,
+`src/app/api/admin/export/route.ts`, `src/app/admin/PersonnesVue.tsx`,
+`src/app/admin/olona/[reference]/page.tsx`.
+
+**Vérifié en local :** types, lint, build de production. Base non
+testable en local (pas de PostgreSQL) : à contrôler en ligne.
+
+### Mise en ligne du lot R
+
+- [ ] GO, commit et push sur `master`.
+- [ ] Contrôle en ligne : compteur inchangé (18) avant import.
+- [ ] Import depuis la session super-administrateur ; compteur attendu
+      18 + 43 = **61**.
+
+---
+
 ## Lot S — Maintenance et sécurité
 
 ### S1 — Mise à jour de sécurité de Next.js et sharp (9 octobre 2026)

@@ -33,7 +33,10 @@ export default async function PersonneAdminPage({ params }: { params: Promise<{ 
 
         <dl className="mt-6 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white">
           <Ligne label="Nom">{p.nom}</Ligne>
-          <Ligne label="Prénom">{p.prenom}</Ligne>
+          <Ligne label="Prénom">{p.prenom || "—"}</Ligne>
+          <Ligne label="Nombre de participants">{p.nombreParticipants}</Ligne>
+          {p.association && <Ligne label="Association">{p.association}</Ligne>}
+          {p.source === "liste_papier" && <Ligne label="Origine">Liste papier (import administrateur)</Ligne>}
           {/* Date de naissance et CV : plus demandés, affichés seulement pour les anciens dossiers */}
           {p.dateNaissance && (
             <Ligne label="Date de naissance">
